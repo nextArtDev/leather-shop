@@ -23,11 +23,9 @@ import {
   ArrowLeft,
   Phone,
   Shield,
-  User,
-  MapPin,
 } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
-import { redirect } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
 // Define schemas for each step
 const phoneSchema = z.object({
@@ -41,47 +39,51 @@ const otpSchema = z.object({
     .max(6, 'کد تایید باید ۶ رقم باشد'),
 })
 
-const personalInfoSchema = z.object({
-  firstName: z.string().min(2, 'نام باید حداقل ۲ کاراکتر باشد'),
-  lastName: z.string().min(2, 'نام خانوادگی باید حداقل ۲ کاراکتر باشد'),
-  email: z.string().email('ایمیل معتبر وارد کنید').optional().or(z.literal('')),
-})
-
-const addressSchema = z.object({
-  address: z.string().min(5, 'آدرس باید حداقل ۵ کاراکتر باشد'),
-  city: z.string().min(2, 'نام شهر باید حداقل ۲ کاراکتر باشد'),
-  postalCode: z.string().min(5, 'کد پستی باید حداقل ۵ رقم باشد'),
-})
-
-// Combined form schema
-const completeFormSchema = z.object({
-  ...phoneSchema.shape,
-  ...otpSchema.shape,
-  ...personalInfoSchema.shape,
-  ...addressSchema.shape,
-})
-
-type CompleteFormData = z.infer<typeof completeFormSchema>
-
-interface MultiStepPhoneAuthProps {
-  className?: string
-  onComplete?: (data: CompleteFormData) => void
+// Define step types
+type Step = {
+  id: string
+  title: string
+  description: string
+  schema: z.ZodSchema
+  icon: React.ElementType
+  fields: Field[]
 }
 
-export default function MultiStepPhoneAuth({
+type Field = {
+  name: string
+  label: string
+  type: 'phone' | 'otp' | 'text' | 'email'
+  placeholder: string
+}
+
+// Define form data type
+type FormData = {
+  phone: string
+  code: string
+}
+
+interface MultiStepSignProps {
+  className?: string
+  onComplete?: (data: FormData) => void
+}
+
+export default function MultiStepSign({
   className,
   onComplete,
-}: MultiStepPhoneAuthProps) {
+}: MultiStepSignProps) {
+  const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [step, setStep] = useState(0)
-  const [formData, setFormData] = useState<Partial<CompleteFormData>>({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [formData, setFormData] = useState<FormData>({
+    phone: '',
+    code: '',
+  })
   const [isComplete, setIsComplete] = useState(false)
   const [otpValue, setOtpValue] = useState('')
   const [otpKey, setOtpKey] = useState(0)
 
   // Define the steps
-  const steps = [
+  const steps: Step[] = [
     {
       id: 'phone',
       title: 'تایید شماره موبایل',
@@ -115,7 +117,8 @@ export default function MultiStepPhoneAuth({
   ]
 
   // Get current step schema
-  const currentStepSchema = steps[step].schema
+  const currentStep = steps[step]
+  type CurrentStepData = z.infer<typeof currentStep.schema>
 
   // Setup form with current step schema
   const {
@@ -124,97 +127,85 @@ export default function MultiStepPhoneAuth({
     formState: { errors },
     reset,
     setValue,
-    watch,
-  } = useForm<any>({
-    resolver: zodResolver(currentStepSchema),
+    trigger,
+  } = useForm<FormData>({
+    resolver: zodResolver(currentStep.schema) as any,
     defaultValues: formData,
   })
 
   // Calculate progress
-  const progress = (-(step + 1) / steps.length) * 100
+  const progress = Math.round(((step + 1) / steps.length) * 100)
 
   // Handle phone submission (step 0)
-  const handlePhoneSubmit = (data: CompleteFormData) => {
-    startTransition(async () => {
-      try {
-        const result = await authClient.phoneNumber.sendOtp({
-          phoneNumber: data.phone,
-        })
+  const handlePhoneSubmit = async (data: CurrentStepData) => {
+    if ('phone' in data) {
+      startTransition(async () => {
+        try {
+          const result = await authClient.phoneNumber.sendOtp({
+            phoneNumber: data.phone,
+          })
 
-        if (!result.error) {
-          const updatedData = { ...formData, ...data }
-          setFormData(updatedData)
-          setStep(1)
-          setOtpValue('')
-          setOtpKey((prev) => prev + 1)
-          reset(updatedData)
-          toast.success('کد تایید ارسال شد')
-        } else {
-          toast.error(result.error.message || 'خطا در ارسال کد')
+          if (!result.error) {
+            const updatedData = { ...formData, ...data }
+            setFormData(updatedData)
+            setStep(1)
+            setOtpValue('')
+            setOtpKey((prev) => prev + 1)
+            reset(updatedData)
+            toast.success('کد تایید ارسال شد')
+          } else {
+            toast.error(result.error.message || 'خطا در ارسال کد')
+          }
+        } catch (error) {
+          console.error('Phone submission error', error)
+          toast.error('خطا در ارسال کد تایید')
         }
-      } catch (error) {
-        console.error('Phone submission error', error)
-        toast.error('خطا در ارسال کد تایید')
-      }
-    })
+      })
+    }
   }
 
   // Handle OTP submission (step 1)
-  const handleOtpSubmit = (data: CompleteFormData) => {
-    startTransition(async () => {
-      try {
-        const result = await authClient.phoneNumber.verify({
-          phoneNumber: formData.phone!,
-          code: data.code,
-        })
+  const handleOtpSubmit = async (data: CurrentStepData) => {
+    if ('code' in data) {
+      startTransition(async () => {
+        try {
+          const result = await authClient.phoneNumber.verify({
+            phoneNumber: formData.phone,
+            code: data.code,
+          })
 
-        if (!result.error) {
-          const updatedData = { ...formData, ...data }
-          setFormData(updatedData)
-          setStep(2)
-          reset(updatedData)
-          toast.success('تایید موفقیت‌آمیز')
-        } else {
-          toast.error(result.error.message || 'کد وارد شده اشتباه است')
+          if (!result.error) {
+            const updatedData = { ...formData, ...data }
+            setFormData(updatedData)
+
+            if (onComplete) {
+              onComplete(updatedData)
+            }
+
+            setIsComplete(true)
+            toast.success('تایید موفقیت‌آمیز')
+
+            // Redirect after successful verification
+            setTimeout(() => {
+              router.push('/')
+            }, 2000)
+          } else {
+            toast.error(result.error.message || 'کد وارد شده اشتباه است')
+          }
+        } catch (error) {
+          console.error('OTP verification error', error)
+          toast.error('خطا در تایید کد')
         }
-      } catch (error) {
-        console.error('OTP verification error', error)
-        toast.error('خطا در تایید کد')
-      }
-    })
+      })
+    }
   }
 
-  // Handle regular form steps (steps 2+)
-  // const handleRegularSubmit = (data: any) => {
-  //   const updatedData = { ...formData, ...data }
-  //   setFormData(updatedData)
-
-  //   if (step < steps.length - 1) {
-  //     setStep(step + 1)
-  //     reset(updatedData)
-  //   } else {
-  //     // Final submission
-  //     setIsSubmitting(true)
-  //     setTimeout(() => {
-  //       if (onComplete) {
-  //         onComplete(updatedData as CompleteFormData)
-  //       }
-  //       setIsComplete(true)
-  //       setIsSubmitting(false)
-  //       toast.success('ثبت‌نام با موفقیت انجام شد')
-  //     }, 1500)
-  //   }
-  // }
-
   // Handle form submission based on current step
-  const handleFormSubmit = (data: CompleteFormData) => {
+  const handleFormSubmit = (data: CurrentStepData) => {
     if (step === 0) {
       handlePhoneSubmit(data)
     } else if (step === 1) {
       handleOtpSubmit(data)
-    } else {
-      // handleRegularSubmit(data)
-      redirect('/')
     }
   }
 
@@ -222,14 +213,11 @@ export default function MultiStepPhoneAuth({
   const handlePrevStep = () => {
     if (step > 0) {
       if (step === 1) {
-        // If going back from OTP, don't go to phone step directly
-        // Instead, allow resending OTP
         setOtpValue('')
         setOtpKey((prev) => prev + 1)
-      } else {
-        setStep(step - 1)
-        reset(formData)
       }
+      setStep(step - 1)
+      reset(formData)
     }
   }
 
@@ -238,7 +226,7 @@ export default function MultiStepPhoneAuth({
     startTransition(async () => {
       try {
         const result = await authClient.phoneNumber.sendOtp({
-          phoneNumber: formData.phone!,
+          phoneNumber: formData.phone,
         })
 
         if (!result.error) {
@@ -277,9 +265,7 @@ export default function MultiStepPhoneAuth({
               <span className="text-sm font-medium">
                 مرحله {step + 1} از {steps.length}
               </span>
-              <span className="text-sm font-medium">
-                {Math.round(progress)}%
-              </span>
+              <span className="text-sm font-medium">{progress}%</span>
             </div>
             <Progress value={progress} className="h-2" />
           </div>
@@ -325,9 +311,9 @@ export default function MultiStepPhoneAuth({
               transition={{ duration: 0.3 }}
             >
               <div className="mb-6 text-center">
-                <h2 className="text-xl font-bold">{steps[step].title}</h2>
+                <h2 className="text-xl font-bold">{currentStep.title}</h2>
                 <p className="text-muted-foreground text-sm">
-                  {steps[step].description}
+                  {currentStep.description}
                 </p>
                 {step === 1 && formData.phone && (
                   <p className="text-sm text-blue-600 mt-2">
@@ -340,7 +326,7 @@ export default function MultiStepPhoneAuth({
                 onSubmit={handleSubmit(handleFormSubmit)}
                 className="space-y-4"
               >
-                {steps[step].fields.map((field) => (
+                {currentStep.fields.map((field) => (
                   <div key={field.name} className="space-y-2">
                     <Label htmlFor={field.name}>{field.label}</Label>
 
@@ -351,12 +337,13 @@ export default function MultiStepPhoneAuth({
                           defaultCountry="IR"
                           disabled={isPending}
                           className={cn(
-                            errors[field.name] && 'border-destructive'
+                            errors[field.name as keyof CurrentStepData] &&
+                              'border-destructive'
                           )}
                           onChange={(value) => {
-                            setValue(field.name, value)
+                            setValue('phone', value)
+                            trigger('phone')
                           }}
-                          onBlur={register(field.name).onBlur}
                         />
                       </div>
                     ) : field.type === 'otp' ? (
@@ -377,12 +364,9 @@ export default function MultiStepPhoneAuth({
                           inputMode="numeric"
                         >
                           <InputOTPGroup>
-                            <InputOTPSlot index={0} />
-                            <InputOTPSlot index={1} />
-                            <InputOTPSlot index={2} />
-                            <InputOTPSlot index={3} />
-                            <InputOTPSlot index={4} />
-                            <InputOTPSlot index={5} />
+                            {Array.from({ length: 6 }).map((_, i) => (
+                              <InputOTPSlot key={i} index={i} />
+                            ))}
                           </InputOTPGroup>
                         </InputOTP>
                       </div>
@@ -391,17 +375,21 @@ export default function MultiStepPhoneAuth({
                         id={field.name}
                         type={field.type}
                         placeholder={field.placeholder}
-                        {...register(field.name)}
-                        disabled={isPending || isSubmitting}
+                        {...register(field.name as keyof CurrentStepData)}
+                        disabled={isPending}
                         className={cn(
-                          errors[field.name] && 'border-destructive'
+                          errors[field.name as keyof CurrentStepData] &&
+                            'border-destructive'
                         )}
                       />
                     )}
 
-                    {errors[field.name] && (
+                    {errors[field.name as keyof CurrentStepData] && (
                       <p className="text-destructive text-sm text-center">
-                        {errors[field.name]?.message as string}
+                        {
+                          errors[field.name as keyof CurrentStepData]
+                            ?.message as string
+                        }
                       </p>
                     )}
                   </div>
@@ -436,23 +424,17 @@ export default function MultiStepPhoneAuth({
                   <Button
                     type="submit"
                     disabled={
-                      isPending ||
-                      isSubmitting ||
-                      (step === 1 && otpValue.length !== 6)
+                      isPending || (step === 1 && otpValue.length !== 6)
                     }
                   >
                     {step === steps.length - 1 ? (
-                      isSubmitting ? (
-                        'در حال ثبت...'
+                      isPending ? (
+                        'در حال بررسی...'
                       ) : (
-                        'تکمیل ثبت‌نام'
+                        'تایید نهایی'
                       )
                     ) : isPending ? (
-                      step === 0 ? (
-                        'در حال ارسال...'
-                      ) : (
-                        'در حال بررسی...'
-                      )
+                      'در حال ارسال...'
                     ) : (
                       <>
                         <ArrowLeft className="mr-2 h-4 w-4" /> بعدی
@@ -481,7 +463,7 @@ export default function MultiStepPhoneAuth({
           <Button
             onClick={() => {
               setStep(0)
-              setFormData({})
+              setFormData({ phone: '', code: '' })
               setIsComplete(false)
               setOtpValue('')
               setOtpKey(0)
