@@ -27,6 +27,7 @@ import {
   MapPin,
 } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
+import { redirect } from 'next/navigation'
 
 // Define schemas for each step
 const phoneSchema = z.object({
@@ -130,7 +131,7 @@ export default function MultiStepPhoneAuth({
   })
 
   // Calculate progress
-  const progress = ((step + 1) / steps.length) * 100
+  const progress = (-(step + 1) / steps.length) * 100
 
   // Handle phone submission (step 0)
   const handlePhoneSubmit = (data: any) => {
@@ -184,26 +185,26 @@ export default function MultiStepPhoneAuth({
   }
 
   // Handle regular form steps (steps 2+)
-  const handleRegularSubmit = (data: any) => {
-    const updatedData = { ...formData, ...data }
-    setFormData(updatedData)
+  // const handleRegularSubmit = (data: any) => {
+  //   const updatedData = { ...formData, ...data }
+  //   setFormData(updatedData)
 
-    if (step < steps.length - 1) {
-      setStep(step + 1)
-      reset(updatedData)
-    } else {
-      // Final submission
-      setIsSubmitting(true)
-      setTimeout(() => {
-        if (onComplete) {
-          onComplete(updatedData as CompleteFormData)
-        }
-        setIsComplete(true)
-        setIsSubmitting(false)
-        toast.success('ثبت‌نام با موفقیت انجام شد')
-      }, 1500)
-    }
-  }
+  //   if (step < steps.length - 1) {
+  //     setStep(step + 1)
+  //     reset(updatedData)
+  //   } else {
+  //     // Final submission
+  //     setIsSubmitting(true)
+  //     setTimeout(() => {
+  //       if (onComplete) {
+  //         onComplete(updatedData as CompleteFormData)
+  //       }
+  //       setIsComplete(true)
+  //       setIsSubmitting(false)
+  //       toast.success('ثبت‌نام با موفقیت انجام شد')
+  //     }, 1500)
+  //   }
+  // }
 
   // Handle form submission based on current step
   const handleFormSubmit = (data: any) => {
@@ -212,7 +213,8 @@ export default function MultiStepPhoneAuth({
     } else if (step === 1) {
       handleOtpSubmit(data)
     } else {
-      handleRegularSubmit(data)
+      // handleRegularSubmit(data)
+      redirect('/')
     }
   }
 

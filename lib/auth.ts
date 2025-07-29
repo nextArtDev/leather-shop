@@ -25,6 +25,20 @@ export const auth = betterAuth({
         return
         // Implement sending OTP code via SMS
       },
+      signUpOnVerification: {
+        getTempEmail: (phoneNumber) => {
+          return `${phoneNumber}@my-site.com`
+        },
+        //optionally, you can also pass `getTempName` function to generate a temporary name for the user
+        getTempName: (phoneNumber) => {
+          return phoneNumber //by default, it will use the phone number as the name
+        },
+      },
+      callbackOnVerification: async ({ phoneNumber, user }, request) => {
+        // Implement callback after phone number verification
+        console.log({ phoneNumber })
+        console.log({ user })
+      },
     }),
   ],
   session: {
@@ -33,7 +47,7 @@ export const auth = betterAuth({
       maxAge: 60 * 60 * 24 * 7, // 7 days
     },
   },
-  //   advanced: {
-  //     generateId: false, // Let Prisma handle ID generation
-  //   },
+  // advanced: {
+  //   generateId: false, // Let Prisma handle ID generation
+  // },
 })
