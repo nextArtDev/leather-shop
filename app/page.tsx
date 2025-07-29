@@ -1,8 +1,13 @@
 import { buttonVariants } from '@/components/ui/button'
 import Image from 'next/image'
 import Link from 'next/link'
+import { headers } from 'next/headers'
+import { auth } from '@/lib/auth'
+export default async function Home() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
 
-export default function Home() {
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
@@ -12,6 +17,11 @@ export default function Home() {
         >
           Sign In
         </Link>
+        <p>{session?.session.userAgent}</p>
+        <p>{session?.session.ipAddress}</p>
+        <p>{session?.session.token}</p>
+        <p>{session?.user.name}</p>
+        <p>{session?.user.phoneNumber}</p>
         <Image
           className="dark:invert"
           src="/next.svg"
