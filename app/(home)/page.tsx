@@ -10,7 +10,7 @@ export default async function Home() {
   })
 
   return (
-    <div className="w-full h-full items-center justify-items-center min-h-screen p-1  ">
+    <div className="w-full h-full items-center justify-items-center min-h-screen   ">
       <Hero />
       <Link
         href={'/sign-in'}
