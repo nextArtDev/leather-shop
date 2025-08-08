@@ -11,6 +11,7 @@ export default function layout({
   return (
     <section className="relative w-full h-full ">
       {/* <NavBar /> */}
+
       <MainNav />
       {children}
     </section>
