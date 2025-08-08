@@ -1,4 +1,5 @@
 import NavBar from '@/components/home/navbar'
+import BannerText from '@/components/home/navbar/BannerText'
 
 export default function layout({
   children,
@@ -6,8 +7,8 @@ export default function layout({
   children: React.ReactNode
 }>) {
   return (
-    <section className=" ">
-      <NavBar />
+    <section className="relative w-full h-full ">
+      {/* <NavBar /> */}
       {children}
     </section>
   )
