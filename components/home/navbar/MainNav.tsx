@@ -10,7 +10,8 @@ import {
   ShoppingBag,
   HelpCircle,
   Package2,
-  X,
+  //   X,
+  User,
 } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
@@ -144,14 +145,12 @@ const navigation: NavigationData = {
   ],
 }
 
-const currencies: string[] = ['CAD', 'USD', 'AUD', 'EUR', 'GBP']
-
 // --- Child Components ---
 
 const Logo = () => (
   <Link href="/" className="flex items-center space-x-2">
     <Package2 className="h-6 w-6" />
-    <span className="font-bold inline-block">ACME Inc.</span>
+    <span className="font-bold inline-block">SEP</span>
   </Link>
 )
 
@@ -205,9 +204,9 @@ const MobileNav = () => (
       <div className="flex items-center justify-between pr-2">
         <Logo />
         <SheetClose asChild>
-          <Button variant="ghost" size="icon" className="rounded-full">
-            <X className="h-5 w-5" />
-          </Button>
+          {/* <Button variant="ghost" size="icon" className="rounded-full"> */}
+          {/* <X className="h-5 w-5" /> */}
+          {/* </Button> */}
         </SheetClose>
       </div>
       <Separator className="my-4" />
@@ -317,21 +316,19 @@ export default function MainNav() {
           </div>
 
           {/* Secondary navigation */}
-          <div className="border-b border-border">
+          <div className=" ">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="flex h-16 items-center justify-between">
                 <div className="flex flex-1 items-center lg:hidden">
                   <MobileNav />
                 </div>
 
-                <div className="hidden lg:flex lg:flex-1 lg:items-center">
-                  <Logo />
-                </div>
-
-                <div className="hidden h-full lg:flex">
+                <div className="hidden lg:items-center h-full lg:flex  ">
                   <DesktopNav />
                 </div>
-
+                <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-center ">
+                  <Logo />
+                </div>
                 <div className="lg:hidden">
                   <Logo />
                 </div>
@@ -348,11 +345,18 @@ export default function MainNav() {
                       <Search className="h-6 w-6" />
                     </Button>
                     <Button variant="ghost" size="icon" aria-label="Help">
-                      <HelpCircle className="h-6 w-6" />
+                      <User className="h-6 w-6" />
                     </Button>
-                    <Button variant="ghost" size="icon" aria-label="Cart">
-                      <ShoppingBag className="h-6 w-6" />
-                      <span className="ml-1 text-sm font-medium">0</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Cart"
+                      className="relative "
+                    >
+                      <ShoppingBag className="h-4 w-4" />
+                      <span className="ml-1 w-fit h-fit p-1 text-sm font-medium text-red-500 rounded-full absolute left-1.5 -top-1.5 ">
+                        1
+                      </span>
                     </Button>
                   </div>
                 </div>
