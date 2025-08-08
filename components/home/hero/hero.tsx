@@ -16,14 +16,14 @@ const Hero = () => {
       {/* motion-safe: for accessability; just scale eit up when its needed */}
       <FadeIn
         vars={{ scale: 1, opacity: 0.5 }}
-        className=" absolute inset-0 motion-safe:scale-125 motion-reduce:opacity-50 "
+        className=" absolute inset-0 pt-12 max-h-svh origin-top lg:h-screen motion-safe:scale-125 motion-reduce:opacity-50 "
       >
         <Image
           src={heroImage}
           priority
           alt="hero image"
           fill
-          className="object-cover"
+          className="object-cover origin-top "
         />
       </FadeIn>
       <div className="relative flex h-screen flex-col justify-center">
