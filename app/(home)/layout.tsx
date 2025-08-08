@@ -1,5 +1,7 @@
 import NavBar from '@/components/home/navbar'
 import BannerText from '@/components/home/navbar/BannerText'
+import MainNav from '@/components/home/navbar/MainNav'
+import FadeMenu from '@/components/home/shared/fade-menu'
 
 export default function layout({
   children,
@@ -9,6 +11,7 @@ export default function layout({
   return (
     <section className="relative w-full h-full ">
       {/* <NavBar /> */}
+      <MainNav />
       {children}
     </section>
   )
