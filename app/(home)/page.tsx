@@ -7,6 +7,7 @@ import Hero from '@/components/home/hero/hero'
 import BannerText from '@/components/home/navbar/BannerText'
 import FadeMenu from '@/components/home/shared/fade-menu'
 import SlideOpacity from '@/components/product/main-page-carousel'
+import ProductDetailCarousel from '@/components/product/product-detail-carousel'
 export default async function Home() {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -22,6 +23,7 @@ export default async function Home() {
       </div> */}
       <Hero />
       <SlideOpacity />
+      <ProductDetailCarousel />
       <div className="h-screen"></div>
       <Link
         href={'/sign-in'}

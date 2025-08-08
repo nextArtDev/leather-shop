@@ -13,11 +13,13 @@ export default function CarouselWithMultipleSlides() {
     <Carousel
       opts={{
         align: 'start',
+        direction: 'rtl',
       }}
+      dir="rtl"
       className="w-full "
     >
       <CarouselContent>
-        {Array.from({ length: 5 }).map((_, index) => (
+        {Array.from({ length: 10 }).map((_, index) => (
           <CarouselItem
             key={index}
             className="basis-1/2 md:basis-1/3 lg:basis-1/4 "
