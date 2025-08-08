@@ -6,6 +6,7 @@ import Link from 'next/link'
 
 import { FadeIn } from '@/components/shared/fade-in'
 import { RevealText } from '@/components/shared/reveal-text'
+import HeroBadges from './hero-badges'
 
 const Hero = () => {
   return (
@@ -57,6 +58,7 @@ const Hero = () => {
           </Link>
         </FadeIn>
       </div>
+      <HeroBadges />
     </Bounded>
   )
 }
