@@ -25,26 +25,24 @@ export default function MainPageCarousel() {
             key={index}
             className="basis-1/2 md:basis-1/3 lg:basis-1/4 pl-0.5 "
           >
-            <div className=" ">
-              <div className=" border-none rounded-none grid grid-rows-7 place-content-center bg-transparent  ">
-                <article className="place-content-center   border-none relative row-span-5 w-full h-full bg-[#eceae8]  ">
-                  <Image
-                    src={Bag.src}
-                    fill
-                    alt=""
-                    // className="object-cover mix-blend-darken"
-                    className="object-cover "
-                  />
-                </article>
-                <article className="row-span-2 min-h-[100px] sm:min-h-[120px] md:h-[150] xl:min-h-[150px] h-full w-full flex flex-col gap-1 justify-evenly py-3 items-start px-2 text-pretty text-xs md:text-sm lg:text-base">
-                  <p className="font-semibold">Emilie</p>
+            <div className=" border-none rounded-none grid grid-rows-7 place-content-center bg-transparent  ">
+              <article className="place-content-center border-none relative row-span-5 w-full h-full bg-[#eceae8]  ">
+                <Image
+                  src={Bag.src}
+                  fill
+                  alt=""
+                  // className="object-cover mix-blend-darken"
+                  className="object-cover "
+                />
+              </article>
+              <article className="row-span-2 min-h-[100px] sm:min-h-[120px] md:h-[150] xl:min-h-[150px] h-full w-full flex flex-col gap-1 justify-evenly py-3 items-start px-2 text-pretty text-xs md:text-sm lg:text-base">
+                <p className="font-semibold">Emilie</p>
 
-                  <p className="font-bold">
-                    Emilie medium-sized handbag in grained leather
-                  </p>
-                  <p>$690.00</p>
-                </article>
-              </div>
+                <p className="font-bold">
+                  Emilie medium-sized handbag in grained leather
+                </p>
+                <p>$690.00</p>
+              </article>
             </div>
           </CarouselItem>
         ))}

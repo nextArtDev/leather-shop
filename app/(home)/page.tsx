@@ -10,6 +10,8 @@ import SlideOpacity from '@/components/product/main-page-carousel'
 import ProductDetailCarousel from '@/components/product/product-detail-carousel'
 import ProductCardCarousel from '@/components/product/product-card-Carousel'
 import MainPageCarousel from '@/components/product/main-page-carousel'
+import ProductCard from '@/components/product/product-card'
+import ProductGrid from '@/components/product/ProductGrid'
 export default async function Home() {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -27,10 +29,10 @@ export default async function Home() {
       </div> */}
       <Hero />
       <MainPageCarousel />
+
+      <ProductGrid />
       <ProductDetailCarousel />
-      <div className="max-w-xs mx-auto">
-        <ProductCardCarousel />
-      </div>
+
       <div className="h-screen"></div>
       <Link
         href={'/sign-in'}

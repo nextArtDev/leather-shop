@@ -8,7 +8,8 @@ import {
   CarouselItem,
 } from '@/components/ui/carousel'
 import { cn } from '@/lib/utils'
-
+import Image from 'next/image'
+import Bag from '../../public/images/bag1.webp'
 const ProductCardCarousel = () => {
   const [api, setApi] = React.useState<CarouselApi>()
   const [current, setCurrent] = React.useState(0)
@@ -40,14 +41,20 @@ const ProductCardCarousel = () => {
       >
         <CarouselContent className=" ">
           {Array.from({ length: 5 }).map((_, index) => (
-            <CarouselItem key={index} className="pl-0">
-              <div className=" ">
-                <Card className="rounded-none">
-                  <CardContent className="flex aspect-square items-center justify-center p-6">
-                    <span className="text-3xl font-semibold">{index + 1}</span>
-                  </CardContent>
-                </Card>
-              </div>
+            <CarouselItem
+              key={index}
+              className="pl-0 flex items-center justify-center"
+            >
+              <article className="flex-1 aspect-square relative w-full h-full">
+                {/* <span className="text-3xl font-semibold">{index + 1}</span> */}
+                <Image
+                  src={Bag.src}
+                  fill
+                  alt=""
+                  // className="object-cover mix-blend-darken"
+                  className=" object-cover "
+                />
+              </article>
             </CarouselItem>
           ))}
         </CarouselContent>
