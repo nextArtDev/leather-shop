@@ -38,10 +38,10 @@ const ProductCardCarousel = () => {
         }}
         className="w-full"
       >
-        <CarouselContent className="-ml-1">
+        <CarouselContent className=" ">
           {Array.from({ length: 5 }).map((_, index) => (
-            <CarouselItem key={index} className="-pl-1  ">
-              <div className="p-1">
+            <CarouselItem key={index} className="pl-0">
+              <div className=" ">
                 <Card className="rounded-none">
                   <CardContent className="flex aspect-square items-center justify-center p-6">
                     <span className="text-3xl font-semibold">{index + 1}</span>
@@ -52,9 +52,9 @@ const ProductCardCarousel = () => {
           ))}
         </CarouselContent>
       </Carousel>
-
+      {/* //rgb(236, 234, 232) */}
       {/* Indicator Container */}
-      <div className="absolute bottom-1 left-2 flex w-[96%] mx-auto items-center gap-x-0.5">
+      <div className="absolute bottom-0 left-2 flex w-[96%] mx-auto items-center gap-x-0.5">
         {/* Note: gap-x-0.5 is typically 2px in Tailwind's default config */}
         {Array.from({ length: count }).map((_, index) => (
           <button

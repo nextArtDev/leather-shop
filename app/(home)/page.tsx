@@ -9,10 +9,13 @@ import FadeMenu from '@/components/home/shared/fade-menu'
 import SlideOpacity from '@/components/product/main-page-carousel'
 import ProductDetailCarousel from '@/components/product/product-detail-carousel'
 import ProductCardCarousel from '@/components/product/product-card-Carousel'
+import MainPageCarousel from '@/components/product/main-page-carousel'
 export default async function Home() {
   const session = await auth.api.getSession({
     headers: await headers(),
   })
+
+  // #eceae8
 
   return (
     <div className="relative w-full h-full items-center justify-items-center min-h-screen">
@@ -23,7 +26,7 @@ export default async function Home() {
         <FadeMenu />
       </div> */}
       <Hero />
-      <SlideOpacity />
+      <MainPageCarousel />
       <ProductDetailCarousel />
       <div className="max-w-xs mx-auto">
         <ProductCardCarousel />
