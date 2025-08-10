@@ -12,6 +12,7 @@ import ProductCardCarousel from '@/components/product/product-card-Carousel'
 import MainPageCarousel from '@/components/product/main-page-carousel'
 import ProductCard from '@/components/product/product-card'
 import ProductGrid from '@/components/product/ProductGrid'
+import ProductPage from '@/components/product/product-detail/ProductDetails'
 export default async function Home() {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -29,11 +30,10 @@ export default async function Home() {
       </div> */}
       <Hero />
       <MainPageCarousel />
-
       <ProductGrid />
-      <ProductDetailCarousel />
-
+      {/* <ProductDetailCarousel /> */}
       <div className="h-screen"></div>
+
       <Link
         href={'/sign-in'}
         className={buttonVariants({ variant: 'destructive' })}
