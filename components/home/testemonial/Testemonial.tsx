@@ -1,10 +1,11 @@
 'use client'
 
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, stagger } from 'framer-motion'
 import { Dot } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { StarRating } from './StarRating'
 import { formatTimeToNow } from '@/lib/utils'
+import { SingleStarRating } from './SingleStartRating'
 
 const testimonials1 = [
   {
@@ -62,8 +63,8 @@ const TestimonialCarousel = ({ testimonials }: TestimonialCarouselProps) => {
     exit: { opacity: 0, y: '100%', scale: 0.9 },
   }
   const dotVariants = {
-    active: { scale: 1.2, backgroundColor: '#45f88a' },
-    inactive: { scale: 1, backgroundColor: '#9CCB3D85' },
+    active: { scale: 0.8, backgroundColor: '#202221' },
+    inactive: { scale: 0.4, backgroundColor: '#8d8f8985' },
   }
 
   return (
@@ -78,19 +79,27 @@ const TestimonialCarousel = ({ testimonials }: TestimonialCarouselProps) => {
             variants={variants}
             className=" flex w-full flex-col items-center justify-center"
             transition={{
-              type: 'spring',
-              stiffness: 200,
-              damping: 20,
-              duration: 0.5,
+              // type: 'spring',
+              // stiffness: 200,
+              // damping: 20,
+              // duration: 0.5,
+              // delay: 0.1,
+              duration: 0.25,
+              delayChildren: stagger(0.25),
             }}
           >
-            <div className="pb-4">
-              <StarRating value={rating} disabled />
-            </div>
-            <p className="m-0 text-center  text-sm md:text-base font-medium tracking-tight line-clamp-7 md:line-clamp-5">
+            <motion.div variants={variants} className="pb-4 flex gap-2 ">
+              {/* <StarRating value={rating} disabled /> */}
+              <SingleStarRating rating={rating} />
+              <span className="font-semibold">{rating}</span>/5
+            </motion.div>
+            <motion.p
+              variants={variants}
+              className="m-0 text-center  text-sm md:text-base font-medium tracking-tight line-clamp-7 md:line-clamp-5"
+            >
               &quot;{text}&quot;
-            </p>
-            <div className="mx-auto mt-5">
+            </motion.p>
+            <motion.div variants={variants} className="mx-auto mt-5">
               <div className="flex flex-col items-center justify-center space-x-3">
                 {/* <div className="font-regular text-sm text-gray-900/80">
                   {author}
@@ -105,13 +114,13 @@ const TestimonialCarousel = ({ testimonials }: TestimonialCarouselProps) => {
                   </span>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </motion.div>
           <div className="mt-8 flex justify-center">
             {testimonials1.map((_, index) => (
               <motion.div
                 key={index}
-                className="mx-1.5 h-2  w-2  cursor-pointer "
+                className="mx-0.5 h-2  w-2  cursor-pointer "
                 variants={dotVariants}
                 animate={index === currentTestimonial ? 'active' : 'inactive'}
                 onClick={() => setCurrentTestimonial(index)}
