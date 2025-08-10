@@ -68,9 +68,11 @@ export default function FixedVideoPlay({
             ref={videoRef}
             src={videoUrl}
             loop
-            muted // Autoplay on browsers generally requires the video to be muted
-            playsInline // Important for compatibility on iOS
+            muted={true}
+            playsInline
+            autoPlay
             className="w-full h-full object-cover"
+            suppressHydrationWarning
           />
         </motion.div>
         {/* This adds the dark overlay on top of the video */}
