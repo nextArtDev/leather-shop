@@ -17,6 +17,7 @@ import StoreStatement from '@/components/home/shared/StoreStatement'
 import WorkVideo from '@/components/home/shared/WorkVideo'
 import TestimonialCarousel from '@/components/home/testemonial/Testemonial'
 import DiscoverMoreCarousel from '@/components/home/discover-more/DiscoverMoreCarousel'
+import Commitments from '@/components/home/shared/Commitments'
 export default async function Home() {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -50,10 +51,14 @@ export default async function Home() {
         <WorkVideo />
       </section>
       <section className="flex flex-col items-center gap-6 text-3xl text-left">
+        <h2 className="uppercase">Our commitments</h2>
+        <Commitments />
+      </section>
+      <TestimonialCarousel />
+      <section className="flex flex-col items-center gap-6 text-3xl text-left">
         <h2 className="uppercase">Discover more</h2>
         <DiscoverMoreCarousel />
       </section>
-      <TestimonialCarousel />
       <ProductGrid />
       {/* <ProductDetailCarousel /> */}
       <div className="h-screen"></div>
