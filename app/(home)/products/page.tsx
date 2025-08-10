@@ -6,6 +6,8 @@ import ProductDetailCarousel from '@/components/product/product-detail-carousel'
 import ProductDetails from '@/components/product/product-detail/ProductDetails'
 import AddToCardBtn from '@/components/product/product-detail/AddToCardBtn'
 import ProductDescriptions from '@/components/product/product-detail/ProductDescriptions'
+import RelatedProducts from '@/components/product/RelatedProducts'
+import { Separator } from '@/components/ui/separator'
 
 type Props = {}
 
@@ -25,6 +27,8 @@ const ProductPage = (props: Props) => {
         In Stuck
       </span>
       <ProductDescriptions />
+      <Separator />
+      <RelatedProducts />
     </section>
   )
 }

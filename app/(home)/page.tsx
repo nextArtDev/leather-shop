@@ -13,6 +13,7 @@ import MainPageCarousel from '@/components/product/main-page-carousel'
 import ProductCard from '@/components/product/product-card'
 import ProductGrid from '@/components/product/ProductGrid'
 import ProductPage from '@/components/product/product-detail/ProductDetails'
+import StoreStatement from '@/components/home/shared/StoreStatement'
 export default async function Home() {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -29,7 +30,22 @@ export default async function Home() {
         <FadeMenu />
       </div> */}
       <Hero />
-      <MainPageCarousel />
+      <StoreStatement />
+      <section className="flex flex-col gap-8 py-8 px-3 ">
+        <h2 className="text-xl md:text-3xl font-bold uppercase">
+          Our bestsellers
+        </h2>
+        <MainPageCarousel />
+      </section>
+      <section className="flex flex-col gap-8 py-8 px-3 ">
+        <h2 className="text-xl md:text-3xl font-bold uppercase">
+          New Collection
+        </h2>
+        <MainPageCarousel />
+      </section>
+      <section>
+        <WorkVideo />
+      </section>
       <ProductGrid />
       {/* <ProductDetailCarousel /> */}
       <div className="h-screen"></div>

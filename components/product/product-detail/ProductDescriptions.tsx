@@ -17,7 +17,7 @@ const ProductDescriptions = () => {
         <p className="font-semibold">Dimensions</p>
         <article className="flex gap-4 justify-between">
           <span className="flex gap-2">
-            <>Width</> 26 cm
+            <strong>Width</strong> 26 cm
           </span>
           <span className="flex gap-2">
             <strong>Height</strong> 20 cm
@@ -28,7 +28,7 @@ const ProductDescriptions = () => {
           </span>
         </article>
       </div>
-      <div className="w-full h-fit grid grid-cols-2 md:grid-cols-3 gap-4 grid-flow-dense ">
+      <div className="w-full h-fit grid grid-cols-2 md:grid-cols-3 grid-rows-2 gap-4 grid-flow-row-dense">
         <span className=" flex flex-col gap-2">
           <span>
             <svg
@@ -48,9 +48,11 @@ const ProductDescriptions = () => {
               <path stroke="#0047BE" stroke-dasharray="3 2" d="M12 4v15"></path>
             </svg>
           </span>
-          <p>Full-grain, pebbled calf leather. Fabric lining.</p>
+          <p className="text-xs ">
+            Full-grain, pebbled calf leather. Fabric lining.
+          </p>
         </span>
-        <span className=" flex flex-col gap-2">
+        <span className="row-span-2 flex flex-col gap-2">
           <span>
             <svg
               aria-hidden="true"
@@ -81,7 +83,7 @@ const ProductDescriptions = () => {
               ></circle>
             </svg>
           </span>
-          <p>
+          <p className="text-xs ">
             1 flat pocket and 1 zipped pocket. 1 flat pocket at the back. 1
             front flat pocket. Detachable and adjustable shoulder strap.
           </p>
@@ -108,7 +110,7 @@ const ProductDescriptions = () => {
               ></path>
             </svg>
           </span>
-          <p>Metallic accessories in light gold finish.</p>
+          <p className="text-xs ">Metallic accessories in light gold finish.</p>
         </span>
       </div>
     </section>

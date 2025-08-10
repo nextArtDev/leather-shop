@@ -23,7 +23,7 @@ export default function MainPageCarousel() {
         {Array.from({ length: 10 }).map((_, index) => (
           <CarouselItem
             key={index}
-            className="basis-1/2 md:basis-1/3 lg:basis-1/4 pl-0.5 "
+            className="basis-1/2 md:basis-1/4 xl:basis-1/6 pl-0.5 "
           >
             <div className=" border-none rounded-none grid grid-rows-7 place-content-center bg-transparent  ">
               <article className="place-content-center border-none relative row-span-5 w-full h-full bg-[#eceae8]  ">
