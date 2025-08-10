@@ -53,7 +53,7 @@ export default function DiscoverMoreCarousel() {
             key={item.id}
             className="basis-1/2 md:basis-1/4 xl:basis-1/6 pl-4 mx-auto"
           >
-            <div className="w-full min-h-[40vh] h-full aspect-square border-none rounded-none grid grid-rows-1  bg-transparent  ">
+            <div className="w-full min-h-[20vh] md:min-h-[40vh] h-full aspect-square border-none rounded-none grid grid-rows-1  bg-transparent  ">
               <figure className="relative border-none row-span-5 w-full h-full bg-[#eceae8]  ">
                 <Image
                   src={item.url}

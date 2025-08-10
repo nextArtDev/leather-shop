@@ -298,7 +298,7 @@ export default function MainNav() {
             </div> */}
             <TextRotate
               texts={[
-                'All duties and taxes included. Free shipping & return for orders within the US',
+                'All duties and taxes included. within the US',
 
                 'Buy now. Pay later with Klarna. ',
               ]}

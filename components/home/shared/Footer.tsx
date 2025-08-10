@@ -209,12 +209,12 @@ export default function Footer() {
           </nav>
         </div>
       </div>
-      <Button
+      {/* <Button
         onClick={() => setIsChatOpen(!isChatOpen)}
         className="fixed bottom-4 right-4 z-50 rounded-full shadow-lg"
       >
         {isChatOpen ? 'Close Chat' : 'Open Chat'}
-      </Button>
+      </Button> */}
       {isChatOpen && (
         <div className="fixed bottom-20 right-4 z-50 w-80 rounded-lg border bg-background p-4 shadow-lg">
           <h4 className="mb-4 text-lg font-semibold">Live Chat</h4>

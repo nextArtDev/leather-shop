@@ -51,7 +51,7 @@ const Hero = () => {
           vars={{ delay: 1.7, duration: 1.1 }}
         >
           <Link
-            href={''}
+            href={'/products'}
             className=" w-fit inline-flex items-center justify-center px-12 py-4 text-center font-extrabold tracking-wider uppercase transition-colors duration-300  border border-white text-white hover:bg-white/20"
           >
             Shop now

@@ -18,7 +18,7 @@ const BannerText = (props: Props) => {
       <BannerTitle>
         <TextRotate
           texts={[
-            'All duties and taxes included. Free shipping & return for orders within the US',
+            'All duties and taxes included.  return for orders within the US',
 
             'Buy now. Pay later with Klarna. ',
           ]}

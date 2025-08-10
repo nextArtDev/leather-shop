@@ -50,7 +50,7 @@ export default function Commitments() {
             className="basis-1/2 md:basis-1/4 xl:basis-1/6 pl-0.5 gap-4 mx-auto"
           >
             <div className=" border-none rounded-none">
-              <article className="relative border-none  min-h-[30vh] aspect-square row-span-5 w-full h-full bg-[#eceae8]  ">
+              <article className="relative border-none min-h-[20vh] md:min-h-[30vh] aspect-square row-span-5 w-full h-full bg-[#eceae8]  ">
                 <Image
                   src={item.url}
                   fill

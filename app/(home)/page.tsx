@@ -141,7 +141,7 @@ export default async function Home() {
         <Commitments />
       </section>
       <TestimonialCarousel />
-      <section className="flex flex-col items-center gap-6 text-3xl text-left">
+      <section className="flex flex-col items-center gap-6 text-3xl text-left overflow-hidden">
         <h2 className="uppercase">Discover more</h2>
         <DiscoverMoreCarousel />
       </section>

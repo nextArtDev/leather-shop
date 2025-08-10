@@ -1,5 +1,6 @@
 import React from 'react'
 import ProductCard from './product-card'
+import Link from 'next/link'
 
 type Props = {}
 
@@ -79,7 +80,9 @@ function ProductGrid({}: Props) {
   return (
     <div className="py-12 mx-auto md:container w-full h-full grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
       {items.map((item) => (
-        <ProductCard key={item.id} item={item} />
+        <Link href={'/products/1'} key={item.id}>
+          <ProductCard item={item} />
+        </Link>
       ))}
     </div>
   )
