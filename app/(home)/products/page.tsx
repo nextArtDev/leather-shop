@@ -16,7 +16,7 @@ const images = [
 ]
 const ProductPage = (props: Props) => {
   return (
-    <section className="max-w-2xl md:mx-auto pb-24 w-full h-full flex flex-col gap-4">
+    <section className="max-w-2xl px-4 mx-auto pb-24 w-full h-full flex flex-col gap-4">
       <ProductDetailCarousel images={images} />
       <ProductDetails />
       <AddToCardBtn />
