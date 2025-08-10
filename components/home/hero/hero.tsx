@@ -30,7 +30,7 @@ const Hero = () => {
         <RevealText
           text="Effortless Elegance"
           id="hero-heading"
-          className="font-display max-w-xl text-6xl leading-none text-neutral-50md:text-7xl lg:text-8xl"
+          className="font-display max-w-xl text-6xl leading-none text-neutral-50 md:text-7xl lg:text-8xl"
           staggerAmount={0.2}
           duration={1.7}
         />
