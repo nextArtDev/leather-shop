@@ -14,6 +14,8 @@ import ProductCard from '@/components/product/product-card'
 import ProductGrid from '@/components/product/ProductGrid'
 import ProductPage from '@/components/product/product-detail/ProductDetails'
 import StoreStatement from '@/components/home/shared/StoreStatement'
+import WorkVideo from '@/components/home/shared/WorkVideo'
+import TestimonialCarousel from '@/components/home/testemonial/Testemonial'
 export default async function Home() {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -46,6 +48,7 @@ export default async function Home() {
       <section>
         <WorkVideo />
       </section>
+      <TestimonialCarousel />
       <ProductGrid />
       {/* <ProductDetailCarousel /> */}
       <div className="h-screen"></div>
