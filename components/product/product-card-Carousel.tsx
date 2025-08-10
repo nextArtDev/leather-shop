@@ -10,7 +10,7 @@ import {
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
 import Bag from '../../public/images/bag1.webp'
-const ProductCardCarousel = () => {
+const ProductCardCarousel = ({ urls }: { urls: string[] }) => {
   const [api, setApi] = React.useState<CarouselApi>()
   const [current, setCurrent] = React.useState(0)
   const [count, setCount] = React.useState(0)
@@ -30,7 +30,7 @@ const ProductCardCarousel = () => {
 
   return (
     // We add a relative class to this parent div to position the indicators
-    <div className="relative w-full">
+    <div className="relative w-full ">
       <Carousel
         setApi={setApi} // Pass the setApi function to the Carousel
         opts={{
@@ -40,19 +40,19 @@ const ProductCardCarousel = () => {
         className="w-full"
       >
         <CarouselContent className=" ">
-          {Array.from({ length: 5 }).map((_, index) => (
+          {urls.map((url, index) => (
             <CarouselItem
               key={index}
-              className="pl-0 flex items-center justify-center"
+              className="  h-[35vh]  pl-0 flex items-center justify-center"
             >
-              <article className="flex-1 aspect-square relative w-full h-full">
+              <article className="flex-1 h-full relative w-full ">
                 {/* <span className="text-3xl font-semibold">{index + 1}</span> */}
                 <Image
-                  src={Bag.src}
+                  src={url}
                   fill
                   alt=""
                   // className="object-cover mix-blend-darken"
-                  className=" object-cover "
+                  className=" object-cover"
                 />
               </article>
             </CarouselItem>

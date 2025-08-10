@@ -62,7 +62,7 @@ export default function DiscoverMoreCarousel() {
                   // className="object-cover mix-blend-darken"
                   className="object-cover"
                 />
-                <article className="absolute inset-0  z-10 text-2xl font-semibold bg-gradient-to-b from-secondary/5 to-secondary/20 h-full w-full flex  text-center justify-center py-3 items-center px-2 flex-col gap-3 ">
+                <article className="absolute inset-0  z-10 text-background text-2xl font-semibold bg-gradient-to-b from-secondary/5 to-secondary/20 h-full w-full flex  text-center justify-center py-3 items-center px-2 flex-col gap-3 ">
                   {item.title}
                   <Link
                     href={item.link}

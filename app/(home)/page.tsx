@@ -25,7 +25,7 @@ const bestSellersItems = [
     title: 'small handbag in grained leather',
     imageSrc: '/images/bag.webp',
     category: 'Juliette',
-    link: '/',
+    link: '/products/1',
     price: 750,
   },
   {
@@ -33,7 +33,7 @@ const bestSellersItems = [
     title: 'medium handbag with double flap in grained leather',
     imageSrc: '/images/bag-2.webp',
     category: 'Emilie',
-    link: '/',
+    link: '/products/1',
     price: 690,
   },
   {
@@ -41,7 +41,7 @@ const bestSellersItems = [
     title: 'Louise small tote bag in grained leather',
     imageSrc: '/images/bag-3.webp',
     category: 'Louise',
-    link: '/',
+    link: '/products/1',
     price: 570,
   },
   {
@@ -49,7 +49,7 @@ const bestSellersItems = [
     title: 'medium-sized handbag in grained leather',
     imageSrc: '/images/bag-4.webp',
     category: 'Emilie',
-    link: '/',
+    link: '/products/1',
     price: 580,
   },
   {
@@ -57,7 +57,7 @@ const bestSellersItems = [
     title: 'medium handbag in smooth leather and nubuck',
     imageSrc: '/images/bag-5.webp',
     category: 'Juliette',
-    link: '/',
+    link: '/products/1',
     price: 670,
   },
 ]
@@ -67,7 +67,7 @@ const CollectionItems = [
     title: 'medium handbag in smooth leather and nubuck',
     imageSrc: '/images/bag-5.webp',
     category: 'Juliette',
-    link: '/',
+    link: '/products/1',
     price: 670,
   },
   {
@@ -75,7 +75,7 @@ const CollectionItems = [
     title: 'medium-sized handbag in grained leather',
     imageSrc: '/images/bag-4.webp',
     category: 'Emilie',
-    link: '/',
+    link: '/products/1',
     price: 580,
   },
   {
@@ -83,7 +83,7 @@ const CollectionItems = [
     title: 'Louise small tote bag in grained leather',
     imageSrc: '/images/bag-3.webp',
     category: 'Louise',
-    link: '/',
+    link: '/products/1',
     price: 570,
   },
 
@@ -92,7 +92,7 @@ const CollectionItems = [
     title: 'medium handbag with double flap in grained leather',
     imageSrc: '/images/bag-2.webp',
     category: 'Emilie',
-    link: '/',
+    link: '/products/1',
     price: 690,
   },
   {
@@ -100,7 +100,7 @@ const CollectionItems = [
     title: 'small handbag in grained leather',
     imageSrc: '/images/bag.webp',
     category: 'Juliette',
-    link: '/',
+    link: '/products/1',
     price: 750,
   },
 ]
@@ -145,11 +145,11 @@ export default async function Home() {
         <h2 className="uppercase">Discover more</h2>
         <DiscoverMoreCarousel />
       </section>
-      <ProductGrid />
-      {/* <ProductDetailCarousel /> */}
-      <div className="h-screen"></div>
 
-      <Link
+      {/* <ProductDetailCarousel /> */}
+      {/* <div className="h-screen"></div> */}
+
+      {/* <Link
         href={'/sign-in'}
         className={buttonVariants({ variant: 'destructive' })}
       >
@@ -159,7 +159,7 @@ export default async function Home() {
       <p>{session?.session.ipAddress}</p>
       <p>{session?.session.token}</p>
       <p>{session?.user.name}</p>
-      <p>{session?.user.phoneNumber}</p>
+      <p>{session?.user.phoneNumber}</p> */}
     </div>
   )
 }
