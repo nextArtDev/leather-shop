@@ -3,12 +3,9 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from '@/components/ui/carousel'
 import Image from 'next/image'
 import React from 'react'
-import Bag from '../../public/images/bag1.webp'
 import Link from 'next/link'
 
 const items = [
@@ -37,36 +34,39 @@ const items = [
     url: '/images/nouvelle-co-hp.webp',
   },
 ]
+
 export default function DiscoverMoreCarousel() {
   return (
     <Carousel
       opts={{
         align: 'start',
-        direction: 'rtl',
+        loop: true, // Added for infinite looping; remove if not wanted
       }}
-      dir="rtl"
-      className="w-full "
+      className="w-full"
     >
-      <CarouselContent>
+      <CarouselContent className="-ml-4 md:-ml-4 xl:-ml-4">
+        {' '}
+        {/* Consistent negative margin to offset padding */}
         {items.map((item) => (
           <CarouselItem
             key={item.id}
-            className="basis-1/2 md:basis-1/4 xl:basis-1/6 pl-4 mx-auto"
+            className="pl-4 basis-1/2 md:basis-1/4 xl:basis-1/6" // Removed mx-auto to avoid centering issues
           >
-            <div className="w-full min-h-[20vh] md:min-h-[40vh] h-full aspect-square border-none rounded-none grid grid-rows-1  bg-transparent  ">
-              <figure className="relative border-none row-span-5 w-full h-full bg-[#eceae8]  ">
+            <div className="w-full aspect-square bg-transparent">
+              {' '}
+              {/* Enforces square shape */}
+              <figure className="relative w-full h-full bg-[#eceae8] border-none rounded-none">
                 <Image
                   src={item.url}
                   fill
-                  alt=""
-                  // className="object-cover mix-blend-darken"
-                  className="object-cover"
+                  alt={item.title}
+                  className="object-cover mix-blend-darken" // Uncommented; remove if not needed
                 />
-                <article className="absolute inset-0  z-10 text-background text-2xl font-semibold bg-gradient-to-b from-secondary/5 to-secondary/20 h-full w-full flex  text-center justify-center py-3 items-center px-2 flex-col gap-3 ">
+                <article className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-gradient-to-b from-secondary/5 to-secondary/20 px-2 py-3 text-center text-2xl font-semibold text-background">
                   {item.title}
                   <Link
                     href={item.link}
-                    className="bg-gradient-to-b from-secondary/5 to-secondary/30 backdrop-blur-[2px] border border-none rounded-none text-sm px-1.5 py-1 text-center "
+                    className="bg-gradient-to-b from-secondary/5 to-secondary/30 border-none rounded-none px-1.5 py-1 text-center text-sm backdrop-blur-[2px]"
                   >
                     DISCOVER
                   </Link>
@@ -76,8 +76,6 @@ export default function DiscoverMoreCarousel() {
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious className="hidden lg:flex items-center justify-center max-w-md:hidden cursor-pointer size-12 bg-background/30 backdrop-blur-sm border-none top-1/2 -translate-y-1/2 left-2" />{' '}
-      <CarouselNext className="hidden lg:flex items-center justify-center cursor-pointer size-12 bg-background/30 backdrop-blur-sm border-none top-1/2 -translate-y-1/2  right-4 " />
     </Carousel>
   )
 }

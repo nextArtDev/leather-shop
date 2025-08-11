@@ -6,7 +6,7 @@ import ProductDetailCarousel from '@/components/product/product-detail-carousel'
 import ProductDetails from '@/components/product/product-detail/ProductDetails'
 import AddToCardBtn from '@/components/product/product-detail/AddToCardBtn'
 import ProductDescriptions from '@/components/product/product-detail/ProductDescriptions'
-import RelatedProducts from '@/components/product/RelatedProducts'
+
 import { Separator } from '@/components/ui/separator'
 import MainPageCarousel from '@/components/product/main-page-carousel'
 

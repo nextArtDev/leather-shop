@@ -1,6 +1,5 @@
 'use client'
 import * as React from 'react'
-import { Card, CardContent } from '@/components/ui/card'
 import {
   Carousel,
   CarouselApi,
@@ -9,7 +8,7 @@ import {
 } from '@/components/ui/carousel'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
-import Bag from '../../public/images/bag1.webp'
+
 const ProductCardCarousel = ({ urls }: { urls: string[] }) => {
   const [api, setApi] = React.useState<CarouselApi>()
   const [current, setCurrent] = React.useState(0)
@@ -19,58 +18,52 @@ const ProductCardCarousel = ({ urls }: { urls: string[] }) => {
     if (!api) {
       return
     }
-
     setCount(api.scrollSnapList().length)
-    setCurrent(api.selectedScrollSnap()) // Use 0-based index for simplicity
-
+    setCurrent(api.selectedScrollSnap())
     api.on('select', () => {
       setCurrent(api.selectedScrollSnap())
     })
   }, [api])
 
   return (
-    // We add a relative class to this parent div to position the indicators
-    <div className="relative w-full ">
+    <div className="relative w-full">
       <Carousel
-        setApi={setApi} // Pass the setApi function to the Carousel
+        setApi={setApi}
         opts={{
           align: 'start',
-          loop: true, // often a good idea for product carousels
+          loop: true,
         }}
         className="w-full"
       >
-        <CarouselContent className=" ">
+        <CarouselContent>
           {urls.map((url, index) => (
             <CarouselItem
               key={index}
-              className="  h-[35vh]  pl-0 flex items-center justify-center"
+              className="flex items-center justify-center pl-0"
             >
-              <article className="flex-1 h-full relative w-full ">
-                {/* <span className="text-3xl font-semibold">{index + 1}</span> */}
+              <figure className="relative w-full aspect-[3/4] bg-[#eceae8]">
+                {' '}
+                {/* Fixed aspect ratio for consistent height */}
                 <Image
                   src={url}
                   fill
-                  alt=""
-                  // className="object-cover mix-blend-darken"
-                  className=" object-cover"
+                  alt={`Product image ${index + 1}`}
+                  className="object-cover mix-blend-darken" // Uncommented; remove if not needed
                 />
-              </article>
+              </figure>
             </CarouselItem>
           ))}
         </CarouselContent>
       </Carousel>
-      {/* //rgb(236, 234, 232) */}
-      {/* Indicator Container */}
       <div className="absolute bottom-0 left-2 flex w-[96%] mx-auto items-center gap-x-0.5">
-        {/* Note: gap-x-0.5 is typically 2px in Tailwind's default config */}
         {Array.from({ length: count }).map((_, index) => (
           <button
             key={index}
             onClick={() => api?.scrollTo(index)}
             className={cn(
-              'h-0.25 flex-1 rounded-full', // flex-1 is the key for full-width
-              current === index ? 'bg-muted-foreground' : '', // Active/inactive colors
-              'transition-colors duration-200 ease-in-out' // Smooth color transition
+              'h-0.25 flex-1 rounded-full',
+              current === index ? 'bg-muted-foreground' : '',
+              'transition-colors duration-200 ease-in-out'
             )}
             aria-label={`Go to slide ${index + 1}`}
           />
