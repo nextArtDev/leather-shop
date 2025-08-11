@@ -1,6 +1,3 @@
-import { Table, TableRow } from '@/components/ui/table'
-import React from 'react'
-
 const ProductDescriptions = () => {
   return (
     <section className="grid gap-7 content-start">

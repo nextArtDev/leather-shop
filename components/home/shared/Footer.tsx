@@ -1,8 +1,6 @@
 'use client'
 
-import * as React from 'react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
@@ -21,9 +19,11 @@ import {
   Sun,
   Twitter,
 } from 'lucide-react'
+import * as React from 'react'
 
 export default function Footer() {
   const [isDarkMode, setIsDarkMode] = React.useState(false)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isChatOpen, setIsChatOpen] = React.useState(false)
 
   React.useEffect(() => {

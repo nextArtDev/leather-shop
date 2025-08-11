@@ -1,11 +1,4 @@
-import React from 'react'
-import {
-  Banner,
-  BannerAction,
-  BannerClose,
-  BannerIcon,
-  BannerTitle,
-} from '../shared/banner'
+import { Banner, BannerClose, BannerTitle } from '../shared/banner'
 import TextRotate from '../shared/text-rotate'
 
 const BannerText = () => {

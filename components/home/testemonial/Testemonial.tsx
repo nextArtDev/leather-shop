@@ -3,8 +3,6 @@
 import { AnimatePresence, motion, stagger } from 'framer-motion'
 import { Dot } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { StarRating } from './StarRating'
-import { formatTimeToNow } from '@/lib/utils'
 import { SingleStarRating } from './SingleStartRating'
 
 const testimonials1 = [
@@ -39,6 +37,7 @@ interface TestimonialCarouselProps {
   }[]
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TestimonialCarousel = ({ testimonials }: TestimonialCarouselProps) => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0)
 

@@ -1,4 +1,4 @@
-import crypto from 'crypto'
+// import crypto from 'crypto'
 import { betterAuth } from 'better-auth'
 import { prismaAdapter } from 'better-auth/adapters/prisma'
 // If your Prisma file is located elsewhere, you can change the path
@@ -15,6 +15,7 @@ export const auth = betterAuth({
   },
   plugins: [
     phoneNumber({
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       sendOTP: async ({ phoneNumber, code }, request) => {
         // const verificationCode = crypto.randomInt(100123, 999879)
         if (!code) {
@@ -34,6 +35,7 @@ export const auth = betterAuth({
           return phoneNumber //by default, it will use the phone number as the name
         },
       },
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       callbackOnVerification: async ({ phoneNumber, user }, request) => {
         // Implement callback after phone number verification
         console.log({ phoneNumber })

@@ -39,7 +39,7 @@ interface StickyNavProps {
   isTop?: boolean
 }
 
-const StickyNav: FC<StickyNavProps> = ({ children, className }) => {
+const StickyNav: FC<StickyNavProps> = ({ children }) => {
   const { scrollYBoundedProgress } = useBoundedScroll(400)
   const scrollYBoundedProgressThrottled = useTransform(
     scrollYBoundedProgress,

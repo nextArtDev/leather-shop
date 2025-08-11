@@ -1,21 +1,21 @@
 // components/main-nav.tsx
 'use client'
 
-import * as React from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
 import {
   Menu,
+  Package2,
   Search,
   ShoppingBag,
-  HelpCircle,
-  Package2,
   //   X,
   User,
 } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
+import * as React from 'react'
 
-import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible'
+import { Input } from '@/components/ui/input'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -25,27 +25,15 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu'
+import { Separator } from '@/components/ui/separator'
 import {
   Sheet,
-  SheetContent,
   SheetClose,
+  SheetContent,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Separator } from '@/components/ui/separator'
+import { cn } from '@/lib/utils'
 import TextRotate from '../shared/text-rotate'
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible'
-import { Input } from '@/components/ui/input'
 
 // --- TypeScript Definitions for Navigation Data ---
 interface FeaturedItem {
