@@ -1,5 +1,4 @@
 import React from 'react'
-import { Card, CardContent } from '../ui/card'
 import ProductCardCarousel from './product-card-Carousel'
 
 type Props = {

@@ -10,8 +10,6 @@ import ProductDescriptions from '@/components/product/product-detail/ProductDesc
 import { Separator } from '@/components/ui/separator'
 import MainPageCarousel from '@/components/product/main-page-carousel'
 
-type Props = {}
-
 const images = [
   { id: '1', url: bag },
   { id: '2', url: bag2 },
@@ -59,7 +57,7 @@ const bestSellersItems = [
     price: 670,
   },
 ]
-const ProductPage = (props: Props) => {
+const ProductPage = () => {
   return (
     <section className="pb-24 w-full h-full">
       <div className="max-w-2xl px-4 mx-auto  flex flex-col gap-4">

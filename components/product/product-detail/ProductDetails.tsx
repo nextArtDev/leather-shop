@@ -12,9 +12,8 @@ const Sizes = [
   { id: '2', size: 'MEDIUM' },
   { id: '3', size: 'LARGE' },
 ]
-type Props = {}
 
-const ProductDetails = (props: Props) => {
+const ProductDetails = () => {
   return (
     <section className="m-1 ">
       <article className="grid grid-row-4 gap-4">

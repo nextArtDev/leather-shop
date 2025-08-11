@@ -6,12 +6,9 @@ import {
   BannerIcon,
   BannerTitle,
 } from '../shared/banner'
-import { CircleAlert } from 'lucide-react'
 import TextRotate from '../shared/text-rotate'
 
-type Props = {}
-
-const BannerText = (props: Props) => {
+const BannerText = () => {
   return (
     <Banner>
       {/* <BannerIcon icon={CircleAlert} /> */}

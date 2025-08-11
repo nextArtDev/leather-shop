@@ -1,8 +1,6 @@
 import React from 'react'
 
-type Props = {}
-
-const StoreStatement = (props: Props) => {
+const StoreStatement = () => {
   return (
     <section className="flex flex-col items-center justify-center py-12 gap-4 w-[90vw] max-w-md mx-auto">
       <h2 className="text-xl md:text-3xl font-bold ">

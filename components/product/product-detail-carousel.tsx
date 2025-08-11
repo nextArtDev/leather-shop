@@ -1,17 +1,17 @@
 'use client'
 import * as React from 'react'
-import { Card, CardContent } from '@/components/ui/card'
 import {
   Carousel,
   CarouselApi,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from '@/components/ui/carousel'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
+import Autoplay from 'embla-carousel-autoplay'
+
 type Props = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   images: any[]
 }
 
@@ -30,18 +30,23 @@ const ProductDetailCarousel = ({ images }: Props) => {
     })
   }, [api])
   return (
-    <section className="relative w-fit min-w-xs  mx-auto">
+    <section className="relative w-fit   mx-auto">
       <Carousel
         setApi={setApi}
         opts={{ align: 'start', loop: true }}
+        plugins={[
+          Autoplay({
+            delay: 3000,
+          }),
+        ]}
         orientation="vertical"
-        className="relative w-full "
+        className="relative w-full mx-auto"
       >
-        <CarouselContent className="-mt-1 h-[348px] md:h-[60vh] ">
+        <CarouselContent className="-mt-1 h-[348px] md:h-[60vh]  mx-auto ">
           {images.map((image) => (
             <CarouselItem
               key={image.id}
-              className="flex items-center justify-center min-w-sm  h-full  "
+              className="flex items-center justify-center min-w-[94vw] h-full   "
             >
               <article className=" border-none relative w-full mx-auto h-full bg-[#eceae8]  ">
                 <Image

@@ -1,9 +1,7 @@
 import React from 'react'
 import FixedVideoPlay from './FixedVideoPlay'
 
-type Props = {}
-
-const WorkVideo = (props: Props) => {
+const WorkVideo = () => {
   return (
     <section className="w-full py-12 flex flex-col items-center justify-center mx-auto gap-12  text-center">
       <div className="container w-[90vw] m-w-xl flex flex-col gap-4">

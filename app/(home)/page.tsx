@@ -1,23 +1,12 @@
-import { buttonVariants } from '@/components/ui/button'
-import Image from 'next/image'
-import Link from 'next/link'
-import { headers } from 'next/headers'
-import { auth } from '@/lib/auth'
+import DiscoverMoreCarousel from '@/components/home/discover-more/DiscoverMoreCarousel'
 import Hero from '@/components/home/hero/hero'
-import BannerText from '@/components/home/navbar/BannerText'
-import FadeMenu from '@/components/home/shared/fade-menu'
-import SlideOpacity, { item } from '@/components/product/main-page-carousel'
-import ProductDetailCarousel from '@/components/product/product-detail-carousel'
-import ProductCardCarousel from '@/components/product/product-card-Carousel'
-import MainPageCarousel from '@/components/product/main-page-carousel'
-import ProductCard from '@/components/product/product-card'
-import ProductGrid from '@/components/product/ProductGrid'
-import ProductPage from '@/components/product/product-detail/ProductDetails'
+import Commitments from '@/components/home/shared/Commitments'
 import StoreStatement from '@/components/home/shared/StoreStatement'
 import WorkVideo from '@/components/home/shared/WorkVideo'
 import TestimonialCarousel from '@/components/home/testemonial/Testemonial'
-import DiscoverMoreCarousel from '@/components/home/discover-more/DiscoverMoreCarousel'
-import Commitments from '@/components/home/shared/Commitments'
+import MainPageCarousel from '@/components/product/main-page-carousel'
+// import { auth } from '@/lib/auth'
+// import { headers } from 'next/headers'
 
 const bestSellersItems = [
   {
@@ -105,9 +94,9 @@ const CollectionItems = [
   },
 ]
 export default async function Home() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  })
+  // const session = await auth.api.getSession({
+  //   headers: await headers(),
+  // })
 
   // #eceae8
 

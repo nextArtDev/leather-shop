@@ -2,8 +2,6 @@ import React from 'react'
 import ProductCard from './product-card'
 import Link from 'next/link'
 
-type Props = {}
-
 const items = [
   {
     id: '2',
@@ -76,7 +74,7 @@ const items = [
     colors: ['#000000', '#451144', '#81212'],
   },
 ]
-function ProductGrid({}: Props) {
+function ProductGrid() {
   return (
     <div className="py-12 mx-auto md:container w-full h-full grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
       {items.map((item) => (
