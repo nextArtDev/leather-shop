@@ -101,7 +101,7 @@ export default async function Home() {
   // #eceae8
 
   return (
-    <div className="relative w-full h-full items-center justify-items-center min-h-screen">
+    <div className="relative w-full h-full items-center justify-items-center min-h-screen mx-auto">
       {/* <div className="sticky w-full h-full top-0 z-20 ">
         <BannerText />
       </div> */}
@@ -129,11 +129,11 @@ export default async function Home() {
         <h2 className="uppercase">Our commitments</h2>
         <Commitments />
       </section>
-      <TestimonialCarousel />
-      <section className="flex flex-col items-center gap-6 text-3xl text-left overflow-hidden">
+      <section className="flex flex-col w-full gap-6 text-3xl text-center py-12 ">
         <h2 className="uppercase">Discover more</h2>
         <DiscoverMoreCarousel />
       </section>
+      <TestimonialCarousel />
 
       {/* <ProductDetailCarousel /> */}
       {/* <div className="h-screen"></div> */}

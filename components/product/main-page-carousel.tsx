@@ -28,8 +28,10 @@ export default function MainPageCarousel({ items }: MainPageCarousel) {
     <Carousel
       opts={{
         align: 'start',
+        direction: 'rtl',
         loop: true, // Added for infinite looping; remove if not wanted
       }}
+      dir="rtl"
       className="w-full"
     >
       <CarouselContent className="-ml-1 md:-ml-2 xl:-ml-4">

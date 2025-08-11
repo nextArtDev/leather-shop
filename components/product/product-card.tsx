@@ -16,7 +16,7 @@ type Props = {
 const ProductCard = ({ item }: Props) => {
   return (
     <div>
-      <div className=" border-none rounded-none grid grid-rows-7 place-content-center bg-transparent gap-1 ">
+      <div className=" border-none rounded-none grid grid-rows-7   place-content-center bg-transparent ">
         <article className=" row-span-5 w-full h-full bg-[#eceae8]  ">
           <ProductCardCarousel urls={item.imageSrc} />
         </article>

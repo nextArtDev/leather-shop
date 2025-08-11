@@ -33,20 +33,21 @@ const ProductCardCarousel = ({ urls }: { urls: string[] }) => {
           align: 'start',
           loop: true,
         }}
-        className="w-full"
+        className=" w-full"
       >
         <CarouselContent>
           {urls.map((url, index) => (
             <CarouselItem
               key={index}
-              className="flex items-center justify-center pl-0"
+              className="flex items-center justify-center pl-1 "
             >
-              <figure className="relative w-full aspect-[3/4] bg-[#eceae8]">
+              <figure className="relative h-full w-full bg-[#eceae8]">
                 {' '}
                 {/* Fixed aspect ratio for consistent height */}
                 <Image
                   src={url}
-                  fill
+                  width={352}
+                  height={320}
                   alt={`Product image ${index + 1}`}
                   className="object-cover mix-blend-darken" // Uncommented; remove if not needed
                 />
@@ -55,7 +56,7 @@ const ProductCardCarousel = ({ urls }: { urls: string[] }) => {
           ))}
         </CarouselContent>
       </Carousel>
-      <div className="absolute bottom-0 left-2 flex w-[96%] mx-auto items-center gap-x-0.5">
+      <div className="absolute -bottom-2.5 sm:bottom-0 left-2 flex w-[96%] mx-auto items-center gap-x-0.5">
         {Array.from({ length: count }).map((_, index) => (
           <button
             key={index}

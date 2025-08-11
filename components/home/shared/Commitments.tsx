@@ -38,16 +38,18 @@ export default function Commitments() {
     <Carousel
       opts={{
         align: 'start',
+        direction: 'rtl',
         // loop: true, // Added for infinite looping; remove if not wanted
       }}
-      className="w-full"
+      dir="rtl"
+      className="w-full "
     >
-      <CarouselContent className="-ml-1 md:-ml-2 xl:-ml-4">
+      <CarouselContent className=" ">
         {/* Responsive negative margin to offset item padding */}
         {items.map((item) => (
           <CarouselItem
             key={item.id}
-            className="pl-1 basis-1/2 md:pl-2 md:basis-1/3 lg:basis-1/4 xl:pl-4 xl:basis-1/5"
+            className="pr-1 mx-auto basis-1/2 md:pl-2 md:basis-1/3 lg:basis-1/4 xl:pl-4 xl:basis-1/5"
             /* Adjusted basis for better fit (e.g., 2 on mobile, 3 on md, 4 on lg, 5 on xl); made padding responsive */
           >
             <div className="flex flex-col border-none rounded-none gap-4">

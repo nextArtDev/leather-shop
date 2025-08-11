@@ -40,27 +40,27 @@ export default function DiscoverMoreCarousel() {
     <Carousel
       opts={{
         align: 'start',
+        direction: 'rtl',
         loop: true, // Added for infinite looping; remove if not wanted
       }}
+      dir="rtl"
       className="w-full"
     >
-      <CarouselContent className="-ml-4 md:-ml-4 xl:-ml-4">
-        {' '}
+      <CarouselContent className=" ">
         {/* Consistent negative margin to offset padding */}
         {items.map((item) => (
           <CarouselItem
             key={item.id}
-            className="pl-4 basis-1/2 md:basis-1/4 xl:basis-1/6" // Removed mx-auto to avoid centering issues
+            className="pr-1 basis-1/2 md:basis-1/3 xl:basis-1/4 w-full mx-auto" // Removed mx-auto to avoid centering issues
           >
             <div className="w-full aspect-square bg-transparent">
-              {' '}
               {/* Enforces square shape */}
               <figure className="relative w-full h-full bg-[#eceae8] border-none rounded-none">
                 <Image
                   src={item.url}
                   fill
                   alt={item.title}
-                  className="object-cover mix-blend-darken" // Uncommented; remove if not needed
+                  className="object-cover " // Uncommented; remove if not needed
                 />
                 <article className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-gradient-to-b from-secondary/5 to-secondary/20 px-2 py-3 text-center text-2xl font-semibold text-background">
                   {item.title}
