@@ -6,6 +6,9 @@ import { Toaster } from 'sonner'
 const myFont = localFont({
   src: '../public/fonts/Parastoo-VariableFont_wght.ttf',
 })
+const vazirFont = localFont({
+  src: '../public/fonts/Vazirmatn-VariableFont_wght.ttf',
+})
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -19,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${myFont.className}   antialiased`}>
+      <body className={`${vazirFont.className}   antialiased`}>
         {children}
         <Toaster />
       </body>

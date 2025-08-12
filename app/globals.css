@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -119,4 +119,26 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+.font-parastoo {
+  font-family: var(--font-parastoo), sans-serif;
+}
+
+.font-vazir {
+  font-family: var(--font-vazir), sans-serif;
+}
+
+/* Numbers specifically use Vazir */
+.numbers,
+.font-numbers {
+  font-family: var(--font-vazir) !important;
+}
+
+/* Auto-apply to common number elements */
+input[type='number'],
+input[type='tel'],
+.price,
+.date,
+.phone {
+  font-family: var(--font-vazir) !important;
 }

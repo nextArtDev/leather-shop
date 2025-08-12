@@ -40,15 +40,15 @@ const ProductDetailCarousel = ({ images }: Props) => {
           }),
         ]}
         orientation="vertical"
-        className="relative w-full mx-auto"
+        className="relative max-w-xs my-14 mx-auto"
       >
-        <CarouselContent className="-mt-1 h-[348px] md:h-[60vh]  mx-auto ">
+        <CarouselContent className="  -mt-1 h-[384px] aspect-square mx-auto ">
           {images.map((image) => (
             <CarouselItem
               key={image.id}
-              className="flex items-center justify-center min-w-[94vw] h-full   "
+              className="flex items-center justify-center  w-full h-full   "
             >
-              <article className=" border-none relative w-full mx-auto h-full bg-[#eceae8]  ">
+              <figure className=" border-none relative h-full w-full   bg-[#eceae8]  ">
                 <Image
                   src={image.url}
                   fill
@@ -56,13 +56,12 @@ const ProductDetailCarousel = ({ images }: Props) => {
                   // className="object-cover mix-blend-darken"
                   className="object-cover "
                 />
-              </article>
+              </figure>
             </CarouselItem>
           ))}
         </CarouselContent>
         {/* <CarouselPrevious /> <CarouselNext /> */}
         <div className="absolute top-1/3 left-3  w-fit mt-4  flex flex-col items-center justify-between gap-2">
-          {' '}
           {Array.from({ length: count }).map((_, index) => (
             <button
               key={index}

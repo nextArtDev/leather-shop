@@ -5,6 +5,10 @@ import StoreStatement from '@/components/home/shared/StoreStatement'
 import WorkVideo from '@/components/home/shared/WorkVideo'
 import TestimonialCarousel from '@/components/home/testemonial/Testemonial'
 import MainPageCarousel from '@/components/product/main-page-carousel'
+import { buttonVariants } from '@/components/ui/button'
+import { auth } from '@/lib/auth'
+import { Link } from 'lucide-react'
+import { headers } from 'next/headers'
 // import { auth } from '@/lib/auth'
 // import { headers } from 'next/headers'
 
@@ -94,9 +98,9 @@ const CollectionItems = [
   },
 ]
 export default async function Home() {
-  // const session = await auth.api.getSession({
-  //   headers: await headers(),
-  // })
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
 
   // #eceae8
 
@@ -138,7 +142,7 @@ export default async function Home() {
       {/* <ProductDetailCarousel /> */}
       {/* <div className="h-screen"></div> */}
 
-      {/* <Link
+      <Link
         href={'/sign-in'}
         className={buttonVariants({ variant: 'destructive' })}
       >
@@ -148,7 +152,7 @@ export default async function Home() {
       <p>{session?.session.ipAddress}</p>
       <p>{session?.session.token}</p>
       <p>{session?.user.name}</p>
-      <p>{session?.user.phoneNumber}</p> */}
+      <p>{session?.user.phoneNumber}</p>
     </div>
   )
 }
