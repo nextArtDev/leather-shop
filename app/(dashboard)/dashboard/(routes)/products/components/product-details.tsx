@@ -98,7 +98,7 @@ interface ProductFormProps {
     }
   >
   categories: Category[]
-  storeUrl: string
+
   offerTags: OfferTag[]
   countries: Country[]
   provinces?: Province[]
@@ -109,7 +109,7 @@ const ProductForm: FC<ProductFormProps> = ({
   data,
   categories,
   offerTags,
-  storeUrl,
+
   provinces,
   // subCategories,
 }) => {
@@ -321,7 +321,7 @@ const ProductForm: FC<ProductFormProps> = ({
       } else {
         startTransition(async () => {
           try {
-            const res = await createNewProduct(formData, storeUrl, path)
+            const res = await createNewProduct(formData, path)
             if (res?.errors?.name) {
               form.setError('name', {
                 type: 'custom',
