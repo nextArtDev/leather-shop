@@ -56,13 +56,13 @@ import MultipleSelector, {
   MultiSelectItem,
   MultiSelectTrigger,
   MultiSelectValue,
-} from '../../components/multi-select'
+} from '../../../components/multi-select'
 import { usePathname } from 'next/navigation'
-import InputFileUpload from '../../components/file-input/InputFileUpload'
-import InputFieldset from '../../components/input-fieldset'
-import RichTextEditor from '../../components/text-editor/react-text-editor'
-import ClickToAddInputsRHF from '../../components/click-to-add'
-import { NewProductFormSchema } from '../../lib/schemas'
+import InputFileUpload from '../../../components/file-input/InputFileUpload'
+import InputFieldset from '../../../components/input-fieldset'
+import RichTextEditor from '../../../components/text-editor/react-text-editor'
+import ClickToAddInputsRHF from '../../../components/click-to-add'
+import { NewProductFormSchema } from '../../../lib/schemas'
 
 const shippingFeeMethods = [
   {

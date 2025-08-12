@@ -2,7 +2,7 @@ import { Prisma } from '@/lib/generated/prisma'
 import { Plus } from 'lucide-react'
 
 import { notFound } from 'next/navigation'
-import DataTable from '../components/data-table'
+import DataTable from '../../components/data-table'
 import ProductDetails from '@/components/product/product-detail/ProductDetails'
 
 export default async function SellerProductsPage({
