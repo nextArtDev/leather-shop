@@ -3,6 +3,18 @@
 
 @custom-variant dark (&:is(.dark *));
 
+.adad {
+  -moz-font-feature-settings: 'ss02';
+  -webkit-font-feature-settings: 'ss02';
+  font-feature-settings: 'ss02';
+}
+
+.adad {
+  -moz-font-feature-settings: 'ss03';
+  -webkit-font-feature-settings: 'ss03';
+  font-feature-settings: 'ss03';
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

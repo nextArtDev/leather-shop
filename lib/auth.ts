@@ -5,6 +5,7 @@ import { prismaAdapter } from 'better-auth/adapters/prisma'
 // import { PrismaClient } from './generated/prisma'
 import { phoneNumber } from 'better-auth/plugins'
 import prisma from './prisma'
+import { headers } from 'next/headers'
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -53,3 +54,19 @@ export const auth = betterAuth({
   //   generateId: false, // Let Prisma handle ID generation
   // },
 })
+
+export const currentUser = async () => {
+  const session = await auth.api.getSession({
+    headers: await headers(), // you need to pass the headers object.
+  })
+
+  return session?.user
+}
+
+// export const currentRole = async () => {
+// const session = await auth.api.getSession({
+//   headers: await headers(), // you need to pass the headers object.
+// })
+
+//   return session?.user?.role
+// }

@@ -14,10 +14,14 @@ import { Separator } from '@/components/ui/separator'
 //   BreadcrumbSeparator,
 // } from '@/components/ui/breadcrumb'
 import AdminSearch from '@/components/dashboard/admin-search'
+import localFont from 'next/font/local'
+const farsiFont = localFont({
+  src: '../../../public/fonts/FarsiFont.woff2',
+})
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <section dir="rtl" className="w-full h-full">
+    <section dir="rtl" className={`w-full h-full ${farsiFont.className}`}>
       <SidebarProvider>
         <AppSidebar />
         <main className="w-full h-full">

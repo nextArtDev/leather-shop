@@ -130,7 +130,7 @@ export default async function Home() {
         <WorkVideo />
       </section>
       <section className="flex flex-col items-center gap-6 text-3xl text-left">
-        <h2 className="uppercase">Our commitments</h2>
+        <h2 className="uppercase adad">Our commitments 54654654654</h2>
         <Commitments />
       </section>
       <section className="flex flex-col w-full gap-6 text-3xl text-center py-12 ">
