@@ -119,11 +119,12 @@ model Image {
 }
 
 model Category {
-  id            String        @id @default(uuid())
-  name          String
-  images        Image[]
-  url           String        @unique
-  featured      Boolean       @default(false)
+  id       String  @id @default(uuid())
+  name     String
+  images   Image[]
+  url      String  @unique
+  featured Boolean @default(false)
+
   subCategories SubCategory[]
   products      Product[]     @relation("CategoryToProduct")
 
@@ -176,9 +177,9 @@ model Product {
   images                      Image[]
   freeShipping                FreeShipping?     @relation("ProductFreeShipping")
   freeShippingForAllCountries Boolean           @default(false)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  isFeatured                  Boolean           @default(false)
+  createdAt                   DateTime          @default(now())
+  updatedAt                   DateTime          @default(now()) @updatedAt
 
   variants  Variant[]  @relation("ProductToVariant")
   specs     Spec[]     @relation("ProductSpec")
@@ -376,8 +377,9 @@ model Review {
   size         String
   quantity     String
   likes        Int     @default(0)
-
-  images Image[]
+  isFeatured   Boolean @default(false)
+  isPending    Boolean @default(true)
+  images       Image[]
 
   user   User   @relation("ReviewToUser", fields: [userId], references: [id])
   userId String

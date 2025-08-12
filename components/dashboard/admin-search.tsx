@@ -12,12 +12,12 @@ const AdminSearch = () => {
 
   // Determine the target URL based on current pathname
   const getTargetUrl = () => {
-    if (pathname.includes('/admin/orders')) {
-      return '/admin/orders'
-    } else if (pathname.includes('/admin/users')) {
-      return '/admin/users'
+    if (pathname.includes('/dashboard/orders')) {
+      return '/dashboard/orders'
+    } else if (pathname.includes('/dashboard/users')) {
+      return '/dashboard/users'
     } else {
-      return '/admin/products'
+      return '/dashboard/products'
     }
   }
 

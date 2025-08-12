@@ -3,6 +3,7 @@ import { Plus } from 'lucide-react'
 
 import { notFound } from 'next/navigation'
 import DataTable from '../components/data-table'
+import ProductDetails from '@/components/product/product-detail/ProductDetails'
 
 export default async function SellerProductsPage({
   params,
@@ -34,7 +35,7 @@ export default async function SellerProductsPage({
           countries={countries}
         />
       }
-      newTabLink={`/dashboard/seller/stores/${storeUrl}/products/new`}
+      newTabLink={`/dashboard/products/new`}
       filterValue="name"
       data={products}
       columns={columns}

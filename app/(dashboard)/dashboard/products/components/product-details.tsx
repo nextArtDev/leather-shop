@@ -31,12 +31,12 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { createNewProduct, editProduct } from '@/lib/actions/dashboard/products'
-import { NewProductFormSchema } from '@/lib/schemas/dashboard'
 
 import {
   Category,
   Country,
   FreeShipping,
+  FreeShippingCity,
   // FreeShippingCountry,
   Image,
   OfferTag,
@@ -49,7 +49,7 @@ import {
 import { Dot } from 'lucide-react'
 import { FC, useEffect, useState, useTransition } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import {
+import MultipleSelector, {
   MultiSelect,
   MultiSelectContent,
   MultiSelectGroup,
@@ -62,6 +62,7 @@ import InputFileUpload from '../../components/file-input/InputFileUpload'
 import InputFieldset from '../../components/input-fieldset'
 import RichTextEditor from '../../components/text-editor/react-text-editor'
 import ClickToAddInputsRHF from '../../components/click-to-add'
+import { NewProductFormSchema } from '../../lib/schemas'
 
 const shippingFeeMethods = [
   {
@@ -91,7 +92,9 @@ interface ProductFormProps {
     Product & { images: Image[] | null } & { specs: Spec[] | null } & {
       questions: Question[] | null
     } & {
-      freeShipping: FreeShipping | null
+      freeShipping:
+        | (FreeShipping & { eligibleCities: FreeShippingCity[] | null })
+        | null
     }
   >
   categories: Category[]
@@ -117,33 +120,6 @@ const ProductForm: FC<ProductFormProps> = ({
   const [isPending, startTransition] = useTransition()
   const [provinceNameForShopping, setProvinceNameForShopping] = useState('')
 
-  // const [productSpecs, setProductSpecs] = useState<
-  //   { name: string; value: string }[]
-  // >(
-  //   data?.specs
-  //     ? data?.specs
-  //         .filter(
-  //           (specs): specs is NonNullable<typeof specs> => specs !== undefined
-  //         )
-  //         .map(({ name, value }) => ({ name, value }))
-  //     : [{ name: '', value: '' }]
-  // )
-  // const [questions, setQuestions] = useState<
-  //   { question: string; answer: string }[]
-  // >(
-  //   data?.questions
-  //     ? data.questions
-  //         .filter(
-  //           (questions): questions is NonNullable<typeof questions> =>
-  //             questions !== undefined
-  //         )
-  //         .map(({ question, answer }) => ({
-  //           question,
-  //           answer,
-  //         }))
-  //     : [{ question: '', answer: '' }]
-  // )
-
   const form = useForm<z.infer<typeof NewProductFormSchema>>({
     resolver: zodResolver(NewProductFormSchema),
     defaultValues: {
@@ -151,12 +127,14 @@ const ProductForm: FC<ProductFormProps> = ({
       description: data?.description,
       images: data?.images || [],
       categoryId: data?.categoryId,
+      freeShippingCityIds:
+        data?.freeShipping?.eligibleCities?.map((fsh) => ({
+          value: fsh.id,
+          label: fsh.id,
+        })) ?? [],
       offerTagId: data?.offerTagId || undefined,
       subCategoryId: data?.subCategoryId,
       brand: data?.brand,
-
-      // product_specs: data?.specs || [],
-      // questions: data?.questions || [],
       product_specs: data?.specs?.map((spec) => ({
         name: spec.name,
         value: spec.value,
@@ -165,15 +143,6 @@ const ProductForm: FC<ProductFormProps> = ({
         question: question.question,
         answer: question.answer,
       })) ?? [{ question: '', answer: '' }],
-
-      freeShippingForAllCountries: data?.freeShippingForAllCountries,
-      // freeShippingCountriesIds:
-      //   data?.freeShipping?.eligibaleCountries?.map((fsh) => {
-      //     return {
-      //       value: fsh.id,
-      //       label: fsh.id,
-      //     }
-      //   }) || [],
       shippingFeeMethod: data?.shippingFeeMethod,
     },
   })
@@ -231,16 +200,6 @@ const ProductForm: FC<ProductFormProps> = ({
             question: q.question,
             answer: q.answer,
           })) ?? [],
-
-        // freeShippingForAllCountries: data?.freeShippingForAllCountries,
-        // freeShippingCountriesIds:
-        //   data?.freeShipping?.eligibaleCountries?.map((fsh) => {
-        //     return {
-        //       value: fsh.id,
-        //       label: fsh.id,
-        //     }
-        //   }) || [],
-        shippingFeeMethod: data?.shippingFeeMethod,
       })
     }
   }, [data, form])
@@ -252,9 +211,6 @@ const ProductForm: FC<ProductFormProps> = ({
     formData.append('name', values.name)
     formData.append('description', values.description)
 
-    formData.append('name_fa', values.name_fa || '')
-    formData.append('description_fa', values.description_fa || '')
-
     // formData.append('images',values.images)
     // formData.append('variantImage',values.variantImage)
     formData.append('categoryId', values.categoryId)
@@ -262,47 +218,6 @@ const ProductForm: FC<ProductFormProps> = ({
     formData.append('offerTagId', (values.offerTagId as string) || '')
     formData.append('brand', values.brand || '')
 
-    formData.append('shippingFeeMethod', values.shippingFeeMethod || [])
-    // if (data?.freeShippingForAllCountries) {
-    //   formData.append('freeShippingForAllCountries', 'true')
-    // }
-    // formData.append(
-    //   'freeShippingCountriesIds',
-    //   values.freeShippingCountriesIds || []
-    // )
-    // if (data?.freeShippingForAllCountries) {
-    //   formData.append('freeShippingForAllCountries', 'true')
-    // } else {
-    //   formData.append(
-    //     'freeShippingForAllCountries',
-    //     String(values.freeShippingForAllCountries) || 'false'
-    //   )
-    // }
-    // if (
-    //   values.freeShippingCountriesIds &&
-    //   values.freeShippingCountriesIds.length > 0
-    // ) {
-    //   values.freeShippingCountriesIds.forEach((id, index) => {
-    //     const res = {
-    //       value:id.value,
-    //       label:id.label
-    //     }
-    //     // Append the 'value' property of the country object
-    //     formData.append(`freeShippingCountriesIds`, {...res})
-    //   })
-    // }
-
-    // if (
-    //   values.freeShippingCountriesIds &&
-    //   values.freeShippingCountriesIds.length > 0
-    // ) {
-    //   for (let i = 0; i < values.freeShippingCountriesIds.length; i++) {
-    //     formData.append(
-    //       'freeShippingCountriesIds',
-    //       values.freeShippingCountriesIds[i].value
-    //     )
-    //   }
-    // }
     if (values.freeShippingCityIds && values.freeShippingCityIds.length > 0) {
       for (let i = 0; i < values.freeShippingCityIds.length; i++) {
         formData.append(
@@ -352,16 +267,6 @@ const ProductForm: FC<ProductFormProps> = ({
               form.setError('description', {
                 type: 'custom',
                 message: res?.errors.description?.join(' و '),
-              })
-            } else if (res?.errors?.name_fa) {
-              form.setError('name_fa', {
-                type: 'custom',
-                message: res?.errors.name_fa?.join(' و '),
-              })
-            } else if (res?.errors?.description_fa) {
-              form.setError('description_fa', {
-                type: 'custom',
-                message: res?.errors.description_fa?.join(' و '),
               })
             } else if (res?.errors?.images) {
               form.setError('images', {
@@ -427,16 +332,6 @@ const ProductForm: FC<ProductFormProps> = ({
                 type: 'custom',
                 message: res?.errors.description?.join(' و '),
               })
-            } else if (res?.errors?.name_fa) {
-              form.setError('name_fa', {
-                type: 'custom',
-                message: res?.errors.name_fa?.join(' و '),
-              })
-            } else if (res?.errors?.description_fa) {
-              form.setError('description_fa', {
-                type: 'custom',
-                message: res?.errors.description_fa?.join(' و '),
-              })
             } else if (res?.errors?.images) {
               form.setError('images', {
                 type: 'custom',
@@ -495,19 +390,9 @@ const ProductForm: FC<ProductFormProps> = ({
 
   const handleDeleteCityFreeShipping = (index: number) => {
     const currentValues = form.getValues().freeShippingCityIds
-    const updatedValues = currentValues.filter((_, i) => i !== index)
+    const updatedValues = currentValues?.filter((_, i) => i !== index)
     form.setValue('freeShippingCityIds', updatedValues)
   }
-
-  // useEffect(() => {
-  //   form.resetField('freeShippingCityIds')
-  //   // form.setValue('questions', questions)
-  // }, [provinceNameForShopping])
-  // useEffect(() => {
-  //   form.setValue('product_specs', productSpecs)
-  //   form.setValue('questions', questions)
-  // }, [form, productSpecs, questions])
-  console.log(form.watch('freeShippingCityIds'))
   return (
     <AlertDialog>
       <Card className="w-full">
@@ -595,7 +480,7 @@ const ProductForm: FC<ProductFormProps> = ({
                 <div className="flex gap-4">
                   <FormField
                     disabled={isPending}
-                    control={form.control}
+                    // control={form.control}
                     name="categoryId"
                     render={({ field }) => (
                       <FormItem className="flex-1">
@@ -826,104 +711,6 @@ const ProductForm: FC<ProductFormProps> = ({
                 label="Free Shipping (Optional)"
                 description="Free Shipping Worldwide ?"
               >
-                <div>
-                  <label
-                    htmlFor="freeShippingForAll"
-                    className="ml-5 flex items-center gap-x-2 cursor-pointer"
-                  >
-                    <FormField
-                      control={form.control}
-                      name="freeShippingForAllCountries"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <>
-                              <input
-                                type="checkbox"
-                                id="freeShippingForAll"
-                                checked={field.value}
-                                onChange={field.onChange}
-                                hidden
-                              />
-                              <Checkbox
-                                checked={field?.value}
-                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                // @ts-ignore
-                                onCheckedChange={field.onChange}
-                              />
-                            </>
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                    <span>Yes</span>
-                  </label>
-                </div>
-                <div>
-                  <p className="mt-4 text-sm pb-3 flex">
-                    <Dot className="-me-1" />
-                    If not select the countries you want to ship this product to
-                    for free
-                  </p>
-                </div>
-                <div className="">
-                  {/* {!form.getValues().freeShippingForAllCountries && (
-                    <div>
-                      <FormField
-                        control={form.control}
-                        name="freeShippingCountriesIds"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <MultipleSelector
-                                {...field}
-                                // value={field?.value}
-                                // onChange={field.onChange}
-                                defaultOptions={countryOptions}
-                                placeholder="Select country you like..."
-                                emptyIndicator={
-                                  <p className="text-center text-lg leading-10  ">
-                                    no results found.
-                                  </p>
-                                }
-                              />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-                      <p className="mt-4 text-sm  pb-3 flex">
-                        <Dot className="-me-1" />
-                        List of countries you offer free shipping for this
-                        product :&nbsp;
-                        {form.getValues().freeShippingCountriesIds &&
-                          form.getValues().freeShippingCountriesIds.length ===
-                            0 &&
-                          'None'}
-                      </p>
-
-                      <div className="flex flex-wrap gap-1">
-                        {form
-                          .getValues()
-                          .freeShippingCountriesIds?.map((country, index) => (
-                            <div
-                              key={country.label}
-                              className="text-xs inline-flex items-center px-3 py-1 rounded-md gap-x-2"
-                            >
-                              <span>{country.label}</span>
-                              <span
-                                className="cursor-pointer hover:text-red-500"
-                                onClick={() =>
-                                  handleDeleteCountryFreeShipping(index)
-                                }
-                              >
-                                x
-                              </span>
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-                  )} */}
-                </div>
                 <div className=" flex gap-2">
                   <Select
                     onValueChange={(v) => setProvinceNameForShopping(v)}
@@ -953,52 +740,29 @@ const ProductForm: FC<ProductFormProps> = ({
                         <FormItem>
                           <FormControl>
                             {citiesForFreeShipping && (
-                              <MultiSelect
-                                onValuesChange={field.onChange}
-                                values={field.value}
-                              >
-                                <FormControl>
-                                  <MultiSelectTrigger className="w-full">
-                                    <MultiSelectValue placeholder="Select frameworks..." />
-                                  </MultiSelectTrigger>
-                                </FormControl>
-
-                                <MultiSelectContent>
-                                  <MultiSelectGroup>
-                                    {citiesForFreeShipping.map((city) => (
-                                      <MultiSelectItem
-                                        key={city.id}
-                                        value={city.id.toString()}
-                                      >
-                                        {city.name}
-                                      </MultiSelectItem>
-                                    ))}
-                                  </MultiSelectGroup>
-                                </MultiSelectContent>
-                              </MultiSelect>
-                              // <MultipleSelector
-                              //   // disabled={
-                              //   //   isPendingCitiesForFreeShipping &&
-                              //   //   !provinceNameForShopping
-                              //   // }
-                              //   {...field}
-                              //   // value={field?.value}
-                              //   // onChange={field.onChange}
-                              //   defaultOptions={citiesForFreeShipping.map(
-                              //     (city) => {
-                              //       return {
-                              //         label: city.name,
-                              //         value: city.id.toString(),
-                              //       }
-                              //     }
-                              //   )}
-                              //   placeholder="Select City"
-                              //   emptyIndicator={
-                              //     <p className="text-center text-lg leading-10  ">
-                              //       no results found.
-                              //     </p>
-                              //   }
-                              // />
+                              <MultipleSelector
+                                // disabled={
+                                //   isPendingCitiesForFreeShipping &&
+                                //   !provinceNameForShopping
+                                // }
+                                {...field}
+                                // value={field?.value}
+                                // onChange={field.onChange}
+                                defaultOptions={citiesForFreeShipping.map(
+                                  (city) => {
+                                    return {
+                                      label: city.name,
+                                      value: city.id.toString(),
+                                    }
+                                  }
+                                )}
+                                placeholder="Select City"
+                                emptyIndicator={
+                                  <p className="text-center text-lg leading-10  ">
+                                    no results found.
+                                  </p>
+                                }
+                              />
                             )}
                           </FormControl>
                         </FormItem>
@@ -1009,7 +773,7 @@ const ProductForm: FC<ProductFormProps> = ({
                       List of cities you offer free shipping for this product
                       :&nbsp;
                       {form.getValues().freeShippingCityIds &&
-                        form.getValues().freeShippingCityIds.length === 0 &&
+                        form.getValues().freeShippingCityIds?.length === 0 &&
                         'None'}
                     </p>
 
