@@ -1,6 +1,6 @@
 import { useModal } from '@/providers/modal-provider'
 
-import { MoreHorizontal, Trash } from 'lucide-react'
+import { Edit, MoreHorizontal, Trash } from 'lucide-react'
 // UI components
 import {
   AlertDialog,
@@ -30,7 +30,10 @@ import { usePathname } from 'next/navigation'
 import CustomModal from '../../../components/custom-modal'
 import CategoryDetails from './category-details'
 import { Category, Image } from '@/lib/generated/prisma'
-import { toast } from 'sonner'
+// import { toast } from 'sonner'
+import Link from 'next/link'
+import { getCategoryById } from '../../../lib/queries'
+import { deleteCategory } from '../../../lib/actions/category'
 
 interface CellActionsProps {
   rowData: Category & { images: Image[] }
@@ -43,12 +46,12 @@ export const CellActions: React.FC<CellActionsProps> = ({ rowData }) => {
   const path = usePathname()
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // const [_, deleteAction, pending] = useActionState(
-  //   deleteCategory.bind(null, path, rowData.id as string),
-  //   {
-  //     errors: {},
-  //   }
-  // )
+  const [_, deleteAction, pending] = useActionState(
+    deleteCategory.bind(null, path, rowData.id as string),
+    {
+      errors: {},
+    }
+  )
   // Return null if rowData or rowData.id don't exist
   if (!rowData || !rowData.id) return null
 
@@ -63,61 +66,60 @@ export const CellActions: React.FC<CellActionsProps> = ({ rowData }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem
-            className="flex gap-2"
-            onClick={() => {
-              try {
-                setOpen(
-                  <CustomModal>
-                    <CategoryDetails initialData={rowData} />
-                  </CustomModal>
-                  // async () => {
-                  //   const data = await getCategoryById(rowData.id)
-                  //   return {
-                  //     rowData: data,
-                  //   }
-                  // }
-                )
-              } catch (error) {
-                console.error('Error:', error)
-              }
-            }}
+          <Link
+            className="flex items-center gap-2"
+            href={`/dashboard/categories/${rowData.id}`}
           >
-            {/* <Link
-              className="flex items-center gap-2"
-              href={`/dashboard/admin/categories/${rowData.id}`}
+            <DropdownMenuItem
+              className="flex gap-2"
+              onClick={() => {
+                try {
+                  setOpen(
+                    <CustomModal>
+                      <CategoryDetails initialData={rowData} />
+                    </CustomModal>,
+                    async () => {
+                      const data = await getCategoryById(rowData.id)
+                      return {
+                        rowData: data,
+                      }
+                    }
+                  )
+                } catch (error) {
+                  console.error('Error:', error)
+                }
+              }}
             >
               <Edit size={15} />
-            </Link> */}
-            Edit Details
-          </DropdownMenuItem>
+              ویرایش دسته‌بندی
+            </DropdownMenuItem>
+          </Link>
           <DropdownMenuSeparator />
           <AlertDialogTrigger asChild>
             <DropdownMenuItem className="flex gap-2" onClick={() => {}}>
-              <Trash size={15} /> Delete category
+              <Trash size={15} /> حذف دسته‌بندی
             </DropdownMenuItem>
           </AlertDialogTrigger>
         </DropdownMenuContent>
       </DropdownMenu>
       <AlertDialogContent className="max-w-lg">
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-left">
-            Are you absolutely sure?
+          <AlertDialogTitle className="text-right">
+            از حذف دسته‌بندی مطمئن هستید؟
           </AlertDialogTitle>
-          <AlertDialogDescription className="text-left">
-            This action cannot be undone. This will permanently delete the
-            category and related data.
+          <AlertDialogDescription className="text-right">
+            این عملیات برگشت‌پذیر نیست و تمام دسته‌بندی و محصولاتش حذف خواهند
+            شد!
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex items-center">
-          <AlertDialogCancel className="mb-2">Cancel</AlertDialogCancel>
-          {/* <AlertDialogAction
+          <AlertDialogCancel className="mb-2">صرف نظر</AlertDialogCancel>
+          <AlertDialogAction
             disabled={pending}
             className="bg-destructive hover:bg-destructive mb-2 text-white"
             onClick={() => {
-              toast('Deleted category')
-
               setClose()
+              // toast('دسته‌بندی حذف شد!')
             }}
           >
             <form action={deleteAction}>
@@ -128,10 +130,10 @@ export const CellActions: React.FC<CellActionsProps> = ({ rowData }) => {
                 type="submit"
                 className="hover:bg-transparent active:bg-transparent w-full outline-none"
               >
-                Delete
+                حدف
               </Button>
             </form>
-          </AlertDialogAction> */}
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

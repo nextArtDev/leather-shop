@@ -50,3 +50,19 @@ export const getAllCategories = cache(
     return { categories, isNext }
   }
 )
+
+export const getCategoryById = cache(
+  async (id: string): Promise<(Category & { images: Image[] }) | null> => {
+    console.log(id)
+    const category = await prisma.category.findFirst({
+      where: {
+        id,
+      },
+      include: {
+        images: true,
+      },
+    })
+
+    return category
+  }
+)
