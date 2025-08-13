@@ -19,14 +19,6 @@ export const getAllCategories = cache(
     const [categories, count] = await prisma.$transaction([
       prisma.category.findMany({
         where: {},
-        // ? {
-        //     products: {
-        //       some: {
-        //         storeId,
-        //       },
-        //     },
-        //   }
-        // : {},
 
         include: {
           images: true,
@@ -53,7 +45,6 @@ export const getAllCategories = cache(
 
 export const getCategoryById = cache(
   async (id: string): Promise<(Category & { images: Image[] }) | null> => {
-    console.log(id)
     const category = await prisma.category.findFirst({
       where: {
         id,
@@ -66,3 +57,63 @@ export const getCategoryById = cache(
     return category
   }
 )
+
+export const getAllSubCategories = cache(
+  async ({
+    page = 1,
+    pageSize = 100,
+  }: {
+    page?: number
+    pageSize?: number
+  }): Promise<{
+    subCategories: (SubCategory & { category: Category } & {
+      images: Image[]
+    })[]
+    isNext: boolean
+  }> => {
+    const skipAmount = (page - 1) * pageSize
+    const [subCategories, count] = await prisma.$transaction([
+      prisma.subCategory.findMany({
+        include: {
+          images: true,
+          category: true,
+        },
+
+        orderBy: {
+          createdAt: 'desc',
+        },
+
+        skip: skipAmount,
+        take: pageSize,
+      }),
+      prisma.category.count({}),
+    ])
+    const isNext = count > skipAmount + subCategories.length
+
+    return { subCategories: subCategories, isNext }
+  }
+)
+
+export const getSubCategoryById = async (
+  id: string
+): Promise<
+  (SubCategory & { category: Category } & { images: Image[] }) | null
+> => {
+  const subCategory = await prisma.subCategory.findFirst({
+    where: {
+      id,
+    },
+    include: {
+      images: true,
+      category: true,
+    },
+  })
+
+  return subCategory
+}
+
+export const getCategoryList = cache(async (): Promise<Category[] | []> => {
+  const categoryList = await prisma.category.findMany({})
+  if (!categoryList.length) return []
+  return categoryList
+})

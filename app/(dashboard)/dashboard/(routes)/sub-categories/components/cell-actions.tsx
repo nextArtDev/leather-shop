@@ -1,9 +1,7 @@
 'use client'
 
 import { useModal } from '@/providers/modal-provider'
-
 import { Edit, MoreHorizontal, Trash } from 'lucide-react'
-// UI components
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,24 +22,26 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Image, SubCategory } from '@/lib/generated/prisma'
+import { Category, Image, SubCategory } from '@/lib/generated/prisma'
 
 import { useActionState } from 'react'
-import { deleteSubCategory } from '@/lib/actions/dashboard/subCategories'
-import SubCategoryDetails from '@/components/dashboard/forms/sub-category-details'
-import { getSubCategoryById } from '@/lib/queries/dashboard/sub-categories'
 import { usePathname } from 'next/navigation'
 import CustomModal from '../../../components/custom-modal'
-import { toast } from 'sonner'
+// import { toast } from 'sonner'
+import SubCategoryDetails from './sub-category-details'
+import { deleteSubCategory } from '../../../lib/actions/sub-category'
+
+import Link from 'next/link'
 
 interface CellActionsProps {
   rowData: SubCategory & { images: Image[] }
+  categories: Partial<Category>[]
 }
 
-// CellActions component definition
-export const CellActions: React.FC<CellActionsProps> = ({ rowData }) => {
-  // Hooks
-  // console.log({ rowData })
+export const CellActions: React.FC<CellActionsProps> = ({
+  rowData,
+  categories,
+}) => {
   const { setOpen, setClose } = useModal()
   const path = usePathname()
 
@@ -64,8 +64,8 @@ export const CellActions: React.FC<CellActionsProps> = ({ rowData }) => {
             <MoreHorizontal className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <DropdownMenuContent align="start">
+          <DropdownMenuLabel>عملیات</DropdownMenuLabel>
           <DropdownMenuItem
             className="flex gap-2"
             onClick={() => {
@@ -74,34 +74,34 @@ export const CellActions: React.FC<CellActionsProps> = ({ rowData }) => {
                   <CustomModal>
                     <SubCategoryDetails
                       initialData={rowData}
-                      // categories={categories}
+                      categories={categories}
                     />
-                  </CustomModal>,
-                  async () => {
-                    const data = await getSubCategoryById(rowData.id)
-                    // console.log({ data })
-                    return {
-                      rowData: data,
-                    }
-                  }
+                  </CustomModal>
+                  // async () => {
+                  //   const data = await getSubCategoryById(rowData.id)
+                  //   // console.log({ data })
+                  //   return {
+                  //     rowData: data,
+                  //   }
+                  // }
                 )
               } catch (error) {
                 console.error('Error:', error)
               }
             }}
           >
-            {/* <Link
+            <Link
               className="flex items-center gap-2"
-              href={`/dashboard/admin/sub-categories/${rowData.id}`}
+              href={`/dashboard/sub-categories/${rowData.id}`}
             >
-            </Link> */}
-            <Edit size={15} />
-            Edit Details
+              <Edit size={15} />
+              ویرایش زیردسته
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <AlertDialogTrigger asChild>
             <DropdownMenuItem className="flex gap-2" onClick={() => {}}>
-              <Trash size={15} /> Delete sub category
+              <Trash size={15} /> حذف زیردسته‌بندی
             </DropdownMenuItem>
           </AlertDialogTrigger>
         </DropdownMenuContent>
@@ -109,22 +109,21 @@ export const CellActions: React.FC<CellActionsProps> = ({ rowData }) => {
       <AlertDialogContent className="max-w-lg">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-left">
-            Are you absolutely sure?
+            از حذف دسته‌بندی مطمئن هستید؟
           </AlertDialogTitle>
           <AlertDialogDescription className="text-left">
-            This action cannot be undone. This will permanently delete the sub
-            category and related data.
+            این عملیات برگشت‌پذیر نیست و تمام زیردسته‌بندی و محصولاتش حذف خواهند
+            شد!
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex items-center">
-          <AlertDialogCancel className="mb-2">Cancel</AlertDialogCancel>
+          <AlertDialogCancel className="mb-2">صرف‌نظر</AlertDialogCancel>
           <AlertDialogAction
             disabled={pending}
             className="bg-destructive hover:bg-destructive mb-2 text-white"
             onClick={() => {
-              toast('Deleted sub category')
-
               setClose()
+              // toast('Deleted sub category')
             }}
           >
             <form action={deleteAction}>
@@ -135,7 +134,7 @@ export const CellActions: React.FC<CellActionsProps> = ({ rowData }) => {
                 type="submit"
                 className="hover:bg-transparent active:bg-transparent w-full outline-none"
               >
-                Delete
+                حذف
               </Button>
             </form>
           </AlertDialogAction>

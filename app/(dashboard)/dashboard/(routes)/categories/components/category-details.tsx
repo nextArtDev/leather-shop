@@ -1,6 +1,4 @@
 'use client'
-
-// React
 import { FC, useEffect, useState, useTransition } from 'react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -70,7 +68,6 @@ const CategoryDetails: FC<CategoryDetailsProps> = ({ initialData }) => {
 
   // Submit handler for form submission
   const handleSubmit = (data: z.infer<typeof CategoryFormSchema>) => {
-    console.log({ data })
     startTransition(async () => {
       try {
         // const formData = new FormData()

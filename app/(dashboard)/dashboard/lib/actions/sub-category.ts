@@ -3,28 +3,29 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { deleteFileFromS3, uploadFileToS3 } from './s3Upload'
-import { CategoryFormSchema } from '../schemas'
+import { SubCategoryFormSchema } from '../schemas'
 import { currentUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
-import { Category } from '@/lib/generated/prisma'
+import { SubCategory } from '@/lib/generated/prisma'
 
-//bunx @better-auth/cli generate
-interface CreateCategoryFormState {
+interface CreateSubCategoryFormState {
   success?: string
   errors: {
     name?: string[]
+    name_fa?: string[]
     url?: string[]
     featured?: string[]
+    categoryId?: string[]
     images?: string[]
     _form?: string[]
   }
 }
 
-export async function createCategory(
+export async function createSubCategory(
   data: unknown,
   path: string
-): Promise<CreateCategoryFormState> {
-  const result = CategoryFormSchema.safeParse(data)
+): Promise<CreateSubCategoryFormState> {
+  const result = SubCategoryFormSchema.safeParse(data)
 
   if (!result.success) {
     console.error(result.error.flatten().fieldErrors)
@@ -35,8 +36,7 @@ export async function createCategory(
   //   console.log(result?.data)
 
   const user = await currentUser()
-  //   if (!user || user.role !== 'ADMIN') {
-  //   if (!user) {
+  //   if ( !user || user.role !== 'ADMIN') {
   //     return {
   //       errors: {
   //         _form: ['شما اجازه دسترسی ندارید!'],
@@ -44,21 +44,42 @@ export async function createCategory(
   //     }
   //   }
 
+  const isCategoryExisted = await prisma.category.findFirst({
+    where: {
+      id: result.data.categoryId,
+    },
+  })
+  if (!isCategoryExisted) {
+    return {
+      errors: {
+        _form: ['دسته‌بندی حذف شده است!'],
+      },
+    }
+  }
+
   try {
-    const isExisting = await prisma.category.findFirst({
+    const isExisting = await prisma.subCategory.findFirst({
       where: {
-        OR: [{ name: result.data.name }, { url: result.data.url }],
+        // OR: [{ name: result.data.name }, { url: result.data.url }],
+        AND: [
+          {
+            OR: [{ name: result.data.name }, { url: result.data.url }],
+          },
+          {
+            categoryId: result.data.categoryId,
+          },
+        ],
       },
     })
     if (isExisting) {
       return {
         errors: {
-          _form: ['دسته‌بندی با این نام موجود است!'],
+          _form: ['زیردسته‌بندی با این نام موجود است!'],
         },
       }
     }
     // console.log(isExisting)
-    // console.log(billboard)
+
     let imageIds: string[] = []
     if (result.data.images) {
       const filesToUpload = result.data.images.filter(
@@ -74,11 +95,12 @@ export async function createCategory(
         .filter(Boolean) as string[]
     }
 
-    await prisma.category.create({
+    await prisma.subCategory.create({
       data: {
         name: result.data.name,
         url: result.data.url,
         featured: result.data.featured,
+        categoryId: result.data.categoryId,
         images: {
           connect: imageIds.map((id) => ({
             id: id,
@@ -92,27 +114,27 @@ export async function createCategory(
     return { errors: { _form: [message] } }
   }
   revalidatePath(path)
-  redirect(`/dashboard/categories`)
+  redirect(`/dashboard/sub-categories`)
 }
-interface EditCategoryFormState {
+interface EditSubCategoryFormState {
   errors: {
     name?: string[]
     name_fa?: string[]
     description?: string[]
-    featured?: string[]
-
+    categoryId?: string[]
     images?: string[]
     _form?: string[]
   }
 }
-export async function editCategory(
+export async function editSubCategory(
   data: unknown,
-  categoryId: string,
+  subCategoryId: string,
   path: string
-): Promise<EditCategoryFormState> {
-  const result = CategoryFormSchema.safeParse(data)
+): Promise<EditSubCategoryFormState> {
+  const result = SubCategoryFormSchema.safeParse(data)
 
-  // console.log(formData.getAll('featured'))
+  // console.log(result)
+  // console.log(formData.getAll('images'))
 
   if (!result.success) {
     // console.error(result.error.flatten().fieldErrors)
@@ -120,20 +142,18 @@ export async function editCategory(
       errors: result.error.flatten().fieldErrors,
     }
   }
-  //   console.log(result.data)
-  //   const session = await currentUser()
-  //   // if (!session || session.role !== 'ADMIN') {
-  //   if (!session) {
+  const user = await currentUser()
+  //   if ( !user || user.role !== 'ADMIN') {
   //     return {
   //       errors: {
   //         _form: ['شما اجازه دسترسی ندارید!'],
   //       },
   //     }
   //   }
-  if (!categoryId) {
+  if (!subCategoryId) {
     return {
       errors: {
-        _form: ['دسته‌بندی در دسترس نیست!'],
+        _form: ['زیردسته‌بندی در دسترس نیست!'],
       },
     }
   }
@@ -141,11 +161,11 @@ export async function editCategory(
 
   try {
     const isExisting:
-      | (Category & {
+      | (SubCategory & {
           images: { id: string; key: string }[] | null
         })
-      | null = await prisma.category.findFirst({
-      where: { id: categoryId },
+      | null = await prisma.subCategory.findFirst({
+      where: { id: subCategoryId },
       include: {
         images: { select: { id: true, key: true } },
       },
@@ -158,15 +178,16 @@ export async function editCategory(
       }
     }
 
-    const isNameExisting = await prisma.category.findFirst({
+    const isNameExisting = await prisma.subCategory.findFirst({
       where: {
         AND: [
           {
             OR: [{ name: result.data.name }, { url: result.data.url }],
           },
           {
+            categoryId: result.data.categoryId,
             NOT: {
-              id: categoryId,
+              id: subCategoryId,
             },
           },
         ],
@@ -176,7 +197,7 @@ export async function editCategory(
     if (isNameExisting) {
       return {
         errors: {
-          _form: ['دسته‌بندی با این نام موجود است!'],
+          _form: ['زیردسته‌بندی با این نام موجود است!'],
         },
       }
     }
@@ -192,17 +213,6 @@ export async function editCategory(
         // console.log('Deleting old keys from S3:', oldImageKeys)
         await Promise.all(oldImageKeys.map((key) => deleteFileFromS3(key)))
       }
-      //   const imageIds: string[] = []
-      //   for (const img of result.data.images) {
-      //     if (img instanceof File) {
-      //       const buffer = Buffer.from(await img.arrayBuffer())
-      //       const res = await uploadFileToS3(buffer, img.name)
-
-      //       if (res?.imageId && typeof res.imageId === 'string') {
-      //         imageIds.push(res.imageId)
-      //       }
-      //     }
-      //   }
       const filesToUpload = result.data.images.filter(
         (img): img is File => img instanceof File
       )
@@ -214,10 +224,10 @@ export async function editCategory(
       const imageIds = uploadedImages
         .map((res) => res?.imageId)
         .filter(Boolean) as string[]
-      // console.log(res)
-      await prisma.category.update({
+
+      await prisma.subCategory.update({
         where: {
-          id: categoryId,
+          id: subCategoryId,
         },
         data: {
           images: {
@@ -227,14 +237,16 @@ export async function editCategory(
           },
         },
       })
-      await prisma.category.update({
+      await prisma.subCategory.update({
         where: {
-          id: categoryId,
+          id: subCategoryId,
         },
         data: {
           name: result.data.name,
           url: result.data.url,
           featured: result.data.featured,
+          categoryId: result.data.categoryId,
+
           images: {
             connect: imageIds.map((id) => ({
               id: id,
@@ -243,14 +255,15 @@ export async function editCategory(
         },
       })
     } else {
-      await prisma.category.update({
+      await prisma.subCategory.update({
         where: {
-          id: categoryId,
+          id: subCategoryId,
         },
         data: {
           name: result.data.name,
           url: result.data.url,
           featured: result.data.featured,
+          categoryId: result.data.categoryId,
         },
       })
     }
@@ -260,29 +273,30 @@ export async function editCategory(
     return { errors: { _form: [message] } }
   }
   revalidatePath(path)
-  redirect(`/dashboard/categories`)
+  redirect(`/dashboard/sub-categories`)
 }
 
 //////////////////////
 
-interface DeleteBillboardFormState {
+interface DeleteSubCategoryFormState {
   errors: {
-    name?: string[]
-    featured?: string[]
-    url?: string[]
+    // name?: string[]
+    // featured?: string[]
+    // url?: string[]
     images?: string[]
+
     _form?: string[]
   }
 }
 
-export async function deleteCategory(
+export async function deleteSubCategory(
   path: string,
-  categoryId: string,
+  subCategoryId: string,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  formState: DeleteBillboardFormState,
+  formState: DeleteSubCategoryFormState,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   formData: FormData
-): Promise<DeleteBillboardFormState> {
+): Promise<DeleteSubCategoryFormState> {
   const user = await currentUser()
   //   if ( !user || user.role !== 'ADMIN') {
   //   if (!user) {
@@ -293,19 +307,19 @@ export async function deleteCategory(
   //     }
   //   }
   // console.log(result)
-  if (!categoryId) {
+  if (!subCategoryId) {
     return {
       errors: {
-        _form: ['دسته‌بندی در دسترس نیست!'],
+        _form: ['فروشگاه در دسترس نیست!'],
       },
     }
   }
 
   try {
     const isExisting:
-      | (Category & { images: { id: string; key: string }[] | null })
-      | null = await prisma.category.findFirst({
-      where: { id: categoryId },
+      | (SubCategory & { images: { id: string; key: string }[] | null })
+      | null = await prisma.subCategory.findFirst({
+      where: { id: subCategoryId },
       include: {
         images: { select: { id: true, key: true } },
       },
@@ -322,17 +336,12 @@ export async function deleteCategory(
       const oldImageKeys = isExisting.images.map((img) => img.key)
 
       await Promise.all(oldImageKeys.map((key) => deleteFileFromS3(key)))
-      //   for (const image of isExisting.images) {
-      //     if (image.key) {
-      //       await deleteFileFromS3(image.key)
-      //     }
-      //   }
+      await prisma.subCategory.delete({
+        where: {
+          id: subCategoryId,
+        },
+      })
     }
-    await prisma.category.delete({
-      where: {
-        id: categoryId,
-      },
-    })
   } catch (err: unknown) {
     if (err instanceof Error) {
       return {
@@ -349,14 +358,5 @@ export async function deleteCategory(
     }
   }
   revalidatePath(path)
-  redirect(`/dashboard/categories`)
+  redirect(`/dashboard/sub-categories`)
 }
-
-// export const getSubCategoryByCategoryId = async (categoryId: string) => {
-//   try {
-//     const subCategories = await getAllCategoriesForCategory(categoryId)
-//     return subCategories
-//   } catch (error) {
-//     console.log(error)
-//   }
-// }

@@ -1,7 +1,10 @@
 import { Plus } from 'lucide-react'
-import { getAllSubCategories } from '@/lib/queries/dashboard'
 import DataTable from '../../components/data-table'
-// import { prisma } from '@/lib/prisma'
+import { getAllSubCategories } from '../../lib/queries'
+import SubCategoryDetails from './components/sub-category-details'
+
+import prisma from '@/lib/prisma'
+import { columns } from './components/columns'
 export default async function AdminSubCategoriesPage({
   searchParams,
 }: {
@@ -10,28 +13,39 @@ export default async function AdminSubCategoriesPage({
   const asyncPage = (await searchParams).page
   const page = asyncPage ? +asyncPage : 1
 
-  // Fetching stores data from the database
   const subCategoriesResponse = await getAllSubCategories({ page })
-  // const categories = await prisma.category.findMany({})
-  // console.log(subCategoriesResponse.subCategories)
+  const categories = await prisma.category.findMany({
+    where: {},
+    select: {
+      name: true,
+      id: true,
+    },
+  })
 
-  // Checking if no categories are found
-  if (!subCategoriesResponse.subCategories) return null // If no categories found, return null
-
+  if (!subCategoriesResponse.subCategories) return null
+  // const columns = getColumns(categories)
+  const dataWithCategories = subCategoriesResponse.subCategories.map(
+    (subCategory) => ({
+      ...subCategory,
+      categories,
+    })
+  )
   return (
-    <DataTable
-      actionButtonText={
-        <>
-          <Plus size={15} />
-          Create category
-        </>
-      }
-      modalChildren={<SubCategoryDetails />}
-      newTabLink="/dashboard/admin/sub-categories/new"
-      filterValue="name"
-      data={subCategoriesResponse.subCategories}
-      searchPlaceholder="Search sub category name..."
-      columns={columns}
-    />
+    <section className="px-1">
+      <DataTable
+        actionButtonText={
+          <>
+            <Plus size={15} />
+            ایجاد زیردسته‌بندی
+          </>
+        }
+        modalChildren={<SubCategoryDetails categories={categories} />}
+        newTabLink="/dashboard/sub-categories/new"
+        filterValue="name"
+        data={dataWithCategories}
+        searchPlaceholder="جست و جوی زیردسته‌ها با نام "
+        columns={columns}
+      />
+    </section>
   )
 }

@@ -1,7 +1,6 @@
 import { useModal } from '@/providers/modal-provider'
 
 import { Edit, MoreHorizontal, Trash } from 'lucide-react'
-// UI components
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,8 +23,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 import { useActionState } from 'react'
-// import { deleteCategory } from '@/lib/actions/dashboard/categories'
-// import { getCategoryById } from '@/lib/queries/dashboard/category'
 import { usePathname } from 'next/navigation'
 import CustomModal from '../../../components/custom-modal'
 import CategoryDetails from './category-details'
@@ -64,8 +61,8 @@ export const CellActions: React.FC<CellActionsProps> = ({ rowData }) => {
             <MoreHorizontal className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <DropdownMenuContent align="start">
+          <DropdownMenuLabel>عملیات</DropdownMenuLabel>
           <Link
             className="flex items-center gap-2"
             href={`/dashboard/categories/${rowData.id}`}

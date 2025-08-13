@@ -1,6 +1,6 @@
 'use client'
 
-import { FC, useEffect, useTransition } from 'react'
+import { FC, useEffect, useState, useTransition } from 'react'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -28,7 +28,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
 import { useQuery } from '@tanstack/react-query'
-import { Image, SubCategory } from '@/lib/generated/prisma'
+import { Category, Image, SubCategory } from '@/lib/generated/prisma'
 import { usePathname } from 'next/navigation'
 import {
   Select,
@@ -37,24 +37,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import InputFileUpload from '../../../components/file-input/InputFileUpload'
+import { SubCategoryFormSchema } from '../../../lib/schemas'
+import { getCategoryList } from '../../../lib/queries'
 import {
   createSubCategory,
   editSubCategory,
-} from '@/lib/actions/dashboard/subCategories'
-
-import { allCategories } from '@/lib/queries/dashboard/category'
-
-import InputFileUpload from '../../../components/file-input/InputFileUpload'
-import { SubCategoryFormSchema } from '../../../lib/schemas'
+} from '../../../lib/actions/sub-category'
+import { handleServerErrors } from '../../../lib/server-utils'
+import slugify from 'slugify'
+import { Loader2 } from 'lucide-react'
 
 interface SubCategoryDetailsProps {
   initialData?: SubCategory & { images: Image[] }
-  // categories: Partial<Category>[]
+  categories: Partial<Category>[]
 }
 
 const SubCategoryDetails: FC<SubCategoryDetailsProps> = ({
   initialData,
-  // categories,
+  categories,
 }) => {
   // Initializing necessary hooks
 
@@ -63,16 +64,10 @@ const SubCategoryDetails: FC<SubCategoryDetailsProps> = ({
 
   const [isPending, startTransition] = useTransition()
 
-  const { data: categories } = useQuery({
-    queryKey: ['categories'],
-    queryFn: () => allCategories(),
-  })
-  // Form hook for managing form state and validation
   const form = useForm<z.infer<typeof SubCategoryFormSchema>>({
-    mode: 'onChange', // Form validation mode
-    resolver: zodResolver(SubCategoryFormSchema), // Resolver for form validation
+    mode: 'onChange',
+    resolver: zodResolver(SubCategoryFormSchema),
     defaultValues: {
-      // Setting default form values from data (if available)
       name: initialData?.name,
       images: initialData?.images
         ? initialData.images.map((image) => ({ url: image.url }))
@@ -83,259 +78,173 @@ const SubCategoryDetails: FC<SubCategoryDetailsProps> = ({
     },
   })
 
-  // Reset form values when data changes
-  useEffect(() => {
-    if (initialData) {
-      form.reset({
-        name: initialData?.name,
-        images: initialData?.images
-          ? initialData.images.map((image) => ({ url: image.url }))
-          : [],
-        url: initialData?.url,
-        featured: initialData?.featured,
-        categoryId: initialData?.categoryId,
-      })
-    }
-  }, [initialData, form])
-
-  // Submit handler for form submission
   const handleSubmit = async (data: z.infer<typeof SubCategoryFormSchema>) => {
     // console.log({ data })
-    const formData = new FormData()
 
-    formData.append('name', data.name)
-    formData.append('url', data.url)
-    formData.append('categoryId', data.categoryId)
-
-    if (!initialData) {
-      if (data.featured) {
-        formData.append('featured', 'true')
-      } else {
-        formData.append('featured', 'false')
+    startTransition(async () => {
+      try {
+        if (initialData) {
+          const res = await editSubCategory(data, initialData.id, path)
+          if (res?.errors) handleServerErrors(res.errors, form.setError)
+        } else {
+          const res = await createSubCategory(data, path)
+          if (res?.errors) handleServerErrors(res.errors, form.setError)
+        }
+      } catch (error) {
+        if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
+          return
+        }
+        toast.error('مشکلی پیش آمده، لطفا دوباره امتحان کنید!')
       }
-    } else {
-      if (data.featured) {
-        formData.append('featured', true.toString())
-      } else {
-        formData.append('featured', false.toString())
-      }
-    }
-
-    if (data.images && data.images.length > 0) {
-      for (let i = 0; i < data.images.length; i++) {
-        formData.append('images', data.images[i] as string | Blob)
-      }
-    }
-    try {
-      if (initialData) {
-        // console.log({ data, initialData })
-
-        startTransition(async () => {
-          try {
-            const res = await editSubCategory(
-              formData,
-
-              initialData.id as string,
-              path
-            )
-
-            if (res?.errors?.name) {
-              form.setError('name', {
-                type: 'custom',
-                message: res?.errors.name?.join(' و '),
-              })
-            } else if (res?.errors?.images) {
-              form.setError('images', {
-                type: 'custom',
-                message: res?.errors.images?.join(' و '),
-              })
-            } else if (res?.errors?.categoryId) {
-              form.setError('categoryId', {
-                type: 'custom',
-                message: res?.errors.categoryId?.join(' و '),
-              })
-            } else if (res?.errors?._form) {
-              toast.error(res?.errors._form?.join(' و '))
-            }
-          } catch (error) {
-            // This will catch the NEXT_REDIRECT error, which is expected
-            // when the redirect happens
-            if (
-              !(
-                error instanceof Error &&
-                error.message.includes('NEXT_REDIRECT')
-              )
-            ) {
-              toast.error('مشکلی پیش آمده.')
-            }
-          }
-        })
-      } else {
-        startTransition(async () => {
-          try {
-            const res = await createSubCategory(formData, path)
-            if (res?.errors?.name) {
-              form.setError('name', {
-                type: 'custom',
-                message: res?.errors.name?.join(' و '),
-              })
-            } else if (res?.errors?.images) {
-              form.setError('images', {
-                type: 'custom',
-                message: res?.errors.images?.join(' و '),
-              })
-            } else if (res?.errors?.url) {
-              form.setError('url', {
-                type: 'custom',
-                message: res?.errors.url?.join(' و '),
-              })
-            } else if (res?.errors?.featured) {
-              form.setError('featured', {
-                type: 'custom',
-                message: res?.errors.featured?.join(' و '),
-              })
-            } else if (res?.errors?.categoryId) {
-              form.setError('categoryId', {
-                type: 'custom',
-                message: res?.errors.categoryId?.join(' و '),
-              })
-            } else if (res?.errors?._form) {
-              toast.error(res?.errors._form?.join(' و '))
-            }
-          } catch (error) {
-            // This will catch the NEXT_REDIRECT error, which is expected when the redirect happens
-            if (
-              !(
-                error instanceof Error &&
-                error.message.includes('NEXT_REDIRECT')
-              )
-            ) {
-              toast.error('مشکلی پیش آمده.')
-            }
-          }
-        })
-      }
-    } catch {
-      toast.error('مشکلی پیش آمده، لطفا دوباره امتحان کنید!')
-    }
+    })
   }
 
+  //Slug creation
+  const [isUrlManuallyEdited, setIsUrlManuallyEdited] = useState(
+    !!initialData?.url
+  )
+
+  const categoryName = form.watch('name')
+
+  useEffect(() => {
+    if (!isUrlManuallyEdited && categoryName) {
+      form.setValue('url', slugify(categoryName), { shouldValidate: true })
+    }
+  }, [categoryName, isUrlManuallyEdited, form])
   return (
     <AlertDialog>
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>Sub Category Information</CardTitle>
+          <CardTitle>اطلاعات زیردسته‌بندی</CardTitle>
           <CardDescription>
             {initialData?.id
-              ? `Update ${initialData?.name} sub category information.`
-              : ' Lets create a sub category. You can edit sub category later from the categories table or the sub category page.'}
+              ? `آپدیت زیردسته‌بندی ${initialData?.name}`
+              : ' زیردسته‌بندی جدید ایجاد کنید. شما می‌توانید بعدا از جدول زیردسته‌بندیها آنرا ویرایش کنید.'}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(handleSubmit)}
-              className="space-y-4"
+              className="space-y-6"
             >
-              <InputFileUpload
-                initialDataImages={initialData?.images || []}
-                name="images"
-                label="Images"
-              />
-              <FormField
-                disabled={isPending}
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel>Sub Category name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 ">
+                <div className="md:col-span-2 max-w-lg mx-auto ">
+                  <InputFileUpload
+                    initialDataImages={initialData?.images || []}
+                    name="images"
+                    label="عکس"
+                  />
+                </div>
+                <FormField
+                  disabled={isPending}
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>نام زیردسته‌بندی</FormLabel>
+                      <FormControl>
+                        <Input placeholder="نام زیردسته‌بندی" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                disabled={isPending}
-                control={form.control}
-                name="url"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel>Sub Category url</FormLabel>
-                    <FormControl>
-                      <Input placeholder="/sub-category-url" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="categoryId"
-                render={({ field }) => (
-                  <FormItem className=" bg-background">
-                    <FormControl>
-                      <Select
-                        dir="rtl"
-                        disabled={isPending}
-                        onValueChange={field.onChange}
-                        value={field.value}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue
-                              defaultValue={field.value}
-                              placeholder="Select a Category"
+                <FormField
+                  disabled={isPending}
+                  control={form.control}
+                  name="url"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>url زیردسته‌بندی</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder=" بصورت خودکار ساخته می‌شود"
+                          {...field}
+                          onChange={(e) => {
+                            field.onChange(e)
+                            setIsUrlManuallyEdited(true)
+                          }}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        این URL بصورت خودکار از نام ساخته می‌شود.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="categoryId"
+                  render={({ field }) => (
+                    <FormItem className=" bg-background">
+                      <FormControl>
+                        <Select
+                          dir="rtl"
+                          disabled={isPending}
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          defaultValue={field.value}
+                        >
+                          <FormLabel>انتخاب دسته‌بندی</FormLabel>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue
+                                defaultValue={field.value}
+                                placeholder="انتخاب دسته‌بندی"
+                              />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {categories?.map((category) => (
+                              <SelectItem
+                                key={category.id}
+                                value={category.id!}
+                              >
+                                {category.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <div className="md:col-span-2">
+                  <FormField
+                    control={form.control}
+                    name="featured"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex cursor-pointer flex-row items-center space-x-3 space-y-0 rounded-md border p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={Boolean(field.value)}
+                              onCheckedChange={field.onChange}
                             />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {categories?.map((category) => (
-                            <SelectItem key={category.id} value={category.id!}>
-                              {category.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>Select a Category</FormLabel>
-                      <FormDescription>
-                        This Sub Category will appear on the home page
-                      </FormDescription>
-                    </div>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="featured"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                    <FormControl>
-                      <Checkbox
-                        checked={Boolean(field.value)}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>Featured</FormLabel>
-                      <FormDescription>
-                        This Sub Category will appear on the home page
-                      </FormDescription>
-                    </div>
-                  </FormItem>
-                )}
-              />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <div className="font-medium">ویژه</div>
+                            <FormDescription>
+                              زیردسته‌بندی ویژه در صفحه اصلی نمایش داده می‌شود.
+                            </FormDescription>
+                          </div>
+                        </FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
               <Button type="submit" disabled={isPending}>
-                {isPending
-                  ? 'loading...'
-                  : initialData?.id
-                  ? 'Save sub category information'
-                  : 'Create sub category'}
+                {isPending ? (
+                  <Loader2 className="animate-spin" />
+                ) : initialData?.id ? (
+                  'ذخیره تغییرات'
+                ) : (
+                  'ایجاد زیردسته‌بندی'
+                )}
               </Button>
             </form>
           </Form>

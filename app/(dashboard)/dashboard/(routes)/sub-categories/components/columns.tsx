@@ -8,19 +8,21 @@ import { CellActions } from './cell-actions'
 import { Category, Image, SubCategory } from '@/lib/generated/prisma'
 
 export const columns: ColumnDef<
-  SubCategory & { category: Category } & { images: Image[] }
+  SubCategory & { category: Category } & { images: Image[] } & {
+    categories: Partial<Category>[]
+  }
 >[] = [
   {
     accessorKey: 'image',
-    header: 'Image',
+    header: 'تصویر',
     cell: ({ row }) => {
       return (
-        <div className="relative w-20  aspect-square min-w-20 rounded-2xl overflow-hidden">
+        <div className="relative w-20 aspect-square min-w-20 rounded-2xl overflow-hidden">
           <NextImage
             src={row.original?.images[0]?.url}
             alt={row.original.name}
             fill
-            className="  rounded-2xl object-cover shadow-2xl"
+            className="rounded-2xl object-cover shadow-2xl"
           />
         </div>
       )
@@ -28,7 +30,7 @@ export const columns: ColumnDef<
   },
   {
     accessorKey: 'name',
-    header: 'Name',
+    header: 'نام',
     cell: ({ row }) => {
       return (
         <span className="font-extrabold text-lg capitalize">
@@ -37,12 +39,11 @@ export const columns: ColumnDef<
       )
     },
   },
-
   {
     accessorKey: 'category',
-    header: 'Category',
+    header: 'دسته‌بندی',
     cell: ({ row }) => {
-      return <span> {row.original.category.name}</span>
+      return <span>{row.original.category.name}</span>
     },
   },
   {
@@ -54,7 +55,7 @@ export const columns: ColumnDef<
   },
   {
     accessorKey: 'featured',
-    header: 'Featured',
+    header: 'ویژه',
     cell: ({ row }) => {
       return (
         <span className="text-muted-foreground flex justify-center">
@@ -71,10 +72,8 @@ export const columns: ColumnDef<
     id: 'actions',
     cell: ({ row }) => {
       const rowData = row.original
-
-      return <CellActions rowData={rowData} />
+      const categories = row.original.categories
+      return <CellActions rowData={rowData} categories={categories} />
     },
   },
 ]
-
-// Define props interface for CellActions component

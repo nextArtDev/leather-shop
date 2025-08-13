@@ -23,7 +23,7 @@ import { Category, Image } from '@/lib/generated/prisma'
 export const columns: ColumnDef<Category & { images: Image[] }>[] = [
   {
     accessorKey: 'image',
-    header: 'Image',
+    header: 'عکس',
     cell: ({ row }) => {
       return (
         <div className="relative w-20  aspect-square min-w-20 rounded-2xl overflow-hidden">
@@ -39,7 +39,7 @@ export const columns: ColumnDef<Category & { images: Image[] }>[] = [
   },
   {
     accessorKey: 'name',
-    header: 'Name',
+    header: 'نام',
     cell: ({ row }) => {
       return (
         <span className="font-extrabold text-lg capitalize">
@@ -58,7 +58,7 @@ export const columns: ColumnDef<Category & { images: Image[] }>[] = [
   },
   {
     accessorKey: 'featured',
-    header: 'Featured',
+    header: 'ویژه',
     cell: ({ row }) => {
       return (
         <span className="text-muted-foreground flex justify-center">

@@ -46,6 +46,11 @@ const data = {
           url: '/dashboard/categories',
           // isActive: true,
         },
+        {
+          title: 'زیر دسته‌بندی',
+          url: '/dashboard/sub-categories',
+          // isActive: true,
+        },
         // {
         //   title: 'Rendering',
         //   url: '#',
