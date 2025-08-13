@@ -339,11 +339,10 @@ export const NewProductFormSchema = z.object({
 export const CategoryFormSchema = z.object({
   name: z
     .string()
-    .min(2, { message: 'Category name must be at least 2 characters long.' })
-    .max(50, { message: 'Category name cannot exceed 50 characters.' })
+    .min(2, { message: 'نام دسته‌بندی حداقل باید سه حرف باشد.' })
+    .max(50, { message: 'نام دسته‌بندی نمی‌تواند بیش از 50 حرف باشد' })
     .regex(/^[a-zA-Z0-9\s'&-‌\u0600-\u06FF]+$/, {
-      message:
-        'Only letters, numbers, and spaces are allowed in the category name.',
+      message: 'تنها استفاده از حروف، اعداد و اسپیس در نام دسته‌بندی مجاز است.',
     }),
 
   images: z
@@ -355,11 +354,12 @@ export const CategoryFormSchema = z.object({
     .optional(),
   url: z
     .string()
-    .min(2, { message: 'Category url must be at least 2 characters long.' })
-    .max(50, { message: 'Category url cannot exceed 50 characters.' })
+    .min(2, { message: 'آدرس دسته‌بندی حداقل باید 2 حرف باشد' })
+    .max(50, { message: 'آدرس دسته‌بندی نمی‌تواند بیش از 50 حرف باشد.' })
     .regex(/^(?!.*(?:[-_ ]){2,})[a-zA-Z0-9\s'&-‌\u0600-\u06FF]+$/, {
       message:
-        'Only letters, numbers, hyphen, and underscore are allowed in the category url, and consecutive occurrences of hyphens, underscores, or spaces are not permitted.',
+        // 'Only letters, numbers, hyphen, and underscore are allowed in the category url, and consecutive occurrences of hyphens, underscores, or spaces are not permitted.',
+        'تنها استفاده از حروف، اعداد، آندرلاین و خط تیره مجاز است.',
     }),
   featured: z.union([z.boolean().default(false), z.string()]).optional(),
 })

@@ -41,11 +41,11 @@ const data = {
           title: 'محصولات',
           url: '/dashboard/products',
         },
-        // {
-        //   title: 'Data Fetching',
-        //   url: '#',
-        //   isActive: true,
-        // },
+        {
+          title: 'دسته‌بندی',
+          url: '/dashboard/categories',
+          // isActive: true,
+        },
         // {
         //   title: 'Rendering',
         //   url: '#',
@@ -84,6 +84,7 @@ export default function AppSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
+
   return (
     <Sidebar side="right" {...props}>
       <SidebarHeader>{/* <SearchForm /> */}</SidebarHeader>
@@ -97,7 +98,10 @@ export default function AppSidebar({
                 {item.items.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     {/* <SidebarMenuButton asChild isActive={item?.isActive}> */}
-                    <SidebarMenuButton asChild isActive={item.url === pathname}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={pathname.includes(item.url)}
+                    >
                       <Link href={item.url}>{item.title}</Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

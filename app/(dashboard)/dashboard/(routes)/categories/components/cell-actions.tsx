@@ -24,8 +24,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 import { useActionState } from 'react'
-import { deleteCategory } from '@/lib/actions/dashboard/categories'
-import { getCategoryById } from '@/lib/queries/dashboard/category'
+// import { deleteCategory } from '@/lib/actions/dashboard/categories'
+// import { getCategoryById } from '@/lib/queries/dashboard/category'
 import { usePathname } from 'next/navigation'
 import CustomModal from '../../../components/custom-modal'
 import CategoryDetails from './category-details'
@@ -43,12 +43,12 @@ export const CellActions: React.FC<CellActionsProps> = ({ rowData }) => {
   const path = usePathname()
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_, deleteAction, pending] = useActionState(
-    deleteCategory.bind(null, path, rowData.id as string),
-    {
-      errors: {},
-    }
-  )
+  // const [_, deleteAction, pending] = useActionState(
+  //   deleteCategory.bind(null, path, rowData.id as string),
+  //   {
+  //     errors: {},
+  //   }
+  // )
   // Return null if rowData or rowData.id don't exist
   if (!rowData || !rowData.id) return null
 
@@ -70,13 +70,13 @@ export const CellActions: React.FC<CellActionsProps> = ({ rowData }) => {
                 setOpen(
                   <CustomModal>
                     <CategoryDetails initialData={rowData} />
-                  </CustomModal>,
-                  async () => {
-                    const data = await getCategoryById(rowData.id)
-                    return {
-                      rowData: data,
-                    }
-                  }
+                  </CustomModal>
+                  // async () => {
+                  //   const data = await getCategoryById(rowData.id)
+                  //   return {
+                  //     rowData: data,
+                  //   }
+                  // }
                 )
               } catch (error) {
                 console.error('Error:', error)
@@ -111,7 +111,7 @@ export const CellActions: React.FC<CellActionsProps> = ({ rowData }) => {
         </AlertDialogHeader>
         <AlertDialogFooter className="flex items-center">
           <AlertDialogCancel className="mb-2">Cancel</AlertDialogCancel>
-          <AlertDialogAction
+          {/* <AlertDialogAction
             disabled={pending}
             className="bg-destructive hover:bg-destructive mb-2 text-white"
             onClick={() => {
@@ -131,7 +131,7 @@ export const CellActions: React.FC<CellActionsProps> = ({ rowData }) => {
                 Delete
               </Button>
             </form>
-          </AlertDialogAction>
+          </AlertDialogAction> */}
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

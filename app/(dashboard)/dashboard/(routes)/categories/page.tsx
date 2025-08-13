@@ -1,16 +1,10 @@
-// Queries
-
-// Data table
-
 import { Plus } from 'lucide-react'
-
 import { columns } from './components/columns'
 import DataTable from '../../components/data-table'
-// import CategoryDetails from '@/components/dashboard/forms/category-details'
-// import DataTable from '@/components/ui/data-table'
-// import { getAllCategories } from '@/lib/queries/dashboard'
+import CategoryDetails from './components/category-details'
+import { getAllCategories } from '../../lib/queries'
 
-export default async function AdminCategoriesPage({
+export default async function CategoriesPage({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>
@@ -26,19 +20,21 @@ export default async function AdminCategoriesPage({
   if (!categoriesResponse.categories) return null // If no categories found, return null
 
   return (
-    <DataTable
-      actionButtonText={
-        <>
-          <Plus size={15} />
-          Create category
-        </>
-      }
-      modalChildren={<CategoryDetails />}
-      newTabLink="/dashboard/admin/categories/new"
-      filterValue="name"
-      data={categoriesResponse.categories}
-      searchPlaceholder="Search category name..."
-      columns={columns}
-    />
+    <div className="px-1">
+      <DataTable
+        actionButtonText={
+          <>
+            <Plus size={15} />
+            ایجاد دسته‌بندی
+          </>
+        }
+        modalChildren={<CategoryDetails />}
+        newTabLink="/dashboard/categories/new"
+        filterValue="name"
+        data={categoriesResponse.categories}
+        searchPlaceholder="جست‌وجو..."
+        columns={columns}
+      />
+    </div>
   )
 }
