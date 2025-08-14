@@ -140,7 +140,7 @@ export const getAllProductsList = cache(async () => {
         subCategory: true,
         offerTag: true,
         images: { orderBy: { created_at: 'desc' } },
-        variantImage: true,
+        variantImages: true,
         questions: true,
         specs: true,
         colors: true,
@@ -180,7 +180,7 @@ export const getProductById = cache(
     | (Product & { images: Image[] | null } & { specs: Spec[] | null } & {
         questions: Question[] | null
       } & {
-        variantImage: Image[] | null
+        variantImages: Image[] | null
         colors: Color[] | null
         sizes: Size[] | null
         specs: Spec[] | null
@@ -192,7 +192,7 @@ export const getProductById = cache(
         id,
       },
       include: {
-        variantImage: true,
+        variantImages: true,
         colors: true,
         sizes: true,
         specs: true,

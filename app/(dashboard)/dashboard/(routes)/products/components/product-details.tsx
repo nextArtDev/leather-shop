@@ -331,7 +331,7 @@ const ProductDetails: FC<ProductFormProps> = ({
               </InputFieldset>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <ImageInput
-                  name="variantImage"
+                  name="variantImages"
                   label="عکس وریانتها"
                   initialDataImages={data?.variantImages?.map((img) => ({
                     url: img.url,

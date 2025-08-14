@@ -9,7 +9,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Image } from '@/lib/generated/prisma'
-// import { Image as PrismaImageType } from '@prisma/client'
 import React, { useEffect, useState } from 'react'
 import { FieldArrayWithId, Path, useFormContext } from 'react-hook-form'
 import { FileInput, FileUploader } from '../file-input/file-input'
@@ -28,7 +27,7 @@ const dropZoneConfig = {
 interface ImageInputProps {
   name: string
   label: string
-  initialDataImages?: Partial<Image>[] | null // Kept for edit mode, but won't be mixed with new files
+  initialDataImages?: Partial<Image>[] | null
   mainVariantColors: FieldArrayWithId<YourMainFormSchemaType, 'colors', 'id'>[]
   addMainVariantColor: (colorValue: string) => void
 }
@@ -40,7 +39,19 @@ export function ImageInput({
   addMainVariantColor,
   initialDataImages,
 }: ImageInputProps) {
-  const { control } = useFormContext<YourMainFormSchemaType>()
+  const { control, setValue, watch } = useFormContext<YourMainFormSchemaType>()
+  const [isEditMode, setIsEditMode] = useState(false)
+
+  // Watch the field value to track changes
+  const fieldValue = watch(name as Path<YourMainFormSchemaType>)
+
+  useEffect(() => {
+    // Set initial images if in edit mode and no files are selected
+    if (initialDataImages && initialDataImages.length > 0 && !fieldValue) {
+      setValue(name as Path<YourMainFormSchemaType>, initialDataImages)
+      setIsEditMode(true)
+    }
+  }, [initialDataImages, name, setValue, fieldValue])
 
   return (
     <div className="w-full">
@@ -48,45 +59,70 @@ export function ImageInput({
         control={control}
         name={name as Path<YourMainFormSchemaType>}
         render={({ field }) => {
-          // 'field.value' is now expected to be File[]
-          const files: File[] = Array.isArray(field.value) ? field.value : []
+          const handleFileChange = (files: File[]) => {
+            // When new files are selected, switch to file mode
+            setIsEditMode(false)
+            field.onChange(files)
+          }
+
+          const handleRemoveExistingImage = (urlToRemove: string) => {
+            if (isEditMode && initialDataImages) {
+              const updatedImages = initialDataImages.filter(
+                (img) => img.url !== urlToRemove
+              )
+              field.onChange(updatedImages)
+
+              // If no images left, prepare for new file uploads
+              if (updatedImages.length === 0) {
+                setIsEditMode(false)
+                field.onChange([])
+              }
+            }
+          }
+
+          const handleRemoveFile = (fileToRemove: File) => {
+            if (!isEditMode && Array.isArray(field.value)) {
+              const files = field.value as File[]
+              const updatedFiles = files.filter((file) => file !== fileToRemove)
+              field.onChange(updatedFiles)
+            }
+          }
+
+          // Determine what to display
+          const hasFiles =
+            !isEditMode && Array.isArray(field.value) && field.value.length > 0
+          const hasExistingImages =
+            isEditMode && Array.isArray(field.value) && field.value.length > 0
 
           return (
             <FormItem>
               <FormLabel>{label}</FormLabel>
               <FormControl>
                 <FileUploader
-                  value={files}
-                  onValueChange={field.onChange} // Directly pass the RHF onChange handler
+                  value={
+                    isEditMode
+                      ? []
+                      : Array.isArray(field.value)
+                      ? field.value
+                      : []
+                  }
+                  onValueChange={handleFileChange}
                   dropzoneOptions={dropZoneConfig}
                   className="relative rounded-lg border border-dashed bg-background p-2"
                 >
-                  {files.length > 0 ? (
-                    !!initialDataImages ? (
+                  {hasFiles || hasExistingImages ? (
+                    isEditMode ? (
                       <ImagesPreviewGrid
-                        images={initialDataImages}
-                        onRemove={(urlToRemove: string) => {
-                          // Assuming initialDataImages have a 'url' property
-                          const updatedImages = initialDataImages.filter(
-                            (img) => img.url !== urlToRemove
-                          )
-                          field.onChange(updatedImages)
-                          if (urlToRemove.startsWith('blob:')) {
-                            URL.revokeObjectURL(urlToRemove)
-                          }
-                        }}
+                        images={field.value || []}
+                        onRemove={handleRemoveExistingImage}
                         mainVariantColors={mainVariantColors}
                         addMainVariantColor={addMainVariantColor}
+                        isEditMode={true}
                       />
                     ) : (
                       <ImagesPreviewGridForFiles
-                        files={files}
-                        onRemove={(fileToRemove) => {
-                          const updatedFiles = files.filter(
-                            (file) => file !== fileToRemove
-                          )
-                          field.onChange(updatedFiles)
-                        }}
+                        files={field.value || []}
+                        onRemove={handleRemoveFile}
                         mainVariantColors={mainVariantColors}
                         addMainVariantColor={addMainVariantColor}
                       />
@@ -109,7 +145,7 @@ export function ImageInput({
   )
 }
 
-// A new internal component to handle preview URL creation and cleanup
+// Component to handle file preview URL creation and cleanup
 function ImagesPreviewGridForFiles({
   files,
   onRemove,
@@ -130,33 +166,41 @@ function ImagesPreviewGridForFiles({
 
     // Cleanup function to revoke URLs when the component unmounts or files change
     return () => {
-      newUrls.forEach((url) => URL.revokeObjectURL(url))
+      previewUrls.forEach((url) => URL.revokeObjectURL(url))
     }
   }, [files])
 
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      previewUrls.forEach((url) => URL.revokeObjectURL(url))
+    }
+  }, [])
+
   return (
     <ImagesPreviewGrid
-      // Map files to the format that ImagesPreviewGrid expects
       images={files.map((file, index) => ({
-        // Use the generated preview URL for display
+        id: `file-${index}`,
         url: previewUrls[index] || '',
-        // Pass the original file to the onRemove handler
+        key: `file-${file.name}-${index}`,
         originalFile: file,
       }))}
       onRemove={(url: string) => {
-        // Find the file corresponding to the preview URL and remove it
         const index = previewUrls.indexOf(url)
         if (index !== -1) {
           onRemove(files[index])
+          // Revoke the specific URL
+          URL.revokeObjectURL(url)
         }
       }}
       mainVariantColors={mainVariantColors}
       addMainVariantColor={addMainVariantColor}
+      isEditMode={false}
     />
   )
 }
 
-// The SVG component remains unchanged
+// SVG component for the upload area
 const FileSvgDraw = () => (
   <>
     <svg

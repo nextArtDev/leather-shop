@@ -102,9 +102,9 @@ model Image {
   subCategoryId String?
 
   variantImage   Product? @relation("variantImage", fields: [variantImageId], references: [id])
-  variantImageId String?  @unique
+  variantImageId String?
 
-  product   Product? @relation(fields: [productId], references: [id])
+  product   Product? @relation("productImage", fields: [productId], references: [id])
   productId String?
 
   review   Review? @relation(fields: [reviewId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -174,7 +174,7 @@ model Product {
   numReviews        Int               @default(0)
   shippingFeeMethod ShippingFeeMethod @default(ITEM)
   views             Int               @default(0)
-  images            Image[]
+  images            Image[]           @relation("productImage")
   freeShipping      FreeShipping?     @relation("ProductFreeShipping")
   isFeatured        Boolean           @default(false)
   isSale            Boolean           @default(false)
@@ -191,7 +191,7 @@ model Product {
 
   wishlist Wishlist[] @relation("WishlistToProduct")
 
-  variantImage Image[] @relation("variantImage")
+  variantImages Image[] @relation("variantImage")
 
   sizes Size[] @relation("ProductSizes")
 

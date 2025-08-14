@@ -65,7 +65,7 @@ export const columns: ColumnDef<StoreProductType>[] = [
                 <Link
                   href={`/dashboard/products/${row.original.product.id}/variants/${row.original.id}`}
                 >
-                  {row.original?.variantImage && (
+                  {row.original?.variantImages && (
                     <NextImage
                       src={row.original?.variantImage[0]?.url}
                       alt={`${row.original.variantName} image`}

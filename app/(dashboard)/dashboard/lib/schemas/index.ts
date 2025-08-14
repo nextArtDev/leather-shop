@@ -128,13 +128,12 @@ export const ProductFormSchema = z.object({
       z.array(z.object({ url: z.string() })),
     ])
     .optional(),
-  variantImages: z
-    .union([
-      z.array(z.instanceof(File)),
-      z.array(z.string()),
-      z.array(z.object({ url: z.string() })),
-    ])
-    .optional(),
+  variantImages: z.union([
+    z.array(z.instanceof(File)),
+    z.array(z.string()),
+    z.array(z.object({ url: z.string() })),
+  ]),
+  // .optional(),
   offerTagId: z.string().optional(),
   isFeatured: z.union([z.boolean().default(false)]).optional(),
   brand: z.string().optional(),

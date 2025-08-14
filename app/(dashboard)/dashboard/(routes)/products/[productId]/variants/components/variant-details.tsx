@@ -48,7 +48,7 @@ import { DateTimePicker } from '@/app/(dashboard)/dashboard/components/date-time
 export type VariantColorFormItem = { id?: string; color: string }
 
 interface VariantDetailsProps {
-  data?: Variant & { variantImage: Image[] | null } & {
+  data?: Variant & { variantImages: Image[] | null } & {
     colors: Color[] | null
   } & { sizes: Size[] | null } & { specs: Spec[] | null }
   productId: string
