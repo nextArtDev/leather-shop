@@ -85,7 +85,7 @@ export async function createProduct(
       errors: result.error.flatten().fieldErrors,
     }
   }
-  console.log(result.data)
+  // console.log(result.data)
   const user = await currentUser()
   // if (!user || !user.id || user.role !== 'SELLER') {
   //   return {
@@ -219,6 +219,7 @@ export async function editProduct(
       errors: result.error.flatten().fieldErrors,
     }
   }
+  console.log('ttoj', result.data)
   const user = await currentUser()
   // if (  !user || !user.id || user.role !== 'SELLER') {
   //   return {
@@ -325,8 +326,8 @@ export async function editProduct(
       })
     }
 
-    await prisma.$transaction(async (tx) => {
-      tx.product.update({
+    const product = await prisma.$transaction(async (tx) => {
+      await tx.product.update({
         where: {
           id: productId,
         },
@@ -337,70 +338,60 @@ export async function editProduct(
           description: result.data.description,
           brand: result.data?.brand || '',
           shippingFeeMethod: result.data.shippingFeeMethod,
+          isFeatured: result.data?.isFeatured,
         },
       })
 
-      const existingFreeShippingCities = await tx.freeShipping.findFirst({
-        where: {
-          productId,
-        },
-        include: {
-          eligibleCities: true,
-        },
-      })
-      const existingCityIds = existingFreeShippingCities?.eligibleCities.map(
-        (city) => city.cityId
-      )
-      // console.log(
-      //   'ev',
+      // const existingFreeShippingCities = await tx.freeShipping.findFirst({
+      //   where: {
+      //     productId,
+      //   },
+      //   include: {
+      //     eligibleCities: true,
+      //   },
+      // })
+      // const existingCityIds = existingFreeShippingCities?.eligibleCities.map(
+      //   (city) => city.cityId
+      // )
+
+      // if (
+      //   // !existingCityIds?.every(
+      //   //   (value, index) => value == +result.data.freeShippingCityIds[index]
+      //   // )
       //   !arraysEqual(existingCityIds, result.data.freeShippingCityIds)
-      // )
-      // console.log(
-      //   'id',
-      //   existingFreeShippingCities?.eligibleCities.map(
-      //     (city: { id: string }) => ({
-      //       id: city.id,
-      //     })
-      //   )
-      // )
-      if (
-        // !existingCityIds?.every(
-        //   (value, index) => value == +result.data.freeShippingCityIds[index]
-        // )
-        !arraysEqual(existingCityIds, result.data.freeShippingCityIds)
-      ) {
-        await tx.freeShipping.update({
-          where: {
-            id: existingFreeShippingCities?.id,
-            productId,
-          },
-          data: {
-            eligibleCities: {
-              deleteMany: existingFreeShippingCities?.eligibleCities.map(
-                (city: { id: string }) => ({
-                  id: city.id,
-                })
-              ),
-            },
-          },
-        })
-        await tx.freeShipping.delete({
-          where: {
-            id: existingFreeShippingCities?.id,
-            productId,
-          },
-        })
-        await tx.freeShipping.create({
-          data: {
-            productId,
-            eligibleCities: {
-              create: result.data.freeShippingCityIds?.map((cityId) => ({
-                cityId: +cityId,
-              })),
-            },
-          },
-        })
-      }
+      // ) {
+      //   await tx.freeShipping.update({
+      //     where: {
+      //       id: existingFreeShippingCities?.id,
+      //       productId,
+      //     },
+      //     data: {
+      //       eligibleCities: {
+      //         deleteMany: existingFreeShippingCities?.eligibleCities.map(
+      //           (city: { id: string }) => ({
+      //             id: city.id,
+      //           })
+      //         ),
+      //       },
+      //     },
+      //   })
+      //   await tx.freeShipping.delete({
+      //     where: {
+      //       id: existingFreeShippingCities?.id,
+      //       productId,
+      //     },
+      //   })
+      //   await tx.freeShipping.create({
+      //     data: {
+      //       productId,
+      //       eligibleCities: {
+      //         create: result.data.freeShippingCityIds?.map((cityId) => ({
+      //           cityId: +cityId,
+      //         })),
+      //       },
+      //     },
+      //   })
+      // }
 
       await tx.spec.deleteMany({
         where: { productId: productId },
@@ -440,6 +431,7 @@ export async function editProduct(
         })
       }
     })
+    console.log({ product })
   } catch (err: unknown) {
     const message =
       err instanceof Error ? err.message : 'مشکلی در سرور پیش آمده.'

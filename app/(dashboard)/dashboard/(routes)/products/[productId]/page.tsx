@@ -18,7 +18,8 @@ export default async function SellerNewProductPage({
     },
     include: {
       images: { select: { url: true } },
-      specs: { select: { name: true, id: true } },
+      specs: { select: { name: true, value: true, id: true } },
+      questions: { select: { question: true, answer: true, id: true } },
       category: { select: { name: true, id: true } },
       freeShipping: {
         select: {

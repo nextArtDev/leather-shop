@@ -39,7 +39,6 @@ import {
 } from '@/components/ui/select'
 import InputFileUpload from '../../../components/file-input/InputFileUpload'
 import { SubCategoryFormSchema } from '../../../lib/schemas'
-import { getCategoryList } from '../../../lib/queries'
 import {
   createSubCategory,
   editSubCategory,

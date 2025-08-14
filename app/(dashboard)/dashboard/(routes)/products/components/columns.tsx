@@ -1,10 +1,6 @@
 'use client'
-
-// React, Next.js imports
 import { useActionState } from 'react'
 import NextImage from 'next/image'
-
-// UI components
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,12 +22,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-
-// Hooks and utilities
-
 import { useModal } from '@/providers/modal-provider'
-
-// Lucide icons
 import {
   CopyPlus,
   FilePenLine,
@@ -41,30 +32,61 @@ import {
 } from 'lucide-react'
 import { ColumnDef } from '@tanstack/react-table'
 import Link from 'next/link'
-import { Color, Image, Product, Size, Variant } from '@/lib/generated/prisma'
+import {
+  Category,
+  Color,
+  Image,
+  OfferTag,
+  Product,
+  Size,
+  SubCategory,
+  Variant,
+} from '@/lib/generated/prisma'
 import { usePathname } from 'next/navigation'
 import { deleteProduct } from '../../../lib/actions/products'
 
-export const columns: ColumnDef<Product & { images: Image[] }>[] = [
+export const columns: ColumnDef<
+  Product & {
+    images: Image[]
+    variants: (Variant & { colors: Color[]; sizes: Size[] })[] | null
+    category: Category
+    subCategory: SubCategory
+    offerTag: OfferTag | null
+  }
+>[] = [
+  {
+    accessorKey: 'name',
+    header: 'نام',
+    cell: ({ row }) => {
+      return <span>{row.original.name}</span>
+    },
+  },
   {
     accessorKey: 'image',
-    header: 'Image',
+    header: 'تصویر',
     cell: ({ row }) => {
       return (
-        <div className="flex flex-col gap-y-3">
-          {/* Product name */}
-          <h1 className="font-bold truncate pb-3 border-b capitalize">
-            {row.original.name}
-          </h1>
-          {/* Product variants */}
-          <div className="relative flex flex-wrap gap-2">
+        <div className=" flex flex-col justify-center items-center gap-y-3">
+          <div className="group relative flex  justify-center items-center cursor-pointer">
+            {/* <h1 className="font-bold truncate pb-3 border-b capitalize">
+              {row.original.name}
+            </h1> */}
             <NextImage
               src={row.original.images.map((img) => img.url)[0]}
               alt={`${row.original.name} image`}
-              width={1000}
-              height={1000}
-              className="max-w-32 h-32 rounded-md object-cover shadow-sm"
+              width={96}
+              height={96}
+              className="max-w-32 h-24 rounded-md object-cover shadow-sm"
             />
+            <Link href={`/dashboard/products/${row.original.id}`}>
+              <div className="-mr-24 w-[200px]  text-background absolute inset-0   z-0 rounded-sm bg-primary/25 transition-all duration-150 hidden group-hover:flex items-center justify-center">
+                <FilePenLine className=" text-background" />
+                ویرایش
+              </div>
+            </Link>
+          </div>
+          {/* Product variants */}
+          <div className="relative flex flex-wrap gap-2">
             {row.original?.variants?.map(
               (
                 variant: Variant & {
@@ -73,14 +95,6 @@ export const columns: ColumnDef<Product & { images: Image[] }>[] = [
               ) => (
                 <div key={variant.id} className="flex flex-col gap-y-2 group">
                   <div className="relative cursor-pointer p-2">
-                    <Link
-                      // href={`/dashboard/products/${row.original.id}/variants/${variant.id}`}
-                      href={`/dashboard/products/${row.original.id}`}
-                    >
-                      <div className="w-[304px] h-full absolute top-0 left-0 bottom-0 right-0 z-0 rounded-sm bg-black/50 transition-all duration-150 hidden group-hover:block">
-                        <FilePenLine className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white" />
-                      </div>
-                    </Link>
                     {/* Info */}
                     <div className="flex flex-col mt-2 gap-2 ">
                       {/* Colors */}
@@ -122,37 +136,30 @@ export const columns: ColumnDef<Product & { images: Image[] }>[] = [
   },
   {
     accessorKey: 'category',
-    header: 'Category',
+    header: 'دسته‌بندی',
     cell: ({ row }) => {
       return <span>{row.original.category.name}</span>
     },
   },
   {
     accessorKey: 'subCategory',
-    header: 'SubCategory',
+    header: 'زیردسته‌بندی',
     cell: ({ row }) => {
       return <span>{row.original.subCategory.name}</span>
     },
   },
   {
     accessorKey: 'offerTag',
-    header: 'Offer',
+    header: 'تخفیف',
     cell: ({ row }) => {
       const offerTag = row.original.offerTag
       return <span>{offerTag ? offerTag.name : '-'}</span>
     },
   },
-  {
-    accessorKey: 'brand',
-    header: 'Brand',
-    cell: ({ row }) => {
-      return <span>{row.original.brand}</span>
-    },
-  },
 
   {
     accessorKey: 'new-variant',
-    header: 'Add Variant',
+    header: 'افزودن وریانت',
     cell: ({ row }) => {
       return (
         <Link href={`/dashboard/products/${row.original.id}/variants/new`}>

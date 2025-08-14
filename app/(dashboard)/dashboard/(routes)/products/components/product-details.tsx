@@ -87,7 +87,7 @@ interface ProductFormProps {
   // }
   //   data?: Partial<ProductWithVariantType>
   data?: Partial<
-    Product & { images: Image[] | null } & { specs: Spec[] | null } & {
+    Product & { images: Partial<Image>[] | null } & { specs: Spec[] | null } & {
       questions: Question[] | null
     } & {
       freeShipping:
@@ -108,7 +108,7 @@ const ProductDetails: FC<ProductFormProps> = ({
   provinces,
   // subCategories,
 }) => {
-  // console.log(data)
+  console.log(data?.isFeatured)
 
   const path = usePathname()
 
@@ -122,6 +122,7 @@ const ProductDetails: FC<ProductFormProps> = ({
       description: data?.description,
       images: data?.images || [],
       categoryId: data?.categoryId,
+      isFeatured: data?.isFeatured || false,
       freeShippingCityIds:
         data?.freeShipping?.eligibleCities?.map((fsh) => ({
           value: fsh.id,
@@ -797,7 +798,7 @@ const ProductDetails: FC<ProductFormProps> = ({
                       <div className="space-y-1 leading-none">
                         <div className="font-medium">ویژه</div>
                         <FormDescription>
-                          زیردسته‌بندی ویژه در صفحه اصلی نمایش داده می‌شود.
+                          محصول ویژه در صفحه اصلی نمایش داده می‌شود.
                         </FormDescription>
                       </div>
                     </FormLabel>
