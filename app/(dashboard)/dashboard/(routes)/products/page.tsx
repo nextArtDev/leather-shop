@@ -1,45 +1,41 @@
-import { Prisma } from '@/lib/generated/prisma'
 import { Plus } from 'lucide-react'
 
 import { notFound } from 'next/navigation'
 import DataTable from '../../components/data-table'
-import ProductDetails from '@/components/product/product-detail/ProductDetails'
 
-export default async function SellerProductsPage({
-  params,
-}: {
-  params: Promise<{ storeUrl: string }>
-}) {
-  const storeUrl = (await params).storeUrl
+import {
+  getAllOfferTags,
+  getAllProductsList,
+  getCategoryList,
+} from '../../lib/queries'
+import { columns } from './components/columns'
+import ProductDetails from './components/product-details'
+
+export default async function ProductsPage() {
   // Fetching products data from the database for the active store
-  //   const products = await getAllStoreProducts(storeUrl)
-  //   if (!products) return notFound()
+  const products = await getAllProductsList()
+  if (!products) return notFound()
   //   // console.log({ products })
 
-  //   const categories = await getAllCategories({})
-  //   const offerTags = await getAllOfferTags()
+  const categories = await getCategoryList()
+  const offerTags = await getAllOfferTags()
 
   return (
     <DataTable
       actionButtonText={
         <>
           <Plus size={15} />
-          Create product
+          ایجاد محصول
         </>
       }
       modalChildren={
-        <ProductDetails
-          categories={categories.categories}
-          offerTags={offerTags}
-          storeUrl={storeUrl}
-          countries={countries}
-        />
+        <ProductDetails categories={categories} offerTags={offerTags} />
       }
       newTabLink={`/dashboard/products/new`}
       filterValue="name"
       data={products}
       columns={columns}
-      searchPlaceholder="Search product name..."
+      searchPlaceholder="جست‌وجوی نام محصول..."
     />
   )
 }

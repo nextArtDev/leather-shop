@@ -293,11 +293,11 @@ export const subCategoryServerFormSchema = z.object({
 //   // shippingFeeMethod: z.nativeEnum(ShippingFeeMethod),
 // })
 
-export const NewProductFormSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  description: z.string().min(1, 'Description is required'),
-  categoryId: z.string().min(1, 'Category is required'),
-  subCategoryId: z.string().min(1, 'Sub-category is required'),
+export const ProductFormSchema = z.object({
+  name: z.string().min(1, 'نام محصول الزامی است.'),
+  description: z.string().min(1, 'توضیحات محصول الزامی است.'),
+  categoryId: z.string().min(1, 'دسته‌بندی محصول الزامی است.'),
+  subCategoryId: z.string().min(1, 'زیر دسته‌بندی الزامی است.'),
   // shippingFeeMethod: z.enum(['ITEM', 'WEIGHT', 'FIXED']).default('ITEM'),
   shippingFeeMethod: z.nativeEnum(ShippingFeeMethod),
   images: z
@@ -308,6 +308,7 @@ export const NewProductFormSchema = z.object({
     ])
     .optional(),
   offerTagId: z.string().optional(),
+  isFeatured: z.union([z.boolean().default(false)]).optional(),
   brand: z.string().optional(),
   product_specs: z
     .array(

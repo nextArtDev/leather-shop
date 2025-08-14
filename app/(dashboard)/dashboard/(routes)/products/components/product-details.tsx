@@ -49,20 +49,13 @@ import {
 import { Dot } from 'lucide-react'
 import { FC, useEffect, useState, useTransition } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import MultipleSelector, {
-  MultiSelect,
-  MultiSelectContent,
-  MultiSelectGroup,
-  MultiSelectItem,
-  MultiSelectTrigger,
-  MultiSelectValue,
-} from '../../../components/multi-select'
+import MultipleSelector from '../../../components/multi-select'
 import { usePathname } from 'next/navigation'
 import InputFileUpload from '../../../components/file-input/InputFileUpload'
 import InputFieldset from '../../../components/input-fieldset'
 import RichTextEditor from '../../../components/text-editor/react-text-editor'
 import ClickToAddInputsRHF from '../../../components/click-to-add'
-import { NewProductFormSchema } from '../../../lib/schemas'
+import { ProductFormSchema } from '../../../lib/schemas'
 
 const shippingFeeMethods = [
   {
@@ -97,19 +90,16 @@ interface ProductFormProps {
         | null
     }
   >
-  categories: Category[]
-
+  categories: Partial<Category>[]
   offerTags: OfferTag[]
-  countries: Country[]
   provinces?: Province[]
   // subCategories?: SubCategory[]
 }
 
-const ProductForm: FC<ProductFormProps> = ({
+const ProductDetails: FC<ProductFormProps> = ({
   data,
   categories,
   offerTags,
-
   provinces,
   // subCategories,
 }) => {
@@ -120,8 +110,8 @@ const ProductForm: FC<ProductFormProps> = ({
   const [isPending, startTransition] = useTransition()
   const [provinceNameForShopping, setProvinceNameForShopping] = useState('')
 
-  const form = useForm<z.infer<typeof NewProductFormSchema>>({
-    resolver: zodResolver(NewProductFormSchema),
+  const form = useForm<z.infer<typeof ProductFormSchema>>({
+    resolver: zodResolver(ProductFormSchema),
     defaultValues: {
       name: data?.name,
       description: data?.description,
@@ -204,7 +194,7 @@ const ProductForm: FC<ProductFormProps> = ({
     }
   }, [data, form])
 
-  const handleSubmit = async (values: z.infer<typeof NewProductFormSchema>) => {
+  const handleSubmit = async (values: z.infer<typeof ProductFormSchema>) => {
     const formData = new FormData()
 
     console.log({ values })
@@ -816,4 +806,4 @@ const ProductForm: FC<ProductFormProps> = ({
   )
 }
 
-export default ProductForm
+export default ProductDetails
