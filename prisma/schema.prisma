@@ -101,7 +101,7 @@ model Image {
   SubCategory   SubCategory? @relation(fields: [subCategoryId], references: [id])
   subCategoryId String?
 
-  variantImage   Variant? @relation("variantImage", fields: [variantImageId], references: [id])
+  variantImage   Product? @relation("variantImage", fields: [variantImageId], references: [id])
   variantImageId String?  @unique
 
   product   Product? @relation(fields: [productId], references: [id])
@@ -164,37 +164,50 @@ enum ShippingFeeMethod {
 }
 
 model Product {
-  id                          String            @id @default(uuid())
-  name                        String
-  description                 String            @db.LongText
-  slug                        String            @unique
-  brand                       String
-  rating                      Float             @default(0)
-  sales                       Int               @default(0)
-  numReviews                  Int               @default(0)
-  shippingFeeMethod           ShippingFeeMethod @default(ITEM)
-  views                       Int               @default(0)
-  images                      Image[]
-  freeShipping                FreeShipping?     @relation("ProductFreeShipping")
-  freeShippingForAllCountries Boolean           @default(false)
-  isFeatured                  Boolean           @default(false)
-  createdAt                   DateTime          @default(now())
-  updatedAt                   DateTime          @default(now()) @updatedAt
+  id                String            @id @default(uuid())
+  name              String
+  description       String            @db.LongText
+  slug              String            @unique
+  brand             String
+  rating            Float             @default(0)
+  sales             Int               @default(0)
+  numReviews        Int               @default(0)
+  shippingFeeMethod ShippingFeeMethod @default(ITEM)
+  views             Int               @default(0)
+  images            Image[]
+  freeShipping      FreeShipping?     @relation("ProductFreeShipping")
+  isFeatured        Boolean           @default(false)
+  isSale            Boolean           @default(false)
+  saleEndDate       String?
+  sku               String
+  keywords          String
+  weight            Float?
 
-  variants  Variant[]  @relation("ProductToVariant")
-  specs     Spec[]     @relation("ProductSpec")
+  specs Spec[] @relation("ProductSpec")
+
   questions Question[] @relation("ProductQuestion")
-  reviews   Review[]   @relation("ReviewToProduct")
-  wishlist  Wishlist[] @relation("WishlistToProduct")
+
+  reviews Review[] @relation("ReviewToProduct")
+
+  wishlist Wishlist[] @relation("WishlistToProduct")
+
+  variantImage Image[] @relation("variantImage")
+
+  sizes Size[] @relation("ProductSizes")
+
+  colors Color[] @relation("ProductColors")
 
   categoryId String
-  category   Category @relation("CategoryToProduct", fields: [categoryId], references: [id])
+  category   Category @relation("CategoryToProduct", fields: [categoryId], references: [id], onDelete: Cascade)
 
   subCategoryId String
-  subCategory   SubCategory @relation("SubCategoryToProduct", fields: [subCategoryId], references: [id])
+  subCategory   SubCategory @relation("SubCategoryToProduct", fields: [subCategoryId], references: [id], onDelete: Cascade)
 
   offerTagId String?
   offerTag   OfferTag? @relation("OfferTagToProduct", fields: [offerTagId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
   @@index([categoryId])
   @@index([subCategoryId])
@@ -202,30 +215,28 @@ model Product {
 }
 
 model Variant {
-  id           String  @id @default(uuid())
-  name         String
-  description  String? @db.LongText
-  variantImage Image[] @relation("variantImage")
-  slug         String  @unique
-  isSale       Boolean @default(false)
-  saleEndDate  String?
-  sku          String
-  keywords     String
-  sales        Int     @default(0)
-  weight       Float
+  id          String  @id @default(uuid())
+  name        String
+  description String? @db.LongText
+  // variantImage Image[] @relation("variantImage")
+  slug        String  @unique
+  isSale      Boolean @default(false)
+  saleEndDate String?
+  sku         String
+  keywords    String
+  sales       Int     @default(0)
+  weight      Float
 
-  productId String
-  product   Product @relation("ProductToVariant", fields: [productId], references: [id], onDelete: Cascade)
+  // productId String
+  // product   Product @relation("ProductToVariant", fields: [productId], references: [id], onDelete: Cascade)
 
-  sizes    Size[]     @relation("VariantSizes")
-  colors   Color[]    @relation("VariantColors")
   specs    Spec[]     @relation("VariantSpec")
   wishlist Wishlist[] @relation("WishlistToVariant")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  @@index([productId])
+  // @@index([productId])
 }
 
 model Size {
@@ -237,26 +248,26 @@ model Size {
 
   wishlist Wishlist[] @relation("WishlistToSize")
 
-  variantId String?
-  variant   Variant? @relation("VariantSizes", fields: [variantId], references: [id])
+  productId String?
+  product   Product? @relation("ProductSizes", fields: [productId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  @@index([variantId])
+  @@index([productId])
 }
 
 model Color {
   id   String @id @default(uuid())
   name String
 
-  variantId String?
-  variant   Variant? @relation("VariantColors", fields: [variantId], references: [id], onDelete: Cascade)
+  productId String?
+  product   Product? @relation("ProductColors", fields: [productId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  @@index([variantId])
+  @@index([productId])
 }
 
 model OfferTag {

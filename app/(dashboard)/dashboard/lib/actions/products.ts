@@ -37,47 +37,7 @@ export async function createProduct(
   data: unknown,
   path: string
 ): Promise<CreateProductFormState> {
-  const result = ProductFormSchema.safeParse(
-    data
-    //   {
-    //   name: formData.get('name'),
-    //   description: formData.get('description'),
-    //   name: formData.get('name'),
-    //   description: formData.get('description'),
-    //   name_fa: formData.get('name_fa'),
-    //   description_fa: formData.get('description_fa'),
-    //   name_fa: formData.get('name_fa'),
-    //   description_fa: formData.get('description_fa'),
-    //   categoryId: formData.get('categoryId'),
-    //   subCategoryId: formData.get('subCategoryId'),
-    //   offerTagId: formData.get('offerTagId'),
-    //   isSale: Boolean(formData.get('isSale')),
-    //   saleEndDate: formData.get('saleEndDate'),
-    //   brand: formData.get('brand'),
-    //   sku: formData.get('sku'),
-    //   weight: Number(formData.get('weight')),
-    //   keywords: formData.getAll('keywords'),
-    //   specs: formData
-    //     .getAll('specs')
-    //     .map((spec) => JSON.parse(spec.toString())),
-    //   variant_specs: formData
-    //     .getAll('variant_specs')
-    //     .map((variant_spec) => JSON.parse(variant_spec.toString())),
-    //   questions: formData
-    //     .getAll('questions')
-    //     .map((question) => JSON.parse(question.toString())),
-    //   sizes: formData.getAll('sizes').map((size) => JSON.parse(size.toString())),
-    //   colors: formData
-    //     .getAll('colors')
-    //     .map((size) => JSON.parse(size.toString())),
-    //   shippingFeeMethod: formData.get('shippingFeeMethod'),
-    //   freeShippingForAllCountries: Boolean(
-    //     formData.get('freeShippingForAllCountries')
-    //   ),
-    //   images: formData.getAll('images'),
-    //   variantImage: formData.getAll('variantImage'),
-    // }
-  )
+  const result = ProductFormSchema.safeParse(data)
 
   if (!result.success) {
     console.error(result.error.flatten().fieldErrors)
@@ -132,6 +92,20 @@ export async function createProduct(
         .map((res) => res?.imageId)
         .filter(Boolean) as string[]
     }
+    let variantImageIds: string[] = []
+    if (result.data.variantImages) {
+      const filesToUpload = result.data.variantImages?.filter(
+        (img): img is File => img instanceof File
+      )
+      const newImageUploadPromises = filesToUpload.map(async (img: File) => {
+        const buffer = Buffer.from(await img.arrayBuffer())
+        return uploadFileToS3(buffer, img.name)
+      })
+      const uploadedImages = await Promise.all(newImageUploadPromises)
+      variantImageIds = uploadedImages
+        .map((res) => res?.imageId)
+        .filter(Boolean) as string[]
+    }
 
     const product = await prisma.product.create({
       data: {
@@ -143,29 +117,24 @@ export async function createProduct(
         brand: result.data?.brand || '',
         shippingFeeMethod: result.data.shippingFeeMethod,
         isFeatured: result.data.isFeatured,
+        keywords: result.data.keywords?.length
+          ? result.data.keywords?.join(',')
+          : '',
+        sku: result.data.sku ? result.data.sku : '',
+        isSale: result.data.isSale,
+        weight: result.data.weight ? +result.data.weight : 0,
+        saleEndDate: String(result.data.saleEndDate),
+
         // freeShipping:result.data.freeShippingCountriesIds?true:false,
         images: {
           connect: imageIds.map((id) => ({
             id: id,
           })),
         },
-      },
-    })
-
-    await prisma.freeShipping.create({
-      data: {
-        productId: product.id,
-        eligibleCities: {
-          create: result.data.freeShippingCityIds?.map((cityId) => ({
-            cityId: +cityId,
+        variantImage: {
+          connect: variantImageIds.map((id) => ({
+            id: id,
           })),
-        },
-      },
-      include: {
-        eligibleCities: {
-          include: {
-            city: true,
-          },
         },
       },
     })
@@ -196,6 +165,36 @@ export async function createProduct(
         data: newQuestions,
       })
     }
+    let newColors
+    if (result.data.colors) {
+      newColors = result.data.colors.map((color) => ({
+        name: color.color,
+        productId: product.id,
+      }))
+    }
+
+    if (newColors) {
+      await prisma.color.createMany({
+        data: newColors,
+      })
+    }
+    //  new Size
+    let newSizes
+    if (result.data.sizes) {
+      newSizes = result.data.sizes.map((size) => ({
+        size: size.size,
+        quantity: size.quantity,
+        price: size.price,
+        discount: size.discount,
+        productId: product.id,
+      }))
+    }
+
+    if (newSizes) {
+      await prisma.size.createMany({
+        data: newSizes,
+      })
+    }
     console.log({ product })
   } catch (err: unknown) {
     const message =
@@ -219,7 +218,7 @@ export async function editProduct(
       errors: result.error.flatten().fieldErrors,
     }
   }
-  console.log('ttoj', result.data)
+  console.log('result.data', result.data)
   const user = await currentUser()
   // if (  !user || !user.id || user.role !== 'SELLER') {
   //   return {
@@ -239,6 +238,8 @@ export async function editProduct(
   let isExisting:
     | (Product & {
         images: { id: string; key: string }[] | null
+      } & {
+        variantImage: { id: string; key: string }[] | null
       })
     | null
   try {
@@ -246,6 +247,7 @@ export async function editProduct(
       where: { id: productId },
       include: {
         images: { select: { id: true, key: true } },
+        variantImage: { select: { id: true, key: true } },
       },
     })
     if (!isExisting) {
@@ -325,6 +327,52 @@ export async function editProduct(
         },
       })
     }
+    if (
+      typeof result.data?.variantImages?.[0] === 'object' &&
+      result.data.variantImages[0] instanceof File
+    ) {
+      if (isExisting.variantImage && isExisting.variantImage.length > 0) {
+        const oldImageKeys = isExisting.variantImage.map((img) => img.key)
+        // console.log('Deleting old keys from S3:', oldImageKeys)
+        await Promise.all(oldImageKeys.map((key) => deleteFileFromS3(key)))
+      }
+      const filesToUpload = result.data.variantImages.filter(
+        (img): img is File => img instanceof File
+      )
+      const newImageUploadPromises = filesToUpload.map(async (img: File) => {
+        const buffer = Buffer.from(await img.arrayBuffer())
+        return uploadFileToS3(buffer, img.name)
+      })
+      const uploadedImages = await Promise.all(newImageUploadPromises)
+      const imageIds = uploadedImages
+        .map((res) => res?.imageId)
+        .filter(Boolean) as string[]
+
+      await prisma.product.update({
+        where: {
+          id: productId,
+        },
+        data: {
+          variantImage: {
+            disconnect: isExisting.images?.map((image: { id: string }) => ({
+              id: image.id,
+            })),
+          },
+        },
+      })
+      await prisma.product.update({
+        where: {
+          id: productId,
+        },
+        data: {
+          variantImage: {
+            connect: imageIds.map((id) => ({
+              id: id,
+            })),
+          },
+        },
+      })
+    }
 
     const product = await prisma.$transaction(async (tx) => {
       await tx.product.update({
@@ -339,59 +387,15 @@ export async function editProduct(
           brand: result.data?.brand || '',
           shippingFeeMethod: result.data.shippingFeeMethod,
           isFeatured: result.data?.isFeatured,
+          keywords: result.data.keywords?.length
+            ? result.data.keywords?.join(',')
+            : '',
+          sku: result.data.sku ? result.data.sku : '',
+          isSale: result.data.isSale,
+          weight: result.data.weight ? +result.data.weight : 0,
+          saleEndDate: String(result.data.saleEndDate),
         },
       })
-
-      // const existingFreeShippingCities = await tx.freeShipping.findFirst({
-      //   where: {
-      //     productId,
-      //   },
-      //   include: {
-      //     eligibleCities: true,
-      //   },
-      // })
-      // const existingCityIds = existingFreeShippingCities?.eligibleCities.map(
-      //   (city) => city.cityId
-      // )
-
-      // if (
-      //   // !existingCityIds?.every(
-      //   //   (value, index) => value == +result.data.freeShippingCityIds[index]
-      //   // )
-      //   !arraysEqual(existingCityIds, result.data.freeShippingCityIds)
-      // ) {
-      //   await tx.freeShipping.update({
-      //     where: {
-      //       id: existingFreeShippingCities?.id,
-      //       productId,
-      //     },
-      //     data: {
-      //       eligibleCities: {
-      //         deleteMany: existingFreeShippingCities?.eligibleCities.map(
-      //           (city: { id: string }) => ({
-      //             id: city.id,
-      //           })
-      //         ),
-      //       },
-      //     },
-      //   })
-      //   await tx.freeShipping.delete({
-      //     where: {
-      //       id: existingFreeShippingCities?.id,
-      //       productId,
-      //     },
-      //   })
-      //   await tx.freeShipping.create({
-      //     data: {
-      //       productId,
-      //       eligibleCities: {
-      //         create: result.data.freeShippingCityIds?.map((cityId) => ({
-      //           cityId: +cityId,
-      //         })),
-      //       },
-      //     },
-      //   })
-      // }
 
       await tx.spec.deleteMany({
         where: { productId: productId },
@@ -431,6 +435,37 @@ export async function editProduct(
         })
       }
     })
+    let newColors
+    if (result.data.colors) {
+      newColors = result.data.colors.map((color) => ({
+        name: color.color,
+        productId: productId,
+      }))
+    }
+
+    if (newColors) {
+      await prisma.color.createMany({
+        data: newColors,
+      })
+    }
+    //  new Size
+    let newSizes
+    if (result.data.sizes) {
+      newSizes = result.data.sizes.map((size) => ({
+        size: size.size,
+        quantity: size.quantity,
+        price: size.price,
+        discount: size.discount,
+        productId: productId,
+      }))
+    }
+
+    if (newSizes) {
+      await prisma.size.createMany({
+        data: newSizes,
+      })
+    }
+
     console.log({ product })
   } catch (err: unknown) {
     const message =
@@ -481,20 +516,15 @@ export async function deleteProduct(
 
   try {
     const isExisting:
-      | (Product & {
-          variants: (Variant & { variantImage: Image[] })[] | null
-        } & {
+      | (Product & { variantImage: Image[] | null } & {
           images: Image[] | null
         })
       | null = await prisma.product.findFirst({
       where: { id: productId },
       include: {
         images: true,
-        variants: {
-          include: {
-            variantImage: true,
-          },
-        },
+
+        variantImage: true,
       },
     })
     if (!isExisting) {

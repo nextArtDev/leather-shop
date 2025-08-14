@@ -140,12 +140,11 @@ export const getAllProductsList = cache(async () => {
         subCategory: true,
         offerTag: true,
         images: { orderBy: { created_at: 'desc' } },
-        variants: {
-          include: {
-            colors: true,
-            sizes: true,
-          },
-        },
+        variantImage: true,
+        questions: true,
+        specs: true,
+        colors: true,
+        sizes: true,
       },
     })
     // console.log({ products })
@@ -181,18 +180,10 @@ export const getProductById = cache(
     | (Product & { images: Image[] | null } & { specs: Spec[] | null } & {
         questions: Question[] | null
       } & {
-        freeShipping:
-          | (FreeShipping & {
-              eligibleCities: FreeShippingCity[] | null
-            })
-          | null
-      } & {
-        variants: (Variant & {
-          variantImage: Image[] | null
-          colors: Color[] | null
-          sizes: Size[] | null
-          specs: Spec[] | null
-        })[]
+        variantImage: Image[] | null
+        colors: Color[] | null
+        sizes: Size[] | null
+        specs: Spec[] | null
       })
     | null
   > => {
@@ -201,22 +192,13 @@ export const getProductById = cache(
         id,
       },
       include: {
-        variants: {
-          include: {
-            variantImage: true,
-            colors: true,
-            sizes: true,
-            specs: true,
-          },
-        },
+        variantImage: true,
+        colors: true,
+        sizes: true,
         specs: true,
+
         questions: true,
         images: true,
-        freeShipping: {
-          include: {
-            eligibleCities: true,
-          },
-        },
       },
     })
 

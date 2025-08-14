@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 import { zodResolver } from '@hookform/resolvers/zod'
 
@@ -12,7 +13,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { FieldArrayWithId, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
@@ -35,6 +36,7 @@ import {
 
 import {
   Category,
+  Color,
   FreeShipping,
   FreeShippingCity,
   Image,
@@ -43,9 +45,10 @@ import {
   Province,
   Question,
   ShippingFeeMethod,
+  Size,
   Spec,
 } from '@/lib/generated/prisma'
-import { Dot } from 'lucide-react'
+import { Dot, Loader2 } from 'lucide-react'
 import { FC, useState, useTransition } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import MultipleSelector from '../../../components/multi-select'
@@ -61,6 +64,11 @@ import {
 } from '../../../lib/queries/server-queries'
 import { createProduct, editProduct } from '../../../lib/actions/products'
 import { handleServerErrors } from '../../../lib/server-utils'
+import { ImageInput } from '../../../components/image-color/image-input'
+import { NumberInput } from '@tremor/react'
+import { TagsInput } from '../../../components/tag-input'
+import { DateTimePicker } from '../../../components/date-time/date-time-picker'
+import { Switch } from '@/components/ui/switch'
 
 const shippingFeeMethods = [
   {
@@ -93,7 +101,9 @@ interface ProductFormProps {
       freeShipping:
         | (FreeShipping & { eligibleCities: FreeShippingCity[] | null })
         | null
-    }
+    } & {
+      colors: Color[] | null
+    } & { sizes: Size[] | null } & { variantImages: Image[] }
   >
   categories: Partial<Category>[]
   offerTags: OfferTag[]
@@ -108,7 +118,7 @@ const ProductDetails: FC<ProductFormProps> = ({
   provinces,
   // subCategories,
 }) => {
-  console.log(data?.isFeatured)
+  console.log(data)
 
   const path = usePathname()
 
@@ -121,13 +131,10 @@ const ProductDetails: FC<ProductFormProps> = ({
       name: data?.name,
       description: data?.description,
       images: data?.images || [],
+      variantImages: data?.variantImages || [],
       categoryId: data?.categoryId,
       isFeatured: data?.isFeatured || false,
-      freeShippingCityIds:
-        data?.freeShipping?.eligibleCities?.map((fsh) => ({
-          value: fsh.id,
-          label: fsh.id,
-        })) ?? [],
+
       offerTagId: data?.offerTagId || undefined,
       subCategoryId: data?.subCategoryId,
       brand: data?.brand,
@@ -140,6 +147,23 @@ const ProductDetails: FC<ProductFormProps> = ({
         answer: question.answer,
       })) ?? [{ question: '', answer: '' }],
       shippingFeeMethod: data?.shippingFeeMethod,
+
+      sku: data?.sku ?? '',
+      colors: data?.colors?.map((clr) => ({ color: clr.name })) ?? [
+        { color: '' },
+      ],
+      sizes: data?.sizes?.map(({ size, price, quantity, discount }) => ({
+        size,
+        price,
+        quantity,
+        discount,
+      })) ?? [{ size: '', quantity: 1, price: 1000, discount: 0 }],
+      isSale: data?.isSale || false,
+      weight: data?.weight ?? 0,
+      saleEndDate: data?.saleEndDate
+        ? new Date(data.saleEndDate)
+        : new Date(new Date().setHours(0, 0, 0, 0)),
+      keywords: data?.keywords ? data.keywords.split(',') : [],
     },
   })
 
@@ -160,16 +184,34 @@ const ProductDetails: FC<ProductFormProps> = ({
     name: 'questions',
   })
 
+  const {
+    fields: colorFields,
+    append: appendColor,
+    remove: removeColor,
+  } = useFieldArray({
+    control: form.control,
+    name: 'colors',
+  })
+
+  const {
+    fields: sizeFields,
+    append: appendSize,
+    remove: removeSize,
+  } = useFieldArray({
+    control: form.control,
+    name: 'sizes',
+  })
+
   const { data: SubCategories, isPending: isPendingCategory } = useQuery({
     queryKey: ['subCateByCat', form.watch().categoryId],
     queryFn: () => getSubCategoryByCategoryId(form.watch().categoryId),
   })
-  const { data: citiesForFreeShipping } = useQuery({
-    queryKey: ['province-for-shipping', provinceNameForShopping],
-    queryFn: () => getCityByProvinceId(provinceNameForShopping),
-    enabled: !!provinceNameForShopping,
-  })
-  console.log({ citiesForFreeShipping })
+  // const { data: citiesForFreeShipping } = useQuery({
+  //   queryKey: ['province-for-shipping', provinceNameForShopping],
+  //   queryFn: () => getCityByProvinceId(provinceNameForShopping),
+  //   enabled: !!provinceNameForShopping,
+  // })
+  // console.log({ citiesForFreeShipping })
   const errors = form.formState.errors
   console.log({ errors })
 
@@ -191,188 +233,21 @@ const ProductDetails: FC<ProductFormProps> = ({
         toast.error('مشکلی پیش آمده، لطفا دوباره امتحان کنید!')
       }
     })
-    // formData.append('name', values.name)
-    // formData.append('description', values.description)
-    // formData.append('categoryId', values.categoryId)
-    // formData.append('subCategoryId', values.subCategoryId)
-    // formData.append('offerTagId', (values.offerTagId as string) || '')
-    // formData.append('brand', values.brand || '')
-
-    // if (values.freeShippingCityIds && values.freeShippingCityIds.length > 0) {
-    //   for (let i = 0; i < values.freeShippingCityIds.length; i++) {
-    //     formData.append(
-    //       'freeShippingCityIds',
-    //       values.freeShippingCityIds[i].value
-    //     )
-    //   }
-    // }
-    // if (values.images && values.images.length > 0) {
-    //   for (let i = 0; i < values.images.length; i++) {
-    //     formData.append('images', values.images[i] as string | Blob)
-    //   }
-    // }
-
-    // if (values.questions && values.questions.length > 0) {
-    //   values.questions.forEach((questions) => {
-    //     if (
-    //       questions.question.trim() !== '' ||
-    //       questions.answer.trim() !== ''
-    //     ) {
-    //       formData.append('questions', JSON.stringify(questions))
-    //     }
-    //   })
-    // }
-
-    // if (values.specs && values.specs.length > 0) {
-    //   values.specs.forEach((spec) => {
-    //     if (spec.name.trim() !== '' || spec.value.trim() !== '') {
-    //       // Ensure non-empty specs
-    //       formData.append('specs', JSON.stringify(spec))
-    //     }
-    //   })
-    // }
-
-    // try {
-    //   if (data) {
-    //     startTransition(async () => {
-    //       try {
-    //         const res = await editProduct(formData, data.id as string, path)
-    //         // console.log({ res })
-    //         if (res?.errors?.name) {
-    //           form.setError('name', {
-    //             type: 'custom',
-    //             message: res?.errors.name?.join(' و '),
-    //           })
-    //         } else if (res?.errors?.description) {
-    //           form.setError('description', {
-    //             type: 'custom',
-    //             message: res?.errors.description?.join(' و '),
-    //           })
-    //         } else if (res?.errors?.images) {
-    //           form.setError('images', {
-    //             type: 'custom',
-    //             message: res?.errors.images?.join(' و '),
-    //           })
-    //         } else if (res?.errors?.categoryId) {
-    //           form.setError('categoryId', {
-    //             type: 'custom',
-    //             message: res?.errors.categoryId?.join(' و '),
-    //           })
-    //         } else if (res?.errors?.subCategoryId) {
-    //           form.setError('subCategoryId', {
-    //             type: 'custom',
-    //             message: res?.errors.subCategoryId?.join(' و '),
-    //           })
-    //         } else if (res?.errors?.offerTagId) {
-    //           form.setError('offerTagId', {
-    //             type: 'custom',
-    //             message: res?.errors.offerTagId?.join(' و '),
-    //           })
-    //         } else if (res?.errors?.brand) {
-    //           form.setError('brand', {
-    //             type: 'custom',
-    //             message: res?.errors.brand?.join(' و '),
-    //           })
-    //         } else if (res?.errors?.specs) {
-    //           form.setError('specs', {
-    //             type: 'custom',
-    //             message: res?.errors.specs?.join(' و '),
-    //           })
-    //         } else if (res?.errors?.questions) {
-    //           form.setError('questions', {
-    //             type: 'custom',
-    //             message: res?.errors.questions?.join(' و '),
-    //           })
-    //         } else if (res?.errors?._form) {
-    //           toast.error(res?.errors._form?.join(' و '))
-    //         }
-    //       } catch (error) {
-    //         // This will catch the NEXT_REDIRECT error, which is expected when the redirect happens
-    //         if (
-    //           !(
-    //             error instanceof Error &&
-    //             error.message.includes('NEXT_REDIRECT')
-    //           )
-    //         ) {
-    //           toast.error('مشکلی پیش آمده.')
-    //         }
-    //       }
-    //     })
-    //   } else {
-    //     startTransition(async () => {
-    //       try {
-    //         const res = await createProduct(formData, path)
-    //         if (res?.errors?.name) {
-    //           form.setError('name', {
-    //             type: 'custom',
-    //             message: res?.errors.name?.join(' و '),
-    //           })
-    //         } else if (res?.errors?.description) {
-    //           form.setError('description', {
-    //             type: 'custom',
-    //             message: res?.errors.description?.join(' و '),
-    //           })
-    //         } else if (res?.errors?.images) {
-    //           form.setError('images', {
-    //             type: 'custom',
-    //             message: res?.errors.images?.join(' و '),
-    //           })
-    //         } else if (res?.errors?.categoryId) {
-    //           form.setError('categoryId', {
-    //             type: 'custom',
-    //             message: res?.errors.categoryId?.join(' و '),
-    //           })
-    //         } else if (res?.errors?.subCategoryId) {
-    //           form.setError('subCategoryId', {
-    //             type: 'custom',
-    //             message: res?.errors.subCategoryId?.join(' و '),
-    //           })
-    //         } else if (res?.errors?.offerTagId) {
-    //           form.setError('offerTagId', {
-    //             type: 'custom',
-    //             message: res?.errors.offerTagId?.join(' و '),
-    //           })
-    //         } else if (res?.errors?.brand) {
-    //           form.setError('brand', {
-    //             type: 'custom',
-    //             message: res?.errors.brand?.join(' و '),
-    //           })
-    //         } else if (res?.errors?.specs) {
-    //           form.setError('specs', {
-    //             type: 'custom',
-    //             message: res?.errors.specs?.join(' و '),
-    //           })
-    //         } else if (res?.errors?.questions) {
-    //           form.setError('questions', {
-    //             type: 'custom',
-    //             message: res?.errors.questions?.join(' و '),
-    //           })
-    //         } else if (res?.errors?._form) {
-    //           toast.error(res?.errors._form?.join(' و '))
-    //         }
-    //       } catch (error) {
-    //         // This will catch the NEXT_REDIRECT error, which is expected when the redirect happens
-    //         if (
-    //           !(
-    //             error instanceof Error &&
-    //             error.message.includes('NEXT_REDIRECT')
-    //           )
-    //         ) {
-    //           toast.error('مشکلی پیش آمده.')
-    //         }
-    //       }
-    //     })
-    //   }
-    // } catch {
-    //   toast.error('مشکلی پیش آمده، لطفا دوباره امتحان کنید!')
-    // }
+  }
+  const addMainVariantColor = (newColorValue: string) => {
+    const exists = colorFields.some((cf) => cf.color === newColorValue)
+    if (!exists && newColorValue && newColorValue.trim() !== '') {
+      appendColor({ color: newColorValue })
+    } else if (exists) {
+      toast.info(`Color ${newColorValue} already exists.`)
+    }
   }
 
-  const handleDeleteCityFreeShipping = (index: number) => {
-    const currentValues = form.getValues().freeShippingCityIds
-    const updatedValues = currentValues?.filter((_, i) => i !== index)
-    form.setValue('freeShippingCityIds', updatedValues)
-  }
+  // const handleDeleteCityFreeShipping = (index: number) => {
+  //   const currentValues = form.getValues().freeShippingCityIds
+  //   const updatedValues = currentValues?.filter((_, i) => i !== index)
+  //   form.setValue('freeShippingCityIds', updatedValues)
+  // }
   return (
     <AlertDialog>
       <Card className="w-full">
@@ -405,12 +280,12 @@ const ProductDetails: FC<ProductFormProps> = ({
                       : []
                   }
                   name="images"
-                  label="images"
+                  label="عکسها"
                 />
               </div>
 
               {/* Name   */}
-              <InputFieldset label="Name">
+              <InputFieldset label="نام">
                 <div className="flex flex-col lg:flex-row gap-4">
                   <FormField
                     disabled={isPending}
@@ -419,7 +294,7 @@ const ProductDetails: FC<ProductFormProps> = ({
                     render={({ field }) => (
                       <FormItem className="flex-1">
                         <FormControl>
-                          <Input placeholder="Product name" {...field} />
+                          <Input placeholder="نام محصول" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -429,7 +304,7 @@ const ProductDetails: FC<ProductFormProps> = ({
               </InputFieldset>
               {/* Product and variant description editors (tabs) */}
               <InputFieldset
-                label="Description"
+                label="توضحیات"
                 description={
                   "Note: The product description is the main description for the product (Will display in every variant page). You can add an extra description specific to this variant using 'Variant description' tab."
                 }
@@ -454,7 +329,90 @@ const ProductDetails: FC<ProductFormProps> = ({
                   )}
                 />
               </InputFieldset>
-              {/* Category - SubCategory - offer*/}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <ImageInput
+                  name="variantImage"
+                  label="عکس وریانتها"
+                  initialDataImages={data?.variantImages?.map((img) => ({
+                    url: img.url,
+                    file: undefined,
+                    id: img.id,
+                  }))}
+                  mainVariantColors={
+                    colorFields as unknown as FieldArrayWithId<
+                      any,
+                      'colors',
+                      'id'
+                    >[]
+                  }
+                  addMainVariantColor={addMainVariantColor}
+                />
+                <div className="space-y-4">
+                  <ClickToAddInputsRHF
+                    fields={
+                      colorFields as unknown as FieldArrayWithId<
+                        any,
+                        'colors',
+                        'id'
+                      >[]
+                    }
+                    name="colors"
+                    control={form.control}
+                    register={form.register}
+                    setValue={form.setValue}
+                    getValues={form.getValues}
+                    onAppend={() => appendColor({ color: '' })}
+                    onRemove={removeColor}
+                    initialDetailSchema={{ color: '' }}
+                    header="Colors"
+                    colorPicker
+                  />
+                  {form.formState.errors.colors && (
+                    <span className="text-sm font-medium text-destructive">
+                      {form.formState.errors.colors.message ||
+                        (form.formState.errors.colors as any)?.root?.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <InputFieldset label="Sizes, Prices, Discounts">
+                <ClickToAddInputsRHF
+                  fields={
+                    sizeFields as unknown as FieldArrayWithId<
+                      any,
+                      'sizes',
+                      'id'
+                    >[]
+                  }
+                  name="sizes"
+                  control={form.control}
+                  register={form.register}
+                  setValue={form.setValue}
+                  getValues={form.getValues}
+                  onAppend={() =>
+                    appendSize({
+                      size: '',
+                      quantity: 1,
+                      price: 1000,
+                      discount: 0,
+                    })
+                  }
+                  onRemove={removeSize}
+                  initialDetailSchema={{
+                    size: '',
+                    quantity: 1,
+                    price: 1000,
+                    discount: 0,
+                  }}
+                />
+                {form.formState.errors.sizes && (
+                  <span className="text-sm font-medium text-destructive">
+                    {form.formState.errors.sizes.message ||
+                      (form.formState.errors.sizes as any)?.root?.message}
+                  </span>
+                )}
+              </InputFieldset>
 
               <InputFieldset label="Category">
                 <div className="flex gap-4">
@@ -590,7 +548,68 @@ const ProductDetails: FC<ProductFormProps> = ({
                 </div>
               </InputFieldset>
 
-              {/* Product and variant specs*/}
+              <InputFieldset label="SKU & Weight">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="sku"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>SKU</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Stock Keeping Unit"
+                            {...field}
+                            value={field.value || ''}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="weight"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Weight (kg)</FormLabel>
+                        <FormControl>
+                          <NumberInput
+                            defaultValue={field.value}
+                            onValueChange={field.onChange}
+                            placeholder="Product weight"
+                            min={0.01}
+                            step={0.01}
+                            className="!shadow-none rounded-md !text-sm"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </InputFieldset>
+              <InputFieldset label="Keywords">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="keywords"
+                    render={({ field }) => (
+                      <FormItem className="relative flex-1">
+                        <FormLabel>variant Keywords</FormLabel>
+                        <FormControl>
+                          <TagsInput
+                            maxItems={10}
+                            value={field?.value || []}
+                            onValueChange={field.onChange}
+                            placeholder="Enter your tags"
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </InputFieldset>
               <InputFieldset
                 label="Specifications"
                 description={
@@ -688,99 +707,31 @@ const ProductDetails: FC<ProductFormProps> = ({
                 />
               </InputFieldset>
 
-              {/* Fee Shipping */}
-
               <InputFieldset
-                label="Free Shipping (Optional)"
-                description="Free Shipping Worldwide ?"
+                label="Sale"
+                description="Is your product on sale ?"
               >
-                <div className=" flex gap-2">
-                  <Select
-                    onValueChange={(v) => setProvinceNameForShopping(v)}
-                    defaultValue={provinceNameForShopping}
-                    value={provinceNameForShopping}
-                  >
-                    <SelectTrigger className="w-[280px]">
-                      <SelectValue placeholder="Select a Province" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {provinces?.map((province) => (
-                        <SelectItem
-                          key={province.id}
-                          value={province.id.toString()}
-                        >
-                          {province.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  <div>
-                    <FormField
-                      control={form.control}
-                      name="freeShippingCityIds"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            {citiesForFreeShipping && (
-                              <MultipleSelector
-                                // disabled={
-                                //   isPendingCitiesForFreeShipping &&
-                                //   !provinceNameForShopping
-                                // }
-                                {...field}
-                                // value={field?.value}
-                                // onChange={field.onChange}
-                                defaultOptions={citiesForFreeShipping.map(
-                                  (city) => {
-                                    return {
-                                      label: city.name,
-                                      value: city.id.toString(),
-                                    }
-                                  }
-                                )}
-                                placeholder="Select City"
-                                emptyIndicator={
-                                  <p className="text-center text-lg leading-10  ">
-                                    no results found.
-                                  </p>
-                                }
-                              />
-                            )}
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                    <p className="mt-4 text-sm  pb-3 flex">
-                      <Dot className="-me-1" />
-                      List of cities you offer free shipping for this product
-                      :&nbsp;
-                      {form.getValues().freeShippingCityIds &&
-                        form.getValues().freeShippingCityIds?.length === 0 &&
-                        'None'}
-                    </p>
-
-                    <div className="flex flex-wrap gap-1">
-                      {form
-                        .getValues()
-                        .freeShippingCityIds?.map((country, index) => (
-                          <div
-                            key={country.label}
-                            className="text-xs inline-flex items-center px-3 py-1 rounded-md gap-x-2"
-                          >
-                            <span>{country.label}</span>
-                            <span
-                              className="cursor-pointer hover:text-red-500"
-                              onClick={() =>
-                                handleDeleteCityFreeShipping(index)
-                              }
-                            >
-                              x
-                            </span>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
+                <div>
+                  <FormField
+                    control={form.control}
+                    name="isSale"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            aria-readonly
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <>
+                    {form.getValues('isSale') ? (
+                      <DateTimePicker name="saleEndDate" />
+                    ) : null}
+                  </>
                 </div>
               </InputFieldset>
               <FormField
@@ -807,11 +758,13 @@ const ProductDetails: FC<ProductFormProps> = ({
               />
 
               <Button type="submit" disabled={isPending}>
-                {isPending
-                  ? 'loading...'
-                  : data?.id
-                  ? 'Save product information'
-                  : 'Create product'}
+                {isPending ? (
+                  <Loader2 className="animate-spin" />
+                ) : data?.id ? (
+                  'ذخیره تغییرات'
+                ) : (
+                  'ایجاد محصول'
+                )}
               </Button>
             </form>
           </Form>

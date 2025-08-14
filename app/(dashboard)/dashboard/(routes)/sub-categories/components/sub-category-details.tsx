@@ -27,7 +27,6 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
-import { useQuery } from '@tanstack/react-query'
 import { Category, Image, SubCategory } from '@/lib/generated/prisma'
 import { usePathname } from 'next/navigation'
 import {

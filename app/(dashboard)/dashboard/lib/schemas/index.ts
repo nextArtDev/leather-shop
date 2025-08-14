@@ -114,185 +114,6 @@ export const SubCategoryFormSchema = z.object({
   categoryId: z.string(),
 })
 
-export const subCategoryServerFormSchema = z.object({
-  name: z
-    .string()
-    .min(2, {
-      message: 'Sub Category name must be at least 2 characters long.',
-    })
-    .max(50, { message: 'Sub Category name cannot exceed 50 characters.' })
-    .regex(/^[a-zA-Z0-9\s'&-‌\u0600-\u06FF]+$/, {
-      message:
-        'Only letters, numbers, and spaces are allowed in the sub category name.',
-    }),
-  name_fa: z
-    .string()
-    .min(2, {
-      message: 'Sub Category name must be at least 2 characters long.',
-    })
-    .max(50, { message: 'Sub Category name cannot exceed 50 characters.' })
-    .regex(/^[a-zA-Z0-9\s'&-‌\u0600-\u06FF]+$/, {
-      message:
-        'Only letters, numbers, and spaces are allowed in the sub category name.',
-    })
-    .optional(),
-
-  images: imageSchema,
-
-  url: z
-    .string()
-    .min(2, { message: 'Sub Category url must be at least 2 characters long.' })
-    .max(50, { message: 'Sub Category url cannot exceed 50 characters.' })
-    .regex(/^(?!.*(?:[-_ ]){2,})[a-zA-Z0-9\s'&-‌\u0600-\u06FF]+$/, {
-      message:
-        'Only letters, numbers, hyphen, and underscore are allowed in the sub category url, and consecutive occurrences of hyphens, underscores, or spaces are not permitted.',
-    }),
-  featured: z.string().optional(),
-  categoryId: z.string(),
-})
-
-// export const ProductEditFormSchema = z.object({
-//   name: z
-//     .string()
-//     .min(2, { message: 'Product name should be at least 2 characters long.' })
-//     .max(200, { message: 'Product name cannot exceed 200 characters.' }),
-//   name_fa: z
-//     .string()
-//     // .min(2, { message: 'Product name should be at least 2 characters long.' })
-//     .max(200, { message: 'Product name cannot exceed 200 characters.' })
-//     .optional(),
-//   description: z.string().min(200, {
-//     message: 'Product description should be at least 200 characters long.',
-//   }),
-//   description_fa: z
-//     .string()
-
-//     .optional(),
-
-//   images: imageSchema,
-//   // .min(3, 'Please upload at least 3 images for the product.')
-//   // .max(6, 'You can upload up to 6 images for the product.'),
-
-//   //  z
-//   //   .object({ url: z.string() })
-//   //   .array()
-//   //   .length(1, 'Choose a product variant image.'),
-//   categoryId: z.string().uuid(),
-//   subCategoryId: z.string().uuid(),
-//   offerTagId: z
-//     .string()
-//     // .uuid()
-//     .optional(),
-//   brand: z
-//     .string()
-//     .min(2, {
-//       message: 'Product brand should be at least 2 characters long.',
-//     })
-//     .max(50, {
-//       message: 'Product brand cannot exceed 50 characters.',
-//     })
-//     .optional(),
-//   sku: z
-//     .string()
-//     .min(6, {
-//       message: 'Product SKU should be at least 6 characters long.',
-//     })
-//     .max(50, {
-//       message: 'Product SKU cannot exceed 50 characters.',
-//     })
-//     .optional(),
-//   weight: z
-//     .number()
-//     .min(0.01, {
-//       message: 'Please provide a valid product weight.',
-//     })
-//     .optional(),
-//   keywords: z
-//     .array(z.string())
-//     .nonempty('Please at least one item')
-//     // .string()
-//     // .array()
-//     // .min(5, {
-//     //   message: 'Please provide at least 5 keywords.',
-//     // })
-//     .max(10, {
-//       message: 'You can provide up to 10 keywords.',
-//     })
-//     .optional(),
-//   keywords_fa: z
-//     .array(z.string())
-//     .nonempty('Please at least one item')
-//     .max(10, {
-//       message: 'You can provide up to 10 keywords.',
-//     })
-//     .optional(),
-
-//   product_specs: z
-//     .object({
-//       name: z.string(),
-//       value: z.string(),
-//       // name_fa: z.string(),
-//     })
-//     .array()
-//     // .min(1, 'Please provide at least one product spec.')
-//     .refine(
-//       (product_specs) =>
-//         product_specs.every((s) => s.name.length > 0 && s.value.length > 0),
-//       {
-//         message: 'All product specs inputs must be filled correctly.',
-//       }
-//     )
-//     .optional(),
-
-//   questions: z
-//     .object({
-//       question: z.string(),
-//       answer: z.string(),
-//       // question_fa: z.string(),
-//       // answer_fa: z.string(),
-//     })
-//     .array()
-//     // .min(1, 'Please provide at least one product question.')
-//     .refine(
-//       (questions) =>
-//         questions.every((q) => q.question.length > 0 && q.answer.length > 0),
-//       {
-//         message: 'All product question inputs must be filled correctly.',
-//       }
-//     )
-//     .optional(),
-
-//   freeShippingForAllCountries: z.boolean().default(false),
-//   freeShippingCountriesIds: z
-//     .array(
-//       z.object({
-//         id: z.string().optional(),
-//         label: z.string(),
-//         value: z.string(),
-//         disable: z.boolean().optional(),
-//       })
-//     )
-//     .optional()
-//     .refine(
-//       (ids) => ids?.every((item) => item.label && item.value),
-//       'Each country must have a valid name and ID.'
-//     )
-//     .default([]), // use it when an array is optional
-//   // .object({
-//   //   id: z.string().optional(),
-//   //   label: z.string(),
-//   //   value: z.string(),
-//   // })
-//   // .array()
-//   // .optional()
-//   // .refine(
-//   //   (ids) => ids?.every((item) => item.label && item.value),
-//   //   'Each country must have a valid name and ID.'
-//   // )
-//   // .default([]),
-//   // shippingFeeMethod: z.nativeEnum(ShippingFeeMethod),
-// })
-
 export const ProductFormSchema = z.object({
   name: z.string().min(1, 'نام محصول الزامی است.'),
   description: z.string().min(1, 'توضیحات محصول الزامی است.'),
@@ -301,6 +122,13 @@ export const ProductFormSchema = z.object({
   // shippingFeeMethod: z.enum(['ITEM', 'WEIGHT', 'FIXED']).default('ITEM'),
   shippingFeeMethod: z.nativeEnum(ShippingFeeMethod),
   images: z
+    .union([
+      z.array(z.instanceof(File)),
+      z.array(z.string()),
+      z.array(z.object({ url: z.string() })),
+    ])
+    .optional(),
+  variantImages: z
     .union([
       z.array(z.instanceof(File)),
       z.array(z.string()),
@@ -336,7 +164,60 @@ export const ProductFormSchema = z.object({
     .optional(),
 
   // .default([]),
+
+  sku: z
+    .string()
+    .min(6, {
+      message: 'SKU باید حداقل 6 کاراکتر باشد.',
+    })
+    .max(50, {
+      message: 'SKU حداکثر می‌تواند 50 کاراکتر باشد',
+    })
+    .optional(),
+  weight: z.number().default(0).optional(),
+  // .optional(),
+
+  colors: z
+    .object({ color: z.string() })
+    .array()
+    .min(1, 'حداقل یک رنگ انتخاب کنید.')
+    .refine((colors) => colors.every((c) => c.color.length > 0), {
+      message: 'همه فیلدهای رنگ را تکمیل کنید.',
+    })
+    .optional(),
+  sizes: z
+    .object({
+      size: z.string(),
+      quantity: z
+        .number()
+        .min(1, { message: 'تعداد باید از صفر بزرگتر باشد.' }),
+      price: z
+        .number()
+        .min(1000, { message: 'قیمت باید از هزارتومان بیشتر باشد.' }),
+      discount: z.number().min(0).default(0).optional(),
+    })
+    .array()
+    .min(1, 'حداقل یک سایز را انتخاب کنید.')
+    .refine(
+      (sizes) =>
+        sizes.every((s) => s.size.length > 0 && s.price > 0 && s.quantity > 0),
+      {
+        message: 'همه فیلدها باید به درستی پر شوند.',
+      }
+    ),
+  isSale: z.boolean().default(false).optional(),
+  // saleEndDate: z.string().optional(),
+  keywords: z
+    .array(z.string())
+    .nonempty('لطفا حداقل یک کلمه کلیدی درباره محصول اضافه کنید.')
+    .max(10, {
+      message: 'حداکثر کلمات کلیدی 10 تاست.',
+    })
+    .optional(),
+
+  saleEndDate: z.union([z.date(), z.string()]).optional(),
 })
+
 export const CategoryFormSchema = z.object({
   name: z
     .string()
