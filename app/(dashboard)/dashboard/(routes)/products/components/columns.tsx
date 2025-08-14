@@ -39,23 +39,13 @@ import {
   SquareStack,
   Trash,
 } from 'lucide-react'
-
-// Queries
-
-// Tanstack React Table
 import { ColumnDef } from '@tanstack/react-table'
-
-// Types
-
 import Link from 'next/link'
-// import { toast } from 'sonner'
-// import { deleteProduct } from '@/lib/actions/dashboard/products'
-import { StoreProductType } from '@/lib/types'
-import { Color, Image, ProductVariant, Size } from '@prisma/client'
-import { deleteProduct } from '@/lib/actions/dashboard/products'
-import { usePathname } from '@/navigation'
+import { Color, Image, Product, Size, Variant } from '@/lib/generated/prisma'
+import { usePathname } from 'next/navigation'
+import { deleteProduct } from '../../../lib/actions/products'
 
-export const columns: ColumnDef<StoreProductType>[] = [
+export const columns: ColumnDef<Product & { images: Image[] }>[] = [
   {
     accessorKey: 'image',
     header: 'Image',
@@ -68,29 +58,24 @@ export const columns: ColumnDef<StoreProductType>[] = [
           </h1>
           {/* Product variants */}
           <div className="relative flex flex-wrap gap-2">
-            {row.original.variants.map(
+            <NextImage
+              src={row.original.images.map((img) => img.url)[0]}
+              alt={`${row.original.name} image`}
+              width={1000}
+              height={1000}
+              className="max-w-32 h-32 rounded-md object-cover shadow-sm"
+            />
+            {row.original?.variants?.map(
               (
-                variant: ProductVariant & { variantImage: Image[] | null } & {
+                variant: Variant & {
                   colors: Color[]
                 } & { sizes: Size[] }
               ) => (
                 <div key={variant.id} className="flex flex-col gap-y-2 group">
                   <div className="relative cursor-pointer p-2">
-                    <NextImage
-                      src={
-                        row.original?.images.length > 0
-                          ? row.original.images?.[0]?.url
-                          : variant?.variantImage?.[0]?.url || ''
-                      }
-                      alt={`${variant.variantName} image`}
-                      width={1000}
-                      height={1000}
-                      className="max-w-32 h-32 rounded-md object-cover shadow-sm"
-                    />
-
                     <Link
-                      // href={`/dashboard/seller/stores/${row.original.store.url}/products/${row.original.id}/variants/${variant.id}`}
-                      href={`/dashboard/seller/stores/${row.original.store.url}/products/${row.original.id}`}
+                      // href={`/dashboard/products/${row.original.id}/variants/${variant.id}`}
+                      href={`/dashboard/products/${row.original.id}`}
                     >
                       <div className="w-[304px] h-full absolute top-0 left-0 bottom-0 right-0 z-0 rounded-sm bg-black/50 transition-all duration-150 hidden group-hover:block">
                         <FilePenLine className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white" />
@@ -111,7 +96,7 @@ export const columns: ColumnDef<StoreProductType>[] = [
                       <div>
                         {/* Name of variant */}
                         <h1 className="max-w-40 capitalize text-sm">
-                          {variant.variantName}
+                          {variant.name}
                         </h1>
                         {/* Sizes */}
                         <div className="flex flex-wrap gap-2 max-w-72 mt-1">
@@ -170,9 +155,7 @@ export const columns: ColumnDef<StoreProductType>[] = [
     header: 'Add Variant',
     cell: ({ row }) => {
       return (
-        <Link
-          href={`/dashboard/seller/stores/${row.original.store.url}/products/${row.original.id}/variants/new`}
-        >
+        <Link href={`/dashboard/products/${row.original.id}/variants/new`}>
           <CopyPlus className="hover:text-blue-200" />
         </Link>
       )
@@ -186,7 +169,7 @@ export const columns: ColumnDef<StoreProductType>[] = [
       return (
         <CellActions
           productId={rowData.id}
-          href={`/dashboard/seller/stores/${row.original.store.url}/products/${row.original.id}/variants`}
+          href={`/dashboard/products/${row.original.id}/variants`}
         />
       )
     },

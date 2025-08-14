@@ -1,4 +1,16 @@
-import { Category, Image, SubCategory } from '@/lib/generated/prisma'
+import {
+  Category,
+  Color,
+  FreeShipping,
+  FreeShippingCity,
+  Image,
+  Product,
+  Question,
+  Size,
+  Spec,
+  SubCategory,
+  Variant,
+} from '@/lib/generated/prisma'
 import prisma from '@/lib/prisma'
 import { cache } from 'react'
 
@@ -159,5 +171,55 @@ export const getAllOfferTags = cache(async () => {
       },
     },
   })
-  return offerTgas
+  return offerTgas ?? []
 })
+
+export const getProductById = cache(
+  (
+    id: string
+  ): Promise<
+    | (Product & { images: Image[] | null } & { specs: Spec[] | null } & {
+        questions: Question[] | null
+      } & {
+        freeShipping:
+          | (FreeShipping & {
+              eligibleCities: FreeShippingCity[] | null
+            })
+          | null
+      } & {
+        variants: (Variant & {
+          variantImage: Image[] | null
+          colors: Color[] | null
+          sizes: Size[] | null
+          specs: Spec[] | null
+        })[]
+      })
+    | null
+  > => {
+    const product = prisma.product.findFirst({
+      where: {
+        id,
+      },
+      include: {
+        variants: {
+          include: {
+            variantImage: true,
+            colors: true,
+            sizes: true,
+            specs: true,
+          },
+        },
+        specs: true,
+        questions: true,
+        images: true,
+        freeShipping: {
+          include: {
+            eligibleCities: true,
+          },
+        },
+      },
+    })
+
+    return product
+  }
+)

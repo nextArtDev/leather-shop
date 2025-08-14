@@ -1,5 +1,3 @@
-// lib/form-utils.ts
-
 import { toast } from 'sonner'
 import {
   type UseFormSetError,
@@ -44,7 +42,6 @@ export const generateUniqueSlug = async (
   field: string = 'slug',
   separator: string = '-'
 ) => {
-  'use server'
   let slug = baseSlug
   let suffix = 1
 

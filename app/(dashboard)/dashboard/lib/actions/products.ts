@@ -57,9 +57,9 @@ export async function createProduct(
     //   sku: formData.get('sku'),
     //   weight: Number(formData.get('weight')),
     //   keywords: formData.getAll('keywords'),
-    //   product_specs: formData
-    //     .getAll('product_specs')
-    //     .map((product_spec) => JSON.parse(product_spec.toString())),
+    //   specs: formData
+    //     .getAll('specs')
+    //     .map((spec) => JSON.parse(spec.toString())),
     //   variant_specs: formData
     //     .getAll('variant_specs')
     //     .map((variant_spec) => JSON.parse(variant_spec.toString())),
@@ -85,13 +85,9 @@ export async function createProduct(
       errors: result.error.flatten().fieldErrors,
     }
   }
-
-  // const user = await currentUser()
-  // if (
-  //   !user ||
-  //   !user.id ||
-  //   user.role !== 'SELLER'
-  // ) {
+  console.log(result.data)
+  const user = await currentUser()
+  // if (!user || !user.id || user.role !== 'SELLER') {
   //   return {
   //     errors: {
   //       _form: ['شما اجازه دسترسی ندارید!'],
@@ -146,6 +142,7 @@ export async function createProduct(
         slug: productSlug,
         brand: result.data?.brand || '',
         shippingFeeMethod: result.data.shippingFeeMethod,
+        isFeatured: result.data.isFeatured,
         // freeShipping:result.data.freeShippingCountriesIds?true:false,
         images: {
           connect: imageIds.map((id) => ({
@@ -174,8 +171,8 @@ export async function createProduct(
     })
 
     let newSpecs
-    if (result.data.product_specs) {
-      newSpecs = result.data.product_specs.map((spec) => ({
+    if (result.data.specs) {
+      newSpecs = result.data.specs.map((spec) => ({
         name: spec.name,
         value: spec.value,
         productId: product.id,
@@ -199,6 +196,7 @@ export async function createProduct(
         data: newQuestions,
       })
     }
+    console.log({ product })
   } catch (err: unknown) {
     const message =
       err instanceof Error ? err.message : 'مشکلی در سرور پیش آمده.'
@@ -412,8 +410,8 @@ export async function editProduct(
       })
 
       let newSpecs
-      if (result.data.product_specs && result.data.product_specs.length > 0) {
-        newSpecs = result.data.product_specs
+      if (result.data.specs && result.data.specs.length > 0) {
+        newSpecs = result.data.specs
           .filter((spec) => spec.name.trim() !== '' || spec.value.trim() !== '')
           .map((spec) => ({
             name: spec.name,
@@ -1254,10 +1252,10 @@ export async function createNewVariant(
         lower: true,
         trim: true,
       }),
-      'productVariant'
+      'variant'
     )
 
-    const variant = await prisma.productVariant.create({
+    const variant = await prisma.variant.create({
       data: {
         productId,
         slug: variantSlug,

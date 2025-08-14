@@ -44,6 +44,7 @@ export default function RichTextEditor({
       // console.log(editor.getHTML());
       onChange(editor.getHTML())
     },
+    immediatelyRender: false,
   })
 
   return (

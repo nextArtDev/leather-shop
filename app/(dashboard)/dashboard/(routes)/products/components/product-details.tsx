@@ -5,8 +5,10 @@ import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -30,14 +32,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { createNewProduct, editProduct } from '@/lib/actions/dashboard/products'
 
 import {
   Category,
-  Country,
   FreeShipping,
   FreeShippingCity,
-  // FreeShippingCountry,
   Image,
   OfferTag,
   Product,
@@ -47,7 +46,7 @@ import {
   Spec,
 } from '@/lib/generated/prisma'
 import { Dot } from 'lucide-react'
-import { FC, useEffect, useState, useTransition } from 'react'
+import { FC, useState, useTransition } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import MultipleSelector from '../../../components/multi-select'
 import { usePathname } from 'next/navigation'
@@ -56,6 +55,12 @@ import InputFieldset from '../../../components/input-fieldset'
 import RichTextEditor from '../../../components/text-editor/react-text-editor'
 import ClickToAddInputsRHF from '../../../components/click-to-add'
 import { ProductFormSchema } from '../../../lib/schemas'
+import {
+  getCityByProvinceId,
+  getSubCategoryByCategoryId,
+} from '../../../lib/queries/server-queries'
+import { createProduct, editProduct } from '../../../lib/actions/products'
+import { handleServerErrors } from '../../../lib/server-utils'
 
 const shippingFeeMethods = [
   {
@@ -125,7 +130,7 @@ const ProductDetails: FC<ProductFormProps> = ({
       offerTagId: data?.offerTagId || undefined,
       subCategoryId: data?.subCategoryId,
       brand: data?.brand,
-      product_specs: data?.specs?.map((spec) => ({
+      specs: data?.specs?.map((spec) => ({
         name: spec.name,
         value: spec.value,
       })) ?? [{ name: '', value: '' }],
@@ -143,7 +148,7 @@ const ProductDetails: FC<ProductFormProps> = ({
     remove: removeSpec,
   } = useFieldArray({
     control: form.control,
-    name: 'product_specs',
+    name: 'specs',
   })
   const {
     fields: questionFields,
@@ -158,10 +163,7 @@ const ProductDetails: FC<ProductFormProps> = ({
     queryKey: ['subCateByCat', form.watch().categoryId],
     queryFn: () => getSubCategoryByCategoryId(form.watch().categoryId),
   })
-  const {
-    data: citiesForFreeShipping,
-    isPending: isPendingCitiesForFreeShipping,
-  } = useQuery({
+  const { data: citiesForFreeShipping } = useQuery({
     queryKey: ['province-for-shipping', provinceNameForShopping],
     queryFn: () => getCityByProvinceId(provinceNameForShopping),
     enabled: !!provinceNameForShopping,
@@ -169,213 +171,200 @@ const ProductDetails: FC<ProductFormProps> = ({
   console.log({ citiesForFreeShipping })
   const errors = form.formState.errors
   console.log({ errors })
-  useEffect(() => {
-    if (data) {
-      form.reset({
-        name: data?.name,
-        description: data?.description,
-        images: data?.images ? data?.images.map((img) => img.url) : [],
-
-        categoryId: data?.categoryId,
-        offerTagId: data?.offerTagId || '',
-        subCategoryId: data?.subCategoryId,
-        brand: data?.brand,
-
-        product_specs:
-          data.specs?.map((spec) => ({ name: spec.name, value: spec.value })) ??
-          [],
-
-        questions:
-          data?.questions?.map((q) => ({
-            question: q.question,
-            answer: q.answer,
-          })) ?? [],
-      })
-    }
-  }, [data, form])
 
   const handleSubmit = async (values: z.infer<typeof ProductFormSchema>) => {
-    const formData = new FormData()
-
     console.log({ values })
-    formData.append('name', values.name)
-    formData.append('description', values.description)
-
-    // formData.append('images',values.images)
-    // formData.append('variantImage',values.variantImage)
-    formData.append('categoryId', values.categoryId)
-    formData.append('subCategoryId', values.subCategoryId)
-    formData.append('offerTagId', (values.offerTagId as string) || '')
-    formData.append('brand', values.brand || '')
-
-    if (values.freeShippingCityIds && values.freeShippingCityIds.length > 0) {
-      for (let i = 0; i < values.freeShippingCityIds.length; i++) {
-        formData.append(
-          'freeShippingCityIds',
-          values.freeShippingCityIds[i].value
-        )
-      }
-    }
-    if (values.images && values.images.length > 0) {
-      for (let i = 0; i < values.images.length; i++) {
-        formData.append('images', values.images[i] as string | Blob)
-      }
-    }
-
-    if (values.questions && values.questions.length > 0) {
-      values.questions.forEach((questions) => {
-        if (
-          questions.question.trim() !== '' ||
-          questions.answer.trim() !== ''
-        ) {
-          formData.append('questions', JSON.stringify(questions))
+    startTransition(async () => {
+      try {
+        if (data) {
+          const res = await editProduct(values, data.id as string, path)
+          if (res?.errors) handleServerErrors(res.errors, form.setError)
+        } else {
+          const res = await createProduct(values, path)
+          if (res?.errors) handleServerErrors(res.errors, form.setError)
         }
-      })
-    }
-
-    if (values.product_specs && values.product_specs.length > 0) {
-      values.product_specs.forEach((spec) => {
-        if (spec.name.trim() !== '' || spec.value.trim() !== '') {
-          // Ensure non-empty product_specs
-          formData.append('product_specs', JSON.stringify(spec))
+      } catch (error) {
+        if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
+          return
         }
-      })
-    }
-
-    try {
-      if (data) {
-        startTransition(async () => {
-          try {
-            const res = await editProduct(formData, data.id as string, path)
-            // console.log({ res })
-            if (res?.errors?.name) {
-              form.setError('name', {
-                type: 'custom',
-                message: res?.errors.name?.join(' و '),
-              })
-            } else if (res?.errors?.description) {
-              form.setError('description', {
-                type: 'custom',
-                message: res?.errors.description?.join(' و '),
-              })
-            } else if (res?.errors?.images) {
-              form.setError('images', {
-                type: 'custom',
-                message: res?.errors.images?.join(' و '),
-              })
-            } else if (res?.errors?.categoryId) {
-              form.setError('categoryId', {
-                type: 'custom',
-                message: res?.errors.categoryId?.join(' و '),
-              })
-            } else if (res?.errors?.subCategoryId) {
-              form.setError('subCategoryId', {
-                type: 'custom',
-                message: res?.errors.subCategoryId?.join(' و '),
-              })
-            } else if (res?.errors?.offerTagId) {
-              form.setError('offerTagId', {
-                type: 'custom',
-                message: res?.errors.offerTagId?.join(' و '),
-              })
-            } else if (res?.errors?.brand) {
-              form.setError('brand', {
-                type: 'custom',
-                message: res?.errors.brand?.join(' و '),
-              })
-            } else if (res?.errors?.product_specs) {
-              form.setError('product_specs', {
-                type: 'custom',
-                message: res?.errors.product_specs?.join(' و '),
-              })
-            } else if (res?.errors?.questions) {
-              form.setError('questions', {
-                type: 'custom',
-                message: res?.errors.questions?.join(' و '),
-              })
-            } else if (res?.errors?._form) {
-              toast.error(res?.errors._form?.join(' و '))
-            }
-          } catch (error) {
-            // This will catch the NEXT_REDIRECT error, which is expected when the redirect happens
-            if (
-              !(
-                error instanceof Error &&
-                error.message.includes('NEXT_REDIRECT')
-              )
-            ) {
-              toast.error('مشکلی پیش آمده.')
-            }
-          }
-        })
-      } else {
-        startTransition(async () => {
-          try {
-            const res = await createNewProduct(formData, path)
-            if (res?.errors?.name) {
-              form.setError('name', {
-                type: 'custom',
-                message: res?.errors.name?.join(' و '),
-              })
-            } else if (res?.errors?.description) {
-              form.setError('description', {
-                type: 'custom',
-                message: res?.errors.description?.join(' و '),
-              })
-            } else if (res?.errors?.images) {
-              form.setError('images', {
-                type: 'custom',
-                message: res?.errors.images?.join(' و '),
-              })
-            } else if (res?.errors?.categoryId) {
-              form.setError('categoryId', {
-                type: 'custom',
-                message: res?.errors.categoryId?.join(' و '),
-              })
-            } else if (res?.errors?.subCategoryId) {
-              form.setError('subCategoryId', {
-                type: 'custom',
-                message: res?.errors.subCategoryId?.join(' و '),
-              })
-            } else if (res?.errors?.offerTagId) {
-              form.setError('offerTagId', {
-                type: 'custom',
-                message: res?.errors.offerTagId?.join(' و '),
-              })
-            } else if (res?.errors?.brand) {
-              form.setError('brand', {
-                type: 'custom',
-                message: res?.errors.brand?.join(' و '),
-              })
-            } else if (res?.errors?.product_specs) {
-              form.setError('product_specs', {
-                type: 'custom',
-                message: res?.errors.product_specs?.join(' و '),
-              })
-            } else if (res?.errors?.questions) {
-              form.setError('questions', {
-                type: 'custom',
-                message: res?.errors.questions?.join(' و '),
-              })
-            } else if (res?.errors?._form) {
-              toast.error(res?.errors._form?.join(' و '))
-            }
-          } catch (error) {
-            // This will catch the NEXT_REDIRECT error, which is expected when the redirect happens
-            if (
-              !(
-                error instanceof Error &&
-                error.message.includes('NEXT_REDIRECT')
-              )
-            ) {
-              toast.error('مشکلی پیش آمده.')
-            }
-          }
-        })
+        toast.error('مشکلی پیش آمده، لطفا دوباره امتحان کنید!')
       }
-    } catch {
-      toast.error('مشکلی پیش آمده، لطفا دوباره امتحان کنید!')
-    }
+    })
+    // formData.append('name', values.name)
+    // formData.append('description', values.description)
+    // formData.append('categoryId', values.categoryId)
+    // formData.append('subCategoryId', values.subCategoryId)
+    // formData.append('offerTagId', (values.offerTagId as string) || '')
+    // formData.append('brand', values.brand || '')
+
+    // if (values.freeShippingCityIds && values.freeShippingCityIds.length > 0) {
+    //   for (let i = 0; i < values.freeShippingCityIds.length; i++) {
+    //     formData.append(
+    //       'freeShippingCityIds',
+    //       values.freeShippingCityIds[i].value
+    //     )
+    //   }
+    // }
+    // if (values.images && values.images.length > 0) {
+    //   for (let i = 0; i < values.images.length; i++) {
+    //     formData.append('images', values.images[i] as string | Blob)
+    //   }
+    // }
+
+    // if (values.questions && values.questions.length > 0) {
+    //   values.questions.forEach((questions) => {
+    //     if (
+    //       questions.question.trim() !== '' ||
+    //       questions.answer.trim() !== ''
+    //     ) {
+    //       formData.append('questions', JSON.stringify(questions))
+    //     }
+    //   })
+    // }
+
+    // if (values.specs && values.specs.length > 0) {
+    //   values.specs.forEach((spec) => {
+    //     if (spec.name.trim() !== '' || spec.value.trim() !== '') {
+    //       // Ensure non-empty specs
+    //       formData.append('specs', JSON.stringify(spec))
+    //     }
+    //   })
+    // }
+
+    // try {
+    //   if (data) {
+    //     startTransition(async () => {
+    //       try {
+    //         const res = await editProduct(formData, data.id as string, path)
+    //         // console.log({ res })
+    //         if (res?.errors?.name) {
+    //           form.setError('name', {
+    //             type: 'custom',
+    //             message: res?.errors.name?.join(' و '),
+    //           })
+    //         } else if (res?.errors?.description) {
+    //           form.setError('description', {
+    //             type: 'custom',
+    //             message: res?.errors.description?.join(' و '),
+    //           })
+    //         } else if (res?.errors?.images) {
+    //           form.setError('images', {
+    //             type: 'custom',
+    //             message: res?.errors.images?.join(' و '),
+    //           })
+    //         } else if (res?.errors?.categoryId) {
+    //           form.setError('categoryId', {
+    //             type: 'custom',
+    //             message: res?.errors.categoryId?.join(' و '),
+    //           })
+    //         } else if (res?.errors?.subCategoryId) {
+    //           form.setError('subCategoryId', {
+    //             type: 'custom',
+    //             message: res?.errors.subCategoryId?.join(' و '),
+    //           })
+    //         } else if (res?.errors?.offerTagId) {
+    //           form.setError('offerTagId', {
+    //             type: 'custom',
+    //             message: res?.errors.offerTagId?.join(' و '),
+    //           })
+    //         } else if (res?.errors?.brand) {
+    //           form.setError('brand', {
+    //             type: 'custom',
+    //             message: res?.errors.brand?.join(' و '),
+    //           })
+    //         } else if (res?.errors?.specs) {
+    //           form.setError('specs', {
+    //             type: 'custom',
+    //             message: res?.errors.specs?.join(' و '),
+    //           })
+    //         } else if (res?.errors?.questions) {
+    //           form.setError('questions', {
+    //             type: 'custom',
+    //             message: res?.errors.questions?.join(' و '),
+    //           })
+    //         } else if (res?.errors?._form) {
+    //           toast.error(res?.errors._form?.join(' و '))
+    //         }
+    //       } catch (error) {
+    //         // This will catch the NEXT_REDIRECT error, which is expected when the redirect happens
+    //         if (
+    //           !(
+    //             error instanceof Error &&
+    //             error.message.includes('NEXT_REDIRECT')
+    //           )
+    //         ) {
+    //           toast.error('مشکلی پیش آمده.')
+    //         }
+    //       }
+    //     })
+    //   } else {
+    //     startTransition(async () => {
+    //       try {
+    //         const res = await createProduct(formData, path)
+    //         if (res?.errors?.name) {
+    //           form.setError('name', {
+    //             type: 'custom',
+    //             message: res?.errors.name?.join(' و '),
+    //           })
+    //         } else if (res?.errors?.description) {
+    //           form.setError('description', {
+    //             type: 'custom',
+    //             message: res?.errors.description?.join(' و '),
+    //           })
+    //         } else if (res?.errors?.images) {
+    //           form.setError('images', {
+    //             type: 'custom',
+    //             message: res?.errors.images?.join(' و '),
+    //           })
+    //         } else if (res?.errors?.categoryId) {
+    //           form.setError('categoryId', {
+    //             type: 'custom',
+    //             message: res?.errors.categoryId?.join(' و '),
+    //           })
+    //         } else if (res?.errors?.subCategoryId) {
+    //           form.setError('subCategoryId', {
+    //             type: 'custom',
+    //             message: res?.errors.subCategoryId?.join(' و '),
+    //           })
+    //         } else if (res?.errors?.offerTagId) {
+    //           form.setError('offerTagId', {
+    //             type: 'custom',
+    //             message: res?.errors.offerTagId?.join(' و '),
+    //           })
+    //         } else if (res?.errors?.brand) {
+    //           form.setError('brand', {
+    //             type: 'custom',
+    //             message: res?.errors.brand?.join(' و '),
+    //           })
+    //         } else if (res?.errors?.specs) {
+    //           form.setError('specs', {
+    //             type: 'custom',
+    //             message: res?.errors.specs?.join(' و '),
+    //           })
+    //         } else if (res?.errors?.questions) {
+    //           form.setError('questions', {
+    //             type: 'custom',
+    //             message: res?.errors.questions?.join(' و '),
+    //           })
+    //         } else if (res?.errors?._form) {
+    //           toast.error(res?.errors._form?.join(' و '))
+    //         }
+    //       } catch (error) {
+    //         // This will catch the NEXT_REDIRECT error, which is expected when the redirect happens
+    //         if (
+    //           !(
+    //             error instanceof Error &&
+    //             error.message.includes('NEXT_REDIRECT')
+    //           )
+    //         ) {
+    //           toast.error('مشکلی پیش آمده.')
+    //         }
+    //       }
+    //     })
+    //   }
+    // } catch {
+    //   toast.error('مشکلی پیش آمده، لطفا دوباره امتحان کنید!')
+    // }
   }
 
   const handleDeleteCityFreeShipping = (index: number) => {
@@ -494,7 +483,10 @@ const ProductDetails: FC<ProductFormProps> = ({
                           </FormControl>
                           <SelectContent>
                             {categories.map((category) => (
-                              <SelectItem key={category.id} value={category.id}>
+                              <SelectItem
+                                key={category.id}
+                                value={category.id!}
+                              >
                                 {category.name}
                               </SelectItem>
                             ))}
@@ -607,7 +599,7 @@ const ProductDetails: FC<ProductFormProps> = ({
                 <div className="w-full flex flex-col gap-y-3">
                   <ClickToAddInputsRHF
                     fields={specFields}
-                    name="product_specs"
+                    name="specs"
                     control={form.control}
                     register={form.register}
                     setValue={form.setValue}
@@ -618,9 +610,9 @@ const ProductDetails: FC<ProductFormProps> = ({
                     containerClassName="flex-1"
                     inputClassName="w-full"
                   />
-                  {errors.product_specs && (
+                  {errors.specs && (
                     <span className="text-sm font-medium text-destructive">
-                      {errors.product_specs.message}
+                      {errors.specs.message}
                     </span>
                   )}
                 </div>
@@ -790,6 +782,28 @@ const ProductDetails: FC<ProductFormProps> = ({
                   </div>
                 </div>
               </InputFieldset>
+              <FormField
+                control={form.control}
+                name="isFeatured"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex cursor-pointer flex-row items-center space-x-3 space-y-0 rounded-md border p-4">
+                      <FormControl>
+                        <Checkbox
+                          checked={Boolean(field.value)}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <div className="font-medium">ویژه</div>
+                        <FormDescription>
+                          زیردسته‌بندی ویژه در صفحه اصلی نمایش داده می‌شود.
+                        </FormDescription>
+                      </div>
+                    </FormLabel>
+                  </FormItem>
+                )}
+              />
 
               <Button type="submit" disabled={isPending}>
                 {isPending

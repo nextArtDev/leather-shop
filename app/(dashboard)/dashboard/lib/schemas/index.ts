@@ -310,7 +310,7 @@ export const ProductFormSchema = z.object({
   offerTagId: z.string().optional(),
   isFeatured: z.union([z.boolean().default(false)]).optional(),
   brand: z.string().optional(),
-  product_specs: z
+  specs: z
     .array(
       z.object({
         name: z.string(),
