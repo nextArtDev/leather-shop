@@ -46,10 +46,24 @@ export function ImageInput({
   const fieldValue = watch(name as Path<YourMainFormSchemaType>)
 
   useEffect(() => {
-    // Set initial images if in edit mode and no files are selected
-    if (initialDataImages && initialDataImages.length > 0 && !fieldValue) {
-      setValue(name as Path<YourMainFormSchemaType>, initialDataImages)
-      setIsEditMode(true)
+    // Set initial images if in edit mode and field is empty
+    if (initialDataImages && initialDataImages.length > 0) {
+      // Only set if the field is currently empty or undefined
+      const currentValue = fieldValue
+      if (
+        !currentValue ||
+        (Array.isArray(currentValue) && currentValue.length === 0)
+      ) {
+        console.log(`Setting initial ${name} images:`, initialDataImages)
+        setValue(name as Path<YourMainFormSchemaType>, initialDataImages)
+        setIsEditMode(true)
+      } else if (currentValue === initialDataImages) {
+        // If the current value matches initial data, we're in edit mode
+        setIsEditMode(true)
+      }
+    } else if (!initialDataImages || initialDataImages.length === 0) {
+      // If no initial data, ensure we're in create mode
+      setIsEditMode(false)
     }
   }, [initialDataImages, name, setValue, fieldValue])
 
@@ -59,10 +73,10 @@ export function ImageInput({
         control={control}
         name={name as Path<YourMainFormSchemaType>}
         render={({ field }) => {
-          const handleFileChange = (files: File[]) => {
+          const handleFileChange = (files: File[] | null) => {
             // When new files are selected, switch to file mode
             setIsEditMode(false)
-            field.onChange(files)
+            field.onChange(files ?? [])
           }
 
           const handleRemoveExistingImage = (urlToRemove: string) => {
@@ -168,6 +182,7 @@ function ImagesPreviewGridForFiles({
     return () => {
       previewUrls.forEach((url) => URL.revokeObjectURL(url))
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [files])
 
   // Cleanup on unmount
@@ -175,6 +190,7 @@ function ImagesPreviewGridForFiles({
     return () => {
       previewUrls.forEach((url) => URL.revokeObjectURL(url))
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (

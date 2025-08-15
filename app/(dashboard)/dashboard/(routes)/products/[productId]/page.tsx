@@ -21,12 +21,9 @@ export default async function SellerNewProductPage({
       specs: { select: { name: true, value: true, id: true } },
       questions: { select: { question: true, answer: true, id: true } },
       category: { select: { name: true, id: true } },
-      freeShipping: {
-        select: {
-          eligibleCities: true,
-          id: true,
-        },
-      },
+      variantImages: true,
+      colors: true,
+      sizes: true,
     },
   })
   if (!product) return notFound()
@@ -34,11 +31,11 @@ export default async function SellerNewProductPage({
   // console.log({ categories })
 
   const offerTags = await getAllOfferTags()
-  const provinces = await prisma.province.findMany({
-    orderBy: {
-      name: 'asc',
-    },
-  })
+  // const provinces = await prisma.province.findMany({
+  //   orderBy: {
+  //     name: 'asc',
+  //   },
+  // })
   // Convert null fields to undefined for compatibility with ProductWithVariantType
   // const productWithUndefined = {
   //   ...product,
@@ -52,7 +49,6 @@ export default async function SellerNewProductPage({
         categories={categories}
         offerTags={offerTags}
         data={product}
-        provinces={provinces}
       />
     </div>
   )

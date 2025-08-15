@@ -34,11 +34,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
+import { Switch } from '@/components/ui/switch'
 import {
   Category,
   Color,
-  FreeShipping,
-  FreeShippingCity,
   Image,
   OfferTag,
   Product,
@@ -48,27 +47,22 @@ import {
   Size,
   Spec,
 } from '@/lib/generated/prisma'
-import { Dot, Loader2 } from 'lucide-react'
-import { FC, useState, useTransition } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import MultipleSelector from '../../../components/multi-select'
-import { usePathname } from 'next/navigation'
-import InputFileUpload from '../../../components/file-input/InputFileUpload'
-import InputFieldset from '../../../components/input-fieldset'
-import RichTextEditor from '../../../components/text-editor/react-text-editor'
-import ClickToAddInputsRHF from '../../../components/click-to-add'
-import { ProductFormSchema } from '../../../lib/schemas'
-import {
-  getCityByProvinceId,
-  getSubCategoryByCategoryId,
-} from '../../../lib/queries/server-queries'
-import { createProduct, editProduct } from '../../../lib/actions/products'
-import { handleServerErrors } from '../../../lib/server-utils'
-import { ImageInput } from '../../../components/image-color/image-input'
 import { NumberInput } from '@tremor/react'
-import { TagsInput } from '../../../components/tag-input'
+import { Loader2 } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { FC, useTransition } from 'react'
+import ClickToAddInputsRHF from '../../../components/click-to-add'
 import { DateTimePicker } from '../../../components/date-time/date-time-picker'
-import { Switch } from '@/components/ui/switch'
+import InputFileUpload from '../../../components/file-input/InputFileUpload'
+import { ImageInput } from '../../../components/image-color/image-input'
+import InputFieldset from '../../../components/input-fieldset'
+import { TagsInput } from '../../../components/tag-input'
+import RichTextEditor from '../../../components/text-editor/react-text-editor'
+import { createProduct, editProduct } from '../../../lib/actions/products'
+import { getSubCategoryByCategoryId } from '../../../lib/queries/server-queries'
+import { ProductFormSchema } from '../../../lib/schemas'
+import { handleServerErrors } from '../../../lib/server-utils'
 
 const shippingFeeMethods = [
   {
@@ -86,24 +80,14 @@ const shippingFeeMethods = [
 ]
 
 interface ProductFormProps {
-  // data?: Product & {
-  //   variants: (ProductVariant & { images: Image[] } & { sizes: Size[] } & {
-  //     colors: Color[]
-  //   })[]
-  // } & { category: { id: string } } & { store: { id: string } } & {
-  //   cover: Image[] | null
-  // }
-  //   data?: Partial<ProductWithVariantType>
   data?: Partial<
-    Product & { images: Partial<Image>[] | null } & { specs: Spec[] | null } & {
-      questions: Question[] | null
+    Product & { images: Partial<Image>[] | null } & {
+      specs: Partial<Spec>[] | null
     } & {
-      freeShipping:
-        | (FreeShipping & { eligibleCities: FreeShippingCity[] | null })
-        | null
+      questions: Partial<Question>[] | null
     } & {
-      colors: Color[] | null
-    } & { sizes: Size[] | null } & { variantImages: Image[] }
+      colors: Partial<Color>[] | null
+    } & { sizes: Partial<Size>[] | null } & { variantImages: Partial<Image>[] }
   >
   categories: Partial<Category>[]
   offerTags: OfferTag[]
@@ -115,15 +99,10 @@ const ProductDetails: FC<ProductFormProps> = ({
   data,
   categories,
   offerTags,
-  provinces,
-  // subCategories,
 }) => {
-  console.log(data)
-
   const path = usePathname()
 
   const [isPending, startTransition] = useTransition()
-  const [provinceNameForShopping, setProvinceNameForShopping] = useState('')
 
   const form = useForm<z.infer<typeof ProductFormSchema>>({
     resolver: zodResolver(ProductFormSchema),
@@ -131,7 +110,7 @@ const ProductDetails: FC<ProductFormProps> = ({
       name: data?.name,
       description: data?.description,
       images: data?.images || [],
-      variantImages: data?.variantImages || [],
+      // variantImages: data?.variantImages || [],
       categoryId: data?.categoryId,
       isFeatured: data?.isFeatured || false,
 
@@ -213,10 +192,8 @@ const ProductDetails: FC<ProductFormProps> = ({
   // })
   // console.log({ citiesForFreeShipping })
   const errors = form.formState.errors
-  console.log({ errors })
 
   const handleSubmit = async (values: z.infer<typeof ProductFormSchema>) => {
-    console.log({ values })
     startTransition(async () => {
       try {
         if (data) {
@@ -252,11 +229,11 @@ const ProductDetails: FC<ProductFormProps> = ({
     <AlertDialog>
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>Create a new product</CardTitle>
+          <CardTitle>اطلاعات محصولات</CardTitle>
           <CardDescription>
             {data?.id
-              ? `Update ${data?.name} product information.`
-              : ' Lets create a product. You can edit product later from the product page.'}
+              ? `آپدیت محصول ${data?.name}`
+              : ' محصول جدید ایجاد کنید. شما می‌توانید بعدا از جدول محصولات آنرا ویرایش کنید.'}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -306,7 +283,7 @@ const ProductDetails: FC<ProductFormProps> = ({
               <InputFieldset
                 label="توضحیات"
                 description={
-                  "Note: The product description is the main description for the product (Will display in every variant page). You can add an extra description specific to this variant using 'Variant description' tab."
+                  'توجه: قسمت توضیحات، توضیحات اصلی محصول در صفحه محصول است و باید کامل باشد.'
                 }
               >
                 <FormField
@@ -333,11 +310,7 @@ const ProductDetails: FC<ProductFormProps> = ({
                 <ImageInput
                   name="variantImages"
                   label="عکس وریانتها"
-                  initialDataImages={data?.variantImages?.map((img) => ({
-                    url: img.url,
-                    file: undefined,
-                    id: img.id,
-                  }))}
+                  initialDataImages={data ? data?.variantImages : null}
                   mainVariantColors={
                     colorFields as unknown as FieldArrayWithId<
                       any,
@@ -364,7 +337,7 @@ const ProductDetails: FC<ProductFormProps> = ({
                     onAppend={() => appendColor({ color: '' })}
                     onRemove={removeColor}
                     initialDetailSchema={{ color: '' }}
-                    header="Colors"
+                    header="رنگها"
                     colorPicker
                   />
                   {form.formState.errors.colors && (
@@ -376,7 +349,7 @@ const ProductDetails: FC<ProductFormProps> = ({
                 </div>
               </div>
 
-              <InputFieldset label="Sizes, Prices, Discounts">
+              <InputFieldset label="سایز، قیمت و تخفیف">
                 <ClickToAddInputsRHF
                   fields={
                     sizeFields as unknown as FieldArrayWithId<
@@ -414,7 +387,7 @@ const ProductDetails: FC<ProductFormProps> = ({
                 )}
               </InputFieldset>
 
-              <InputFieldset label="Category">
+              <InputFieldset label="دسته‌بندی">
                 <div className="flex gap-4">
                   <FormField
                     disabled={isPending}
@@ -436,7 +409,7 @@ const ProductDetails: FC<ProductFormProps> = ({
                             <SelectTrigger>
                               <SelectValue
                                 defaultValue={field.value}
-                                placeholder="Select a category"
+                                placeholder="یک دسته‌بندی انتخاب کنید"
                               />
                             </SelectTrigger>
                           </FormControl>
@@ -476,7 +449,7 @@ const ProductDetails: FC<ProductFormProps> = ({
                             <SelectTrigger>
                               <SelectValue
                                 defaultValue={field.value}
-                                placeholder="Select a sub-category"
+                                placeholder="زیردسته‌بندی را انتخاب کنید"
                               />
                             </SelectTrigger>
                           </FormControl>
@@ -509,7 +482,7 @@ const ProductDetails: FC<ProductFormProps> = ({
                             <SelectTrigger>
                               <SelectValue
                                 defaultValue={field.value}
-                                placeholder="Select an offer"
+                                placeholder="یک کد تخفیف انتخاب کنید"
                               />
                             </SelectTrigger>
                           </FormControl>
@@ -530,7 +503,7 @@ const ProductDetails: FC<ProductFormProps> = ({
               </InputFieldset>
 
               {/* Brand, Sku, Weight */}
-              <InputFieldset label={'Brand, Sku, Weight'}>
+              <InputFieldset label={'برند محصول'}>
                 <div className="flex flex-col lg:flex-row gap-4">
                   <FormField
                     disabled={isPending}
@@ -539,7 +512,7 @@ const ProductDetails: FC<ProductFormProps> = ({
                     render={({ field }) => (
                       <FormItem className="flex-1">
                         <FormControl>
-                          <Input placeholder="Product brand" {...field} />
+                          <Input placeholder="برند محصول" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -548,7 +521,7 @@ const ProductDetails: FC<ProductFormProps> = ({
                 </div>
               </InputFieldset>
 
-              <InputFieldset label="SKU & Weight">
+              <InputFieldset label="SKU محصول">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -558,7 +531,7 @@ const ProductDetails: FC<ProductFormProps> = ({
                         <FormLabel>SKU</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="Stock Keeping Unit"
+                            placeholder=""
                             {...field}
                             value={field.value || ''}
                           />
@@ -572,12 +545,12 @@ const ProductDetails: FC<ProductFormProps> = ({
                     name="weight"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Weight (kg)</FormLabel>
+                        <FormLabel>وزن (kg)</FormLabel>
                         <FormControl>
                           <NumberInput
                             defaultValue={field.value}
                             onValueChange={field.onChange}
-                            placeholder="Product weight"
+                            placeholder="وزن محصول"
                             min={0.01}
                             step={0.01}
                             className="!shadow-none rounded-md !text-sm"
@@ -589,20 +562,20 @@ const ProductDetails: FC<ProductFormProps> = ({
                   />
                 </div>
               </InputFieldset>
-              <InputFieldset label="Keywords">
+              <InputFieldset label="کلمات کلیدی">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="keywords"
                     render={({ field }) => (
                       <FormItem className="relative flex-1">
-                        <FormLabel>variant Keywords</FormLabel>
+                        <FormLabel>کلمات کلیدی محصول</FormLabel>
                         <FormControl>
                           <TagsInput
                             maxItems={10}
                             value={field?.value || []}
                             onValueChange={field.onChange}
-                            placeholder="Enter your tags"
+                            placeholder=""
                           />
                         </FormControl>
                       </FormItem>
@@ -610,12 +583,7 @@ const ProductDetails: FC<ProductFormProps> = ({
                   />
                 </div>
               </InputFieldset>
-              <InputFieldset
-                label="Specifications"
-                description={
-                  "Note: The product specifications are the main specs for the product (Will display in every variant page). You can add extra specs specific to this variant using 'Variant Specifications' tab."
-                }
-              >
+              <InputFieldset label="خصوصیات محصول" description={''}>
                 <div className="w-full flex flex-col gap-y-3">
                   <ClickToAddInputsRHF
                     fields={specFields}
@@ -639,7 +607,7 @@ const ProductDetails: FC<ProductFormProps> = ({
               </InputFieldset>
               {/* Questions*/}
 
-              <InputFieldset label="Questions & Answers">
+              <InputFieldset label="سوال و جوابهای راجع به محصول">
                 <div className="w-full flex flex-col gap-y-3">
                   <ClickToAddInputsRHF
                     fields={questionFields}
@@ -672,7 +640,7 @@ const ProductDetails: FC<ProductFormProps> = ({
 
               {/* Shipping fee method */}
 
-              <InputFieldset label="Product shipping fee method">
+              <InputFieldset label="متد پست محصول">
                 <FormField
                   disabled={isPending}
                   control={form.control}
@@ -689,7 +657,7 @@ const ProductDetails: FC<ProductFormProps> = ({
                           <SelectTrigger>
                             <SelectValue
                               defaultValue={field.value}
-                              placeholder="Select Shipping Fee Calculation method"
+                              placeholder="انتخاب نحوه محاسبه هزینه ارسال"
                             />
                           </SelectTrigger>
                         </FormControl>
@@ -708,10 +676,10 @@ const ProductDetails: FC<ProductFormProps> = ({
               </InputFieldset>
 
               <InputFieldset
-                label="Sale"
-                description="Is your product on sale ?"
+                label="فروش ویژه"
+                description="آیا محصول شما در فروش ویژه است؟"
               >
-                <div>
+                <div className="flex flex-col gap-8">
                   <FormField
                     control={form.control}
                     name="isSale"
@@ -719,6 +687,7 @@ const ProductDetails: FC<ProductFormProps> = ({
                       <FormItem>
                         <FormControl>
                           <Switch
+                            dir="ltr"
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             aria-readonly
@@ -729,7 +698,10 @@ const ProductDetails: FC<ProductFormProps> = ({
                   />
                   <>
                     {form.getValues('isSale') ? (
-                      <DateTimePicker name="saleEndDate" />
+                      <DateTimePicker
+                        name="saleEndDate"
+                        label="تاریخ اتمام فروش ویژه"
+                      />
                     ) : null}
                   </>
                 </div>

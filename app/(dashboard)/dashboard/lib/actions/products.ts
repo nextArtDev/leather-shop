@@ -195,7 +195,7 @@ export async function createProduct(
         data: newSizes,
       })
     }
-    console.log({ product })
+    // console.log({ product })
   } catch (err: unknown) {
     const message =
       err instanceof Error ? err.message : 'مشکلی در سرور پیش آمده.'
@@ -218,7 +218,7 @@ export async function editProduct(
       errors: result.error.flatten().fieldErrors,
     }
   }
-  console.log('result.data', result.data)
+  // console.log('result.data', result.data)
   const user = await currentUser()
   // if (  !user || !user.id || user.role !== 'SELLER') {
   //   return {
@@ -375,7 +375,7 @@ export async function editProduct(
       })
     }
 
-    const product = await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx) => {
       await tx.product.update({
         where: {
           id: productId,
@@ -438,6 +438,9 @@ export async function editProduct(
     })
     let newColors
     if (result.data.colors) {
+      await prisma.color.deleteMany({
+        where: { productId: productId },
+      })
       newColors = result.data.colors.map((color) => ({
         name: color.color,
         productId: productId,
@@ -452,12 +455,15 @@ export async function editProduct(
     //  new Size
     let newSizes
     if (result.data.sizes) {
+      await prisma.size.deleteMany({
+        where: { productId },
+      })
       newSizes = result.data.sizes.map((size) => ({
         size: size.size,
         quantity: size.quantity,
         price: size.price,
         discount: size.discount,
-        productId: productId,
+        productId,
       }))
     }
 
@@ -466,8 +472,6 @@ export async function editProduct(
         data: newSizes,
       })
     }
-
-    console.log({ product })
   } catch (err: unknown) {
     const message =
       err instanceof Error ? err.message : 'مشکلی در سرور پیش آمده.'
@@ -562,5 +566,5 @@ export async function deleteProduct(
     }
   }
   revalidatePath(path)
-  redirect(` /dashboard/products`)
+  redirect(`/dashboard/products`)
 }

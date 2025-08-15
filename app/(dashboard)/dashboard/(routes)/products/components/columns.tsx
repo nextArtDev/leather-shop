@@ -23,13 +23,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useModal } from '@/providers/modal-provider'
-import {
-  CopyPlus,
-  FilePenLine,
-  MoreHorizontal,
-  SquareStack,
-  Trash,
-} from 'lucide-react'
+import { Edit, FilePenLine, MoreHorizontal, Trash } from 'lucide-react'
 import { ColumnDef } from '@tanstack/react-table'
 import Link from 'next/link'
 import {
@@ -40,7 +34,6 @@ import {
   Product,
   Size,
   SubCategory,
-  Variant,
 } from '@/lib/generated/prisma'
 import { usePathname } from 'next/navigation'
 import { deleteProduct } from '../../../lib/actions/products'
@@ -48,7 +41,9 @@ import { deleteProduct } from '../../../lib/actions/products'
 export const columns: ColumnDef<
   Product & {
     images: Image[]
-    variants: (Variant & { colors: Color[]; sizes: Size[] })[] | null
+    variantImages: Image[]
+    colors: Color[] | null
+    sizes: Size[] | null
     category: Category
     subCategory: SubCategory
     offerTag: OfferTag | null
@@ -67,69 +62,48 @@ export const columns: ColumnDef<
     cell: ({ row }) => {
       return (
         <div className=" flex flex-col justify-center items-center gap-y-3">
-          <div className="group relative flex  justify-center items-center cursor-pointer">
-            {/* <h1 className="font-bold truncate pb-3 border-b capitalize">
-              {row.original.name}
-            </h1> */}
-            <NextImage
-              src={row.original.images.map((img) => img.url)[0]}
-              alt={`${row.original.name} image`}
-              width={96}
-              height={96}
-              className="max-w-32 h-24 rounded-md object-cover shadow-sm"
-            />
-            <Link href={`/dashboard/products/${row.original.id}`}>
-              <div className="-mr-24 w-[200px]  text-background absolute inset-0   z-0 rounded-sm bg-primary/25 transition-all duration-150 hidden group-hover:flex items-center justify-center">
+          <Link href={`/dashboard/products/${row.original.id}`}>
+            <div className="group relative flex  justify-center items-center cursor-pointer">
+              <NextImage
+                src={row.original.images.map((img) => img.url)[0]}
+                alt={`${row.original.name} image`}
+                width={96}
+                height={96}
+                className="max-w-32 h-24 rounded-md object-cover shadow-sm"
+              />
+              <div className=" w-[230px]  text-background absolute inset-0   z-0 rounded-sm bg-primary/25 transition-all duration-150 hidden group-hover:flex items-center justify-center">
                 <FilePenLine className=" text-background" />
                 ویرایش
               </div>
-            </Link>
-          </div>
-          {/* Product variants */}
-          <div className="relative flex flex-wrap gap-2">
-            {row.original?.variants?.map(
-              (
-                variant: Variant & {
-                  colors: Color[]
-                } & { sizes: Size[] }
-              ) => (
-                <div key={variant.id} className="flex flex-col gap-y-2 group">
-                  <div className="relative cursor-pointer p-2">
-                    {/* Info */}
-                    <div className="flex flex-col mt-2 gap-2 ">
-                      {/* Colors */}
-                      <div className=" flex flex-wrap max-w-sm gap-2 rounded-md">
-                        {variant.colors.map((color: Color) => (
-                          <span
-                            key={color.name}
-                            className="w-4 h-4 rounded-full shadow-2xl"
-                            style={{ backgroundColor: color.name }}
-                          />
-                        ))}
-                      </div>
-                      <div>
-                        {/* Name of variant */}
-                        <h1 className="max-w-40 capitalize text-sm">
-                          {variant.name}
-                        </h1>
-                        {/* Sizes */}
-                        <div className="flex flex-wrap gap-2 max-w-72 mt-1">
-                          {variant.sizes.map((size: Size) => (
-                            <span
-                              key={size.size}
-                              className="w-fit p-1 rounded-md text-[11px] font-medium border-2 bg-white/10"
-                            >
-                              {size.size} - ({size.quantity}) - {size.price}$
-                            </span>
-                          ))}
-                        </div>
-                      </div>
+
+              <div className="flex flex-col gap-y-2 group">
+                <div className="relative **:flex flex-col mt-2 gap-2 cursor-pointer p-2">
+                  <div className=" flex flex-wrap max-w-sm gap-2 rounded-md">
+                    {row.original?.colors?.map((color: Color) => (
+                      <span
+                        key={color.name}
+                        className="w-4 h-4 rounded-full shadow-2xl"
+                        style={{ backgroundColor: color.name }}
+                      />
+                    ))}
+                  </div>
+                  <div>
+                    {/* Sizes */}
+                    <div className="flex flex-col  gap-2 max-w-72 mt-1">
+                      {row.original.sizes?.map((size: Size) => (
+                        <span
+                          key={size.size}
+                          className="w-fit p-1 rounded-md text-[11px] font-medium border-2 bg-white/10"
+                        >
+                          {size.size} - ({size.quantity} عدد) - {size.price}
+                        </span>
+                      ))}
                     </div>
                   </div>
                 </div>
-              )
-            )}
-          </div>
+              </div>
+            </div>
+          </Link>
         </div>
       )
     },
@@ -156,29 +130,12 @@ export const columns: ColumnDef<
       return <span>{offerTag ? offerTag.name : '-'}</span>
     },
   },
-
-  {
-    accessorKey: 'new-variant',
-    header: 'افزودن وریانت',
-    cell: ({ row }) => {
-      return (
-        <Link href={`/dashboard/products/${row.original.id}/variants/new`}>
-          <CopyPlus className="hover:text-blue-200" />
-        </Link>
-      )
-    },
-  },
   {
     id: 'actions',
     cell: ({ row }) => {
       const rowData = row.original
 
-      return (
-        <CellActions
-          productId={rowData.id}
-          href={`/dashboard/products/${row.original.id}/variants`}
-        />
-      )
+      return <CellActions productId={rowData.id} />
     },
   },
 ]
@@ -186,11 +143,10 @@ export const columns: ColumnDef<
 // Define props interface for CellActions component
 interface CellActionsProps {
   productId: string
-  href: string
 }
 
 // CellActions component definition
-const CellActions: React.FC<CellActionsProps> = ({ productId, href }) => {
+const CellActions: React.FC<CellActionsProps> = ({ productId }) => {
   // Hooks
   const { setClose } = useModal()
   // const [loading, setLoading] = useState(false)
@@ -210,25 +166,32 @@ const CellActions: React.FC<CellActionsProps> = ({ productId, href }) => {
 
   return (
     <AlertDialog>
-      <DropdownMenu>
+      <DropdownMenu dir="rtl">
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="h-8 w-8 p-0">
             <span className="sr-only">Open menu</span>
             <MoreHorizontal className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <DropdownMenuContent align="start">
+          <DropdownMenuLabel>عملیات</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <Link href={href}>
-              <DropdownMenuItem className="flex gap-2">
-                <SquareStack size={15} /> Variants
-              </DropdownMenuItem>
-            </Link>
+            <DropdownMenuItem className="flex gap-2">
+              <Link
+                className="flex items-center gap-2"
+                href={`/dashboard/products/${productId}`}
+              >
+                <Edit size={15} />
+                ویرایش محصول
+              </Link>
+            </DropdownMenuItem>
             <AlertDialogTrigger asChild>
-              <DropdownMenuItem className="flex gap-2" onClick={() => {}}>
-                <Trash size={15} /> Delete product
+              <DropdownMenuItem
+                className="flex gap-2 text-red-500"
+                onClick={() => {}}
+              >
+                <Trash size={15} className="text-red-500" /> حذف محصول
               </DropdownMenuItem>
             </AlertDialogTrigger>
           </DropdownMenuGroup>
@@ -237,15 +200,14 @@ const CellActions: React.FC<CellActionsProps> = ({ productId, href }) => {
       <AlertDialogContent className="max-w-lg">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-left">
-            Are you absolutely sure?
+            از حذف محصول مطمئن هستید؟
           </AlertDialogTitle>
           <AlertDialogDescription className="text-left">
-            This action cannot be undone. This will permanently delete the
-            product and variants that exist inside product.
+            این عملیات برگشت‌پذیر نیست و تمام محصول و محصولاتش حذف خواهند شد!
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex items-center">
-          <AlertDialogCancel className="mb-2">Cancel</AlertDialogCancel>
+          <AlertDialogCancel className="mb-2">صرف‌نظر</AlertDialogCancel>
           <AlertDialogAction
             disabled={pending}
             className="bg-destructive hover:bg-destructive mb-2 text-white"
@@ -261,7 +223,7 @@ const CellActions: React.FC<CellActionsProps> = ({ productId, href }) => {
                 type="submit"
                 className="hover:bg-transparent active:bg-transparent w-full outline-none"
               >
-                Delete
+                حذف
               </Button>
             </form>
           </AlertDialogAction>

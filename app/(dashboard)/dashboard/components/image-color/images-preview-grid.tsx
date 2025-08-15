@@ -30,7 +30,6 @@ const ImagesPreviewGrid: FC<ImagesPreviewGridProps> = ({
   onRemove,
   mainVariantColors,
   addMainVariantColor,
-  isEditMode = false,
 }) => {
   const imagesLength = images.length
   const GridClassName = getGridClassName(imagesLength)
@@ -170,7 +169,7 @@ const ImagesPreviewGrid: FC<ImagesPreviewGridProps> = ({
         <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
           <h4 className="text-sm font-medium mb-2">Selected Colors:</h4>
           <div className="flex flex-wrap gap-2">
-            {mainVariantColors.map((colorField, index) => (
+            {mainVariantColors.map((colorField) => (
               <div
                 key={colorField.id}
                 className="flex items-center gap-2 bg-white dark:bg-gray-700 px-2 py-1 rounded-md border"

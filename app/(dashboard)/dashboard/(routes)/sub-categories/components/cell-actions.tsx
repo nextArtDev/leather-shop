@@ -109,7 +109,7 @@ export const CellActions: React.FC<CellActionsProps> = ({
       <AlertDialogContent className="max-w-lg">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-left">
-            از حذف دسته‌بندی مطمئن هستید؟
+            از حذف زیردسته‌بندی مطمئن هستید؟
           </AlertDialogTitle>
           <AlertDialogDescription className="text-left">
             این عملیات برگشت‌پذیر نیست و تمام زیردسته‌بندی و محصولاتش حذف خواهند

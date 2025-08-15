@@ -1,15 +1,12 @@
 import {
   Category,
   Color,
-  FreeShipping,
-  FreeShippingCity,
   Image,
   Product,
   Question,
   Size,
   Spec,
   SubCategory,
-  Variant,
 } from '@/lib/generated/prisma'
 import prisma from '@/lib/prisma'
 import { cache } from 'react'

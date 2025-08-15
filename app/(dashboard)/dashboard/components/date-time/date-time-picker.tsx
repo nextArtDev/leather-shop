@@ -63,7 +63,7 @@ DateTimePickerProps) {
                   {field.value ? (
                     format(field.value, 'Pp HH:mm:ss')
                   ) : (
-                    <span>Pick a date</span>
+                    <span>انتخاب تاریخ</span>
                   )}
                 </Button>
               </PopoverTrigger>
@@ -75,7 +75,7 @@ DateTimePickerProps) {
                 onSelect={field.onChange}
                 initialFocus
               />
-              <div className="p-3 border-t border-border">
+              <div dir="ltr" className="p-3 border-t border-border">
                 <TimePickerDemo setDate={field.onChange} date={field.value} />
               </div>
             </PopoverContent>

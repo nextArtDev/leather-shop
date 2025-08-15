@@ -110,7 +110,7 @@ export default function DataTable<TData, TValue>({
           {newTabLink && (
             <Link href={newTabLink}>
               <Button variant="outline">
-                <FilePlus2 className="me-1" /> Create in new page
+                <FilePlus2 className="me-1" /> ایجاد در صفحه جدید
               </Button>
             </Link>
           )}
