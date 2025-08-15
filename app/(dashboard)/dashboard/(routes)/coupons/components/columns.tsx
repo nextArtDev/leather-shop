@@ -45,25 +45,25 @@ export const columns: ColumnDef<Coupon>[] = [
     accessorKey: 'startDate',
     header: 'شروع',
     cell: ({ row }) => {
-      return <span>{format(row.original.startDate, 'Pp HH:mm:ss')}</span>
+      return <span>{format(row.original.startDate, 'hh:mm:ss y/LL/dd')}</span>
     },
   },
   {
     accessorKey: 'endDate',
     header: 'پایان',
     cell: ({ row }) => {
-      return <span>{format(row.original.endDate, 'Pp HH:mm:ss')}</span>
+      return <span>{format(row.original.endDate, 'hh:mm:ss y/LL/dd')}</span>
     },
   },
   {
     accessorKey: 'timeLeft',
-    header: 'Time Left',
+    header: 'زمان مانده',
     cell: ({ row }) => {
       const { days, hours } = getTimeUntil(row.original.endDate)
       return (
         <span>
           {/* {days} days and {hours} hours */}
-          روز و {hours} ساعت {days}
+          {days} روز و {hours} ساعت
         </span>
       )
     },
@@ -73,7 +73,9 @@ export const columns: ColumnDef<Coupon>[] = [
     accessorKey: 'discount',
     header: 'تخفیف',
     cell: ({ row }) => {
-      return <span>{row.original.discount}</span>
+      return (
+        <span className="text-red-500 font-bold">{row.original.discount}</span>
+      )
     },
   },
 

@@ -68,6 +68,16 @@ const data = {
       ],
     },
     {
+      title: 'تخفیها',
+      url: '/dashboard/coupons',
+      items: [
+        {
+          title: 'کوپن تخفیف',
+          url: '/dashboard/coupons',
+        },
+      ],
+    },
+    {
       title: 'کاربران',
       url: '/dashboard/users',
       items: [

@@ -34,14 +34,15 @@ const CustomModal = ({
     <Dialog open={isOpen || defaultOpen} onOpenChange={setClose}>
       <DialogOverlay>
         <DialogContent
+          dir="rtl"
           className={cn(
             'overflow-y-scroll md:max-h-[700px] md:h-fit h-screen bg-card',
             maxWidth
           )}
         >
-          <DialogHeader className="pt-8 text-left">
+          <DialogHeader className="pt-8 text-right  ">
             {heading && (
-              <DialogTitle className="text-2xl font-bold">
+              <DialogTitle className="text-2xl  font-bold">
                 {heading}
               </DialogTitle>
             )}

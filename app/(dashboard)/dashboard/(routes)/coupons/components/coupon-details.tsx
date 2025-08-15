@@ -127,8 +127,8 @@ const CouponDetails = () => {
                 )}
               />
 
-              <DateTimePicker name="startDate" />
-              <DateTimePicker name="endDate" />
+              <DateTimePicker name="startDate" label="تاریخ شروع" />
+              <DateTimePicker name="endDate" label="تاریخ پایان" />
 
               <Button type="submit" disabled={isPending}>
                 {isPending ? (

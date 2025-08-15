@@ -91,7 +91,7 @@ export default function DataTable<TData, TValue>({
         <div className="flex gap-x-2">
           {modalChildren && (
             <Button
-              className="flex- gap-2"
+              className="flex  gap-2"
               onClick={() => {
                 if (modalChildren)
                   setOpen(
@@ -122,12 +122,12 @@ export default function DataTable<TData, TValue>({
         <Table className="">
           {/* Table header */}
           {!noHeader && (
-            <TableHeader>
+            <TableHeader className=" ">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
                     return (
-                      <TableHead key={header.id}>
+                      <TableHead key={header.id} className="text-right">
                         {header.isPlaceholder
                           ? null
                           : flexRender(

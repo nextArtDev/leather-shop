@@ -11,19 +11,21 @@ export default async function SellerCouponsPage() {
   if (!coupons) return notFound()
 
   return (
-    <DataTable
-      actionButtonText={
-        <>
-          <Plus size={15} />
-          ایجاد کوپن تخفیف
-        </>
-      }
-      modalChildren={<CouponDetails />}
-      newTabLink={`/dashboard/coupons/new`}
-      filterValue="code"
-      data={coupons}
-      columns={columns}
-      searchPlaceholder="جست‌وجوی کد کوپن..."
-    />
+    <section className="px-1">
+      <DataTable
+        actionButtonText={
+          <>
+            <Plus size={15} />
+            ایجاد کوپن تخفیف
+          </>
+        }
+        modalChildren={<CouponDetails />}
+        newTabLink={`/dashboard/coupons/new`}
+        filterValue="code"
+        data={coupons}
+        columns={columns}
+        searchPlaceholder="جست‌وجوی کد کوپن..."
+      />
+    </section>
   )
 }
