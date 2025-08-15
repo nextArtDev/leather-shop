@@ -7,9 +7,9 @@ import QueryProviders from '@/providers/query-provider'
 const myFont = localFont({
   src: '../public/fonts/Parastoo-VariableFont_wght.ttf',
 })
-const vazirFont = localFont({
-  src: '../public/fonts/Vazirmatn-VariableFont_wght.ttf',
-})
+// const vazirFont = localFont({
+//   src: '../public/fonts/Vazirmatn-VariableFont_wght.ttf',
+// })
 
 export const numericFont = localFont({
   src: '../public/fonts/FarsiAdad.woff2',

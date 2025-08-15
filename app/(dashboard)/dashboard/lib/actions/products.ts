@@ -9,8 +9,7 @@ import { ProductFormSchema } from '../schemas'
 import { currentUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { generateUniqueSlug } from '../server-utils'
-import { Image, Product, Variant } from '@/lib/generated/prisma'
-import { arraysEqual } from '../utils'
+import { Image, Product } from '@/lib/generated/prisma'
 
 interface CreateProductFormState {
   success?: string

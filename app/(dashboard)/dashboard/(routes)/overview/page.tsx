@@ -2,7 +2,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -11,7 +10,7 @@ import {
 
 import { BadgeDollarSign, Barcode, CreditCard, Users } from 'lucide-react'
 import { Metadata } from 'next'
-import Link from 'next/link'
+
 import Charts from './components/charts'
 import { currentUser } from '@/lib/auth'
 
