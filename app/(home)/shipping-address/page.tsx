@@ -1,16 +1,17 @@
-import LocationSelectorForm from '@/components/shared/province-city/LocationSelectorForm'
-import { getProvinces } from '@/lib/home/actions/location'
+// import LocationSelectorForm from '@/components/shared/province-city/LocationSelectorForm'
+// import { getProvinces } from '@/lib/home/actions/location'
 
 const page = async () => {
   //خوزستان ->18
-  const provinces = await getProvinces()
+  // const provinces = await getProvinces()
   //   console.log(provinces)
   return (
     <section
       className="w-full h-full min-h-screen flex flex-col items-center
      justify-center max-w-md mx-auto"
     >
-      {provinces.length > 0 && <LocationSelectorForm provinces={provinces} />}
+      page
+      {/* {provinces.length > 0 && <LocationSelectorForm provinces={provinces} />} */}
     </section>
   )
 }

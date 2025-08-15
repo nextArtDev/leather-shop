@@ -202,3 +202,21 @@ export const getProductById = cache(
     return product
   }
 )
+
+export const getAllCoupons = async () => {
+  try {
+    // const user = await currentUser()
+    // if (!user) throw new Error('Unauthenticated.')
+
+    // if (user.role !== 'ADMIN')
+    //   throw new Error(
+    //     'Unauthorized Access: Seller Privileges Required for Entry.'
+    //   )
+
+    const coupons = await prisma.coupon.findMany()
+    // console.log({ coupons })
+    return coupons
+  } catch (error) {
+    console.log(error)
+  }
+}

@@ -214,31 +214,6 @@ model Product {
   @@index([offerTagId])
 }
 
-model Variant {
-  id          String  @id @default(uuid())
-  name        String
-  description String? @db.LongText
-  // variantImage Image[] @relation("variantImage")
-  slug        String  @unique
-  isSale      Boolean @default(false)
-  saleEndDate String?
-  sku         String
-  keywords    String
-  sales       Int     @default(0)
-  weight      Float
-
-  // productId String
-  // product   Product @relation("ProductToVariant", fields: [productId], references: [id], onDelete: Cascade)
-
-  specs    Spec[]     @relation("VariantSpec")
-  wishlist Wishlist[] @relation("WishlistToVariant")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-
-  // @@index([productId])
-}
-
 model Size {
   id       String @id @default(uuid())
   size     String
@@ -289,14 +264,10 @@ model Spec {
   productId String?
   product   Product? @relation("ProductSpec", fields: [productId], references: [id], onDelete: Cascade)
 
-  variantId String?
-  variant   Variant? @relation("VariantSpec", fields: [variantId], references: [id], onDelete: Cascade)
-
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
   @@index([productId])
-  @@index([variantId])
 }
 
 model Question {
@@ -645,9 +616,6 @@ model Wishlist {
   productId String
   product   Product @relation("WishlistToProduct", fields: [productId], references: [id], onDelete: Cascade)
 
-  variantId String
-  variant   Variant @relation("WishlistToVariant", fields: [variantId], references: [id], onDelete: Cascade)
-
   sizeId String?
   size   Size?   @relation("WishlistToSize", fields: [sizeId], references: [id])
 
@@ -656,7 +624,6 @@ model Wishlist {
 
   @@index([userId])
   @@index([productId])
-  @@index([variantId])
   @@index([sizeId])
 }
 

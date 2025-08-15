@@ -1,246 +1,196 @@
-'use server'
+// 'use server'
 
-import {
-  COURIER_CODES,
-  //   createShippingRequest,
-  SERVICE_TYPES,
-  ShippingCalculationRequest,
-  ShippingCalculationResponse,
-  validateShippingRequest,
-} from '@/lib/utils'
+// export async function getProvinces() {
+//   const apiKey = process.env.POSTEX_API_KEY
+//   try {
+//     const response = await fetch(
+//       'https://api.postex.ir/api/v1/locality/provinces',
+//       {
+//         headers: {
+//           Authorization: `Bearer ${apiKey}`,
+//           'Content-Type': 'application/json',
+//         },
+//       }
+//     )
 
-export async function getProvinces() {
-  const apiKey = process.env.POSTEX_API_KEY
-  try {
-    const response = await fetch(
-      'https://api.postex.ir/api/v1/locality/provinces',
-      {
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    )
+//     if (!response.ok) {
+//       throw new Error('Failed to fetch provinces')
+//     }
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch provinces')
-    }
+//     const data = await response.json()
 
-    const data = await response.json()
+//     return data
+//   } catch (error) {
+//     console.error(error)
+//     return []
+//   }
+// }
 
-    return data
-  } catch (error) {
-    console.error(error)
-    return []
-  }
-}
+// export async function getCityByProvinceCode(provinceCode: number) {
+//   const apiKey = process.env.POSTEX_API_KEY
+//   try {
+//     const response = await fetch(
+//       `https://api.postex.ir/api/v1/locality/cities/${provinceCode}`,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${apiKey}`,
+//           'Content-Type': 'application/json',
+//         },
+//       }
+//     )
 
-export async function getCityByProvinceCode(provinceCode: number) {
-  const apiKey = process.env.POSTEX_API_KEY
-  try {
-    const response = await fetch(
-      `https://api.postex.ir/api/v1/locality/cities/${provinceCode}`,
-      {
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    )
+//     if (!response.ok) {
+//       throw new Error('Failed to fetch provinces')
+//     }
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch provinces')
-    }
+//     const data = await response.json()
 
-    const data = await response.json()
+//     return data
+//   } catch (error) {
+//     return console.error(error)
+//   }
+// }
+// export async function getCityByCode(cityCode: number) {
+//   const apiKey = process.env.POSTEX_API_KEY
+//   try {
+//     const response = await fetch(
+//       `https://api.postex.ir/api/v1/locality/cities/${cityCode}`,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${apiKey}`,
+//           'Content-Type': 'application/json',
+//         },
+//       }
+//     )
 
-    return data
-  } catch (error) {
-    return console.error(error)
-  }
-}
-export async function getCityByCode(cityCode: number) {
-  const apiKey = process.env.POSTEX_API_KEY
-  try {
-    const response = await fetch(
-      `https://api.postex.ir/api/v1/locality/cities/${cityCode}`,
-      {
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    )
+//     if (!response.ok) {
+//       throw new Error('Failed to fetch provinces')
+//     }
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch provinces')
-    }
+//     const data = await response.json()
 
-    const data = await response.json()
+//     return data
+//   } catch (error) {
+//     console.error(error)
+//     return []
+//   }
+// }
 
-    return data
-  } catch (error) {
-    console.error(error)
-    return []
-  }
-}
+// // Calculation Price
+// interface ParcelProperties {
+//   length: number
+//   width: number
+//   height: number
+//   total_weight: number
+//   is_fragile: boolean
+//   is_liquid: boolean
+//   total_value: number
+//   pre_paid_amount: number
+//   total_value_currency: string
+//   box_type_id: number
+// }
 
-// Calculation Price
-interface CourierData {
-  courier_code: string
-  service_type: string
-  payment_type: string
-}
+// /**
+//  * Represents a single parcel in the shipping request.
+//  */
+// interface Parcel {
+//   custom_parcel_id: string
+//   to_city_code: number
+//   payment_type: string
+//   parcel_properties: ParcelProperties // Updated to use the detailed interface
+// }
 
-interface ParcelProperties {
-  height: number
-  width: number
-  length: number
-  box_type_id: number
-  total_weight: number
-  total_value: number
-}
+// /**
+//  * Represents the courier and service type.
+//  */
+// interface Courier {
+//   courier_code: string
+//   service_type: string
+// }
 
-interface ShippingCalculationRequest {
-  courier: CourierData
-  from_city_code: number
-  to_city_code: number
-  parcel_properties: ParcelProperties
-  has_collection: boolean
-  has_distribution: boolean
-  value_added_service: number[]
-}
+// interface ValueAddedService {
+//   insurance?: {
+//     amount: number
+//     currency: string
+//   }
+//   cod?: {
+//     enabled: boolean
+//     amount: number
+//     currency: string
+//   }
+// }
 
-// Response types (you may need to adjust based on actual API response)
-interface ShippingCalculationResponse {
-  success: boolean
-  data?: {
-    price: number
-    delivery_time?: string
-    service_details?: any
-  }
-  error?: string
-  message?: string
-}
+// interface ShippingQuotePayload {
+//   from_city_code: number
+//   pickup_needed: boolean
+//   courier: Courier
+//   parcels: Parcel[]
+//   ValueAddedService: ValueAddedService // تغییر نام فیلد
+// }
 
-export async function calculateShippingPrice(
-  requestData: ShippingCalculationRequest
-): Promise<ShippingCalculationResponse> {
-  const API_URL = 'https://api.postex.ir/api/v1/parcels/mark-ready'
-  const API_KEY = process.env.POSTEX_API_KEY
+// /**
+//  * Defines the structure for the expected API response.
+//  */
+// interface ShippingQuoteResponse {
+//   success: boolean
+//   data: {
+//     price: number
+//   }[]
+//   message?: string
+// }
 
-  // Validate API key
-  if (!API_KEY) {
-    console.error('POSTEX_API_KEY environment variable is not set')
-    return {
-      success: false,
-      error: 'API configuration error',
-    }
-  }
+// /**
+//  * A Next.js server action to calculate the shipping price using the PostEx API.
+//  * @param payload - The data for the shipping quote request.
+//  * @returns A promise that resolves to the API response or an error object.
+//  */
+// export async function calculateShippingPrice(
+//   payload: ShippingQuotePayload
+// ): Promise<{ success: boolean; data?: any; error?: string }> {
+//   const apiKey = process.env.POSTEX_API_KEY
 
-  // Validate required fields
-  if (
-    !requestData.courier?.courier_code ||
-    !requestData.from_city_code ||
-    !requestData.to_city_code ||
-    !requestData.parcel_properties?.total_weight
-  ) {
-    return {
-      success: false,
-      error:
-        'Missing required fields: courier_code, from_city_code, to_city_code, or total_weight',
-    }
-  }
+//   if (!apiKey) {
+//     console.error('API key for PostEx is not configured.')
+//     return {
+//       success: false,
+//       error: 'Server configuration error: Missing API key.',
+//     }
+//   }
 
-  try {
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestData),
-    })
+//   const apiUrl = 'https://api.postex.ir/api/app/v1/shipping/quotes'
 
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error('API Error:', response.status, errorText)
+//   try {
+//     console.log('Payload sent to PostEx:', JSON.stringify(payload, null, 2))
+//     const response = await fetch(apiUrl, {
+//       method: 'POST',
+//       headers: {
+//         Authorization: `Bearer ${apiKey}`,
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify(payload),
+//     })
 
-      return {
-        success: false,
-        error: `HTTP ${response.status}: ${response.statusText}`,
-        message: errorText,
-      }
-    }
+//     const responseBody = await response.text()
+//     console.log('API response:', response.status, responseBody)
 
-    const data = await response.json()
+//     if (!response.ok) {
+//       const errorData = JSON.parse(responseBody)
+//       console.error('API request failed:', response.status, errorData)
+//       return {
+//         success: false,
+//         error:
+//           errorData?.message ||
+//           `API request failed with status ${response.status}`,
+//       }
+//     }
 
-    return {
-      success: true,
-      data: data,
-    }
-  } catch (error) {
-    console.error('Fetch error:', error)
-
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error occurred',
-    }
-  }
-}
-
-// Helper function to create a shipping request with default values
-function createShippingRequest(
-  params: Partial<ShippingCalculationRequest>
-): ShippingCalculationRequest {
-  return {
-    courier: {
-      courier_code: params.courier?.courier_code || '',
-      service_type: params.courier?.service_type || 'normal',
-      payment_type: params.courier?.payment_type || 'prepaid',
-    },
-    from_city_code: params.from_city_code || 0,
-    to_city_code: params.to_city_code || 0,
-    parcel_properties: {
-      height: params.parcel_properties?.height || 0,
-      width: params.parcel_properties?.width || 0,
-      length: params.parcel_properties?.length || 0,
-      box_type_id: params.parcel_properties?.box_type_id || 0,
-      total_weight: params.parcel_properties?.total_weight || 0,
-      total_value: params.parcel_properties?.total_value || 0,
-    },
-    has_collection: params.has_collection ?? true,
-    has_distribution: params.has_distribution ?? true,
-    value_added_service: params.value_added_service || [],
-  }
-}
-
-// Example usage function
-export async function getShippingQuote(
-  courierCode: string,
-  fromCityCode: number,
-  toCityCode: number,
-  weight: number,
-  dimensions: { height: number; width: number; length: number },
-  value: number = 0
-) {
-  const shippingRequest = createShippingRequest({
-    courier: {
-      courier_code: courierCode,
-      service_type: 'normal',
-      payment_type: 'prepaid',
-    },
-    from_city_code: fromCityCode,
-    to_city_code: toCityCode,
-    parcel_properties: {
-      height: dimensions.height,
-      width: dimensions.width,
-      length: dimensions.length,
-      total_weight: weight,
-      total_value: value,
-      box_type_id: 1, // You may need to adjust this based on your box types
-    },
-  })
-
-  return await calculateShippingPrice(shippingRequest)
-}
+//     const data: ShippingQuoteResponse = JSON.parse(responseBody)
+//     return { success: true, data }
+//   } catch (error) {
+//     console.error('An unexpected error occurred:', error)
+//     return {
+//       success: false,
+//       error: 'An unexpected error occurred. Please try again.',
+//     }
+//   }
+// }

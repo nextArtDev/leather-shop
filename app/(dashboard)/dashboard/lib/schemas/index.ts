@@ -276,109 +276,6 @@ export const CategoryServerFormSchema = z.object({
     }),
   featured: z.string().optional(),
 })
-// export const NewServerProductFormSchema = z.object({
-//   name: z
-//     .string()
-//     .min(2, { message: 'Product name should be at least 2 characters long.' })
-//     .max(200, { message: 'Product name cannot exceed 200 characters.' }),
-//   name_fa: z
-//     .string()
-//     // .min(2, { message: 'Product name should be at least 2 characters long.' })
-//     .max(200, { message: 'Product name cannot exceed 200 characters.' })
-//     .optional(),
-//   description: z.string().min(200, {
-//     message: 'Product description should be at least 200 characters long.',
-//   }),
-//   description_fa: z
-//     .string()
-
-//     .optional(),
-
-//   images: imageSchema,
-
-//   categoryId: z.string().uuid(),
-//   subCategoryId: z.string().uuid(),
-//   offerTagId: z
-//     .string()
-//     // .uuid()
-//     .optional(),
-//   brand: z
-//     .string()
-//     .min(2, {
-//       message: 'Product brand should be at least 2 characters long.',
-//     })
-//     .max(50, {
-//       message: 'Product brand cannot exceed 50 characters.',
-//     })
-//     .optional(),
-
-//   product_specs: z
-//     .object({
-//       name: z.string(),
-//       value: z.string(),
-//       // name_fa: z.string(),
-//     })
-//     .array()
-//     // .min(1, 'Please provide at least one product spec.')
-//     .refine(
-//       (product_specs) =>
-//         product_specs.every((s) => s.name.length > 0 && s.value.length > 0),
-//       {
-//         message: 'All product specs inputs must be filled correctly.',
-//       }
-//     )
-//     .optional(),
-
-//   questions: z
-//     .object({
-//       question: z.string(),
-//       answer: z.string(),
-//       // question_fa: z.string(),
-//       // answer_fa: z.string(),
-//     })
-//     .array()
-//     // .min(1, 'Please provide at least one product question.')
-//     .refine(
-//       (questions) =>
-//         questions.every((q) => q.question.length > 0 && q.answer.length > 0),
-//       {
-//         message: 'All product question inputs must be filled correctly.',
-//       }
-//     )
-//     .optional(),
-
-//   freeShippingForAllCountries: z.boolean().default(false),
-//   freeShippingCountriesIds: z
-//     .array(z.string())
-//     .optional()
-//     // .refine(
-//     //   (ids) => ids?.every((item) => item.label && item.value),
-//     //   'Each country must have a valid name and ID.'
-//     // )
-//     .default([]), // use it when an array is optional
-//   freeShippingCityIds: z
-//     .array(z.string())
-//     .optional()
-//     // .refine(
-//     //   (ids) => ids?.every((item) => item.label && item.value),
-//     //   'Each country must have a valid name and ID.'
-//     // )
-//     .default([]), // use it when an array is optional
-
-//   // .object({
-//   //   id: z.string().optional(),
-//   //   label: z.string(),
-//   //   value: z.string(),
-//   // })
-//   // .array()
-//   // .optional()
-//   // .refine(
-//   //   (ids) => ids?.every((item) => item.label && item.value),
-//   //   'Each country must have a valid name and ID.'
-//   // )
-//   // .default([]),
-//   // shippingFeeMethod: z.nativeEnum(ShippingFeeMethod),
-// })
 
 export const VariantFormSchema = z.object({
   name: z
@@ -461,21 +358,21 @@ export const VariantFormSchema = z.object({
   saleEndDate: z.union([z.date(), z.string()]).optional(),
 })
 
-// export const CouponFormSchema = z.object({
-//   code: z
-//     .string()
-//     .min(2, { message: 'Coupon code must be at least 2 characters long.' })
-//     .max(50, { message: 'Coupon code cannot exceed 50 characters.' })
-//     .regex(/^[a-zA-Z0-9]+$/, {
-//       message: 'Only letters and numbers are allowed in the coupon code.',
-//     }),
-//   startDate: z.union([z.date(), z.string()]),
-//   endDate: z.union([z.date(), z.string()]),
-//   discount: z
-//     .number()
-//     .min(1, { message: 'Discount must be at least 1.' })
-//     .max(99, { message: 'Discount cannot exceed 99.' }),
-// })
+export const CouponFormSchema = z.object({
+  code: z
+    .string()
+    .min(2, { message: 'کوپن تخفیف باید حداقل دو کاراکتر باشد.' })
+    .max(50, { message: 'کوپن تخفیف نمی‌تواند بیش از 50 کاراکتر باشد.' })
+    .regex(/^[a-zA-Z0-9]+$/, {
+      message: 'تنها حروف و اعداد میتوانند در کوپن تخفیف باشند.',
+    }),
+  startDate: z.union([z.date(), z.string()]),
+  endDate: z.union([z.date(), z.string()]),
+  discount: z
+    .number()
+    .min(1, { message: 'تخفیف باید حداقل 1% باشد' })
+    .max(100, { message: 'تخفیف نمی‌تواند بیش از 100% باشد.' }),
+})
 // export const UpdateOrderGroupStatusFormSchema = z.object({
 //   status: z.string(),
 // })

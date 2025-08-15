@@ -334,19 +334,9 @@ export async function deleteCategory(
       },
     })
   } catch (err: unknown) {
-    if (err instanceof Error) {
-      return {
-        errors: {
-          _form: [err.message],
-        },
-      }
-    } else {
-      return {
-        errors: {
-          _form: ['مشکلی پیش آمده، لطفا دوباره امتحان کنید!'],
-        },
-      }
-    }
+    const message =
+      err instanceof Error ? err.message : 'مشکلی در سرور پیش آمده.'
+    return { errors: { _form: [message] } }
   }
   revalidatePath(path)
   redirect(`/dashboard/categories`)
