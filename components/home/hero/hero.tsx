@@ -6,9 +6,14 @@ import Link from 'next/link'
 
 import { FadeIn } from '@/components/shared/fade-in'
 import { RevealText } from '@/components/shared/reveal-text'
-import HeroBadges from './hero-badges'
+import { SubCategoryForHomePage } from '@/lib/types/home'
 
-const Hero = () => {
+const Hero = ({
+  subCategories,
+}: {
+  subCategories: SubCategoryForHomePage[]
+}) => {
+  console.log({ subCategories })
   return (
     <Bounded
       className={`relative w-full h-full  overflow-hidden bg-neutral-950 `}
@@ -57,8 +62,26 @@ const Hero = () => {
             Shop now
           </Link>
         </FadeIn>
+        <FadeIn
+          className="mt-8 translate-y-5"
+          vars={{ delay: 2, duration: 1.1 }}
+        >
+          <article className="mt-12  text-secondary flex flex-wrap items-center justify-center">
+            <ul className=" flex items-center justify-center w-full h-full  flex-wrap max-w-[70vw] mx-auto gap-x-2 md:gap-x-4">
+              {subCategories?.map((sub) => (
+                <li key={sub.id}>
+                  <Link
+                    href={sub.url}
+                    className="bg-gradient-to-b from-background/5 to-background/30 backdrop-blur-[2px] border border-background rounded-none  px-2 py-1 text-center  "
+                  >
+                    {sub.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </article>
+        </FadeIn>
       </div>
-      <HeroBadges />
     </Bounded>
   )
 }
