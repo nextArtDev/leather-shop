@@ -46,13 +46,15 @@ export async function createProduct(
   }
   // console.log(result.data)
   const user = await currentUser()
-  // if (!user || !user.id || user.role !== 'SELLER') {
-  //   return {
-  //     errors: {
-  //       _form: ['شما اجازه دسترسی ندارید!'],
-  //     },
-  //   }
-  // }
+  if (!user || user.role !== 'ADMIN') {
+    if (!user) {
+      return {
+        errors: {
+          _form: ['شما اجازه دسترسی ندارید!'],
+        },
+      }
+    }
+  }
 
   try {
     const isExistingProduct = await prisma.product.findFirst({
@@ -219,13 +221,15 @@ export async function editProduct(
   }
   // console.log('result.data', result.data)
   const user = await currentUser()
-  // if (  !user || !user.id || user.role !== 'SELLER') {
-  //   return {
-  //     errors: {
-  //       _form: ['شما اجازه دسترسی ندارید!'],
-  //     },
-  //   }
-  // }
+  if (!user || user.role !== 'ADMIN') {
+    if (!user) {
+      return {
+        errors: {
+          _form: ['شما اجازه دسترسی ندارید!'],
+        },
+      }
+    }
+  }
   if (!productId) {
     return {
       errors: {
@@ -502,13 +506,15 @@ export async function deleteProduct(
   formData: FormData
 ): Promise<DeleteProductFormState> {
   const user = await currentUser()
-  // if (  !user || user.role !== 'SELLER') {
-  //   return {
-  //     errors: {
-  //       _form: ['شما اجازه دسترسی ندارید!'],
-  //     },
-  //   }
-  // }
+  if (!user || user.role !== 'ADMIN') {
+    if (!user) {
+      return {
+        errors: {
+          _form: ['شما اجازه دسترسی ندارید!'],
+        },
+      }
+    }
+  }
   // console.log(result)
   if (!productId) {
     return {

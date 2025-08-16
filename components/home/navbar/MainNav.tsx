@@ -169,7 +169,7 @@ const DesktopNav = () => (
       ))}
       {navigation.pages.map((page) => (
         <NavigationMenuItem key={page.name}>
-          <Link href={page.href} legacyBehavior passHref>
+          <Link href={page.href} passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
               {page.name}
             </NavigationMenuLink>

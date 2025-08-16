@@ -57,10 +57,26 @@ export const auth = betterAuth({
 
 export const currentUser = async () => {
   const session = await auth.api.getSession({
-    headers: await headers(), // you need to pass the headers object.
+    headers: await headers(),
   })
 
-  return session?.user
+  if (!session?.user?.id) {
+    return null
+  }
+
+  // Fetch the complete user data including role
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phoneNumber: true,
+      role: true,
+    },
+  })
+
+  return user
 }
 
 // export const currentRole = async () => {

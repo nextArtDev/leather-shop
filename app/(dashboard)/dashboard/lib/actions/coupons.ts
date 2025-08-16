@@ -30,17 +30,15 @@ export async function createCoupon(
     }
   }
   const user = await currentUser()
-  //   if (
-  //     !user ||
-  //     !user.id ||
-  //     user.role !== 'ADMIN'
-  //   ) {
-  //     return {
-  //       errors: {
-  //         _form: ['شما اجازه دسترسی ندارید!'],
-  //       },
-  //     }
-  //   }
+  if (!user || user.role !== 'ADMIN') {
+    if (!user) {
+      return {
+        errors: {
+          _form: ['شما اجازه دسترسی ندارید!'],
+        },
+      }
+    }
+  }
 
   try {
     // Throw error if a coupon with the same code and storeId already exists
@@ -107,17 +105,15 @@ export async function deleteCoupon(
   formData: FormData
 ): Promise<DeleteBillboardFormState> {
   const user = await currentUser()
-  //   if (
-  //     !user ||
-  //     !user.id ||
-  //     user.role !== 'ADMIN'
-  //   ) {
-  //     return {
-  //       errors: {
-  //         _form: ['شما اجازه دسترسی ندارید!'],
-  //       },
-  //     }
-  //   }
+  if (!user || user.role !== 'ADMIN') {
+    if (!user) {
+      return {
+        errors: {
+          _form: ['شما اجازه دسترسی ندارید!'],
+        },
+      }
+    }
+  }
   // console.log(result)
   if (!couponId) {
     return {

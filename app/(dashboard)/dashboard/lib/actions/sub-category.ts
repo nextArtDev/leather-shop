@@ -36,13 +36,15 @@ export async function createSubCategory(
   //   console.log(result?.data)
 
   const user = await currentUser()
-  //   if ( !user || user.role !== 'ADMIN') {
-  //     return {
-  //       errors: {
-  //         _form: ['شما اجازه دسترسی ندارید!'],
-  //       },
-  //     }
-  //   }
+  if (!user || user.role !== 'ADMIN') {
+    if (!user) {
+      return {
+        errors: {
+          _form: ['شما اجازه دسترسی ندارید!'],
+        },
+      }
+    }
+  }
 
   const isCategoryExisted = await prisma.category.findFirst({
     where: {
@@ -143,13 +145,15 @@ export async function editSubCategory(
     }
   }
   const user = await currentUser()
-  //   if ( !user || user.role !== 'ADMIN') {
-  //     return {
-  //       errors: {
-  //         _form: ['شما اجازه دسترسی ندارید!'],
-  //       },
-  //     }
-  //   }
+  if (!user || user.role !== 'ADMIN') {
+    if (!user) {
+      return {
+        errors: {
+          _form: ['شما اجازه دسترسی ندارید!'],
+        },
+      }
+    }
+  }
   if (!subCategoryId) {
     return {
       errors: {
@@ -298,14 +302,15 @@ export async function deleteSubCategory(
   formData: FormData
 ): Promise<DeleteSubCategoryFormState> {
   const user = await currentUser()
-  //   if ( !user || user.role !== 'ADMIN') {
-  //   if (!user) {
-  //     return {
-  //       errors: {
-  //         _form: ['شما اجازه دسترسی ندارید!'],
-  //       },
-  //     }
-  //   }
+  if (!user || user.role !== 'ADMIN') {
+    if (!user) {
+      return {
+        errors: {
+          _form: ['شما اجازه دسترسی ندارید!'],
+        },
+      }
+    }
+  }
   // console.log(result)
   if (!subCategoryId) {
     return {

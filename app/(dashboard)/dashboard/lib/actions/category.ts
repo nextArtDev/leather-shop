@@ -35,15 +35,15 @@ export async function createCategory(
   //   console.log(result?.data)
 
   const user = await currentUser()
-  //   if (!user || user.role !== 'ADMIN') {
-  //   if (!user) {
-  //     return {
-  //       errors: {
-  //         _form: ['شما اجازه دسترسی ندارید!'],
-  //       },
-  //     }
-  //   }
-
+  if (!user || user.role !== 'ADMIN') {
+    if (!user) {
+      return {
+        errors: {
+          _form: ['شما اجازه دسترسی ندارید!'],
+        },
+      }
+    }
+  }
   try {
     const isExisting = await prisma.category.findFirst({
       where: {
@@ -284,14 +284,15 @@ export async function deleteCategory(
   formData: FormData
 ): Promise<DeleteBillboardFormState> {
   const user = await currentUser()
-  //   if ( !user || user.role !== 'ADMIN') {
-  //   if (!user) {
-  //     return {
-  //       errors: {
-  //         _form: ['شما اجازه دسترسی ندارید!'],
-  //       },
-  //     }
-  //   }
+  if (!user || user.role !== 'ADMIN') {
+    if (!user) {
+      return {
+        errors: {
+          _form: ['شما اجازه دسترسی ندارید!'],
+        },
+      }
+    }
+  }
   // console.log(result)
   if (!categoryId) {
     return {

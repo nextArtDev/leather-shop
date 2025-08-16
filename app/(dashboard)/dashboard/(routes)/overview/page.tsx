@@ -21,9 +21,10 @@ export const metadata: Metadata = {
 const AdminOverviewPage = async () => {
   const user = await currentUser()
 
-  // if (user?.role !== 'ADMIN') {
-  //   throw new Error('User is not authorized')
-  // }
+  if (user?.role !== 'ADMIN') {
+    throw new Error('User is not authorized')
+  }
+  // console.log(user)
 
   // const summary = await getOrderSummary()
 
