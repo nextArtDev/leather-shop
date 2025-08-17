@@ -4,12 +4,8 @@ import AddToCardBtn from '@/components/product/product-detail/AddToCardBtn'
 import ProductStatements from '@/components/product/product-detail/ProductStatemeents'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import {
-  ProductColor,
-  ProductDetails,
-  ProductSize,
-  ProductSpec,
-} from '@/lib/types/home'
+import { ProductColor, ProductDetails, ProductSize } from '@/lib/types/home'
+import { FC } from 'react'
 
 // const images = [
 //   { id: '1', url: bag },
@@ -58,38 +54,40 @@ import {
 //     price: 670,
 //   },
 // ]
-
-const ProductPage = ({ data }: { data: ProductDetails }) => {
+type ProductPageProp = {
+  data: NonNullable<ProductDetails>
+}
+const ProductPage: FC<ProductPageProp> = ({ data }) => {
   const {
-    id,
-    name,
     description,
-    slug,
-    brand,
-    rating,
-    sales,
-    numReviews,
-    shippingFeeMethod,
-    views,
-    isFeatured,
-    isSale,
-    saleEndDate,
     sku,
-    keywords,
-    weight,
-    createdAt,
-    updatedAt,
     images,
     variantImages,
     sizes,
     colors,
-    specs,
-    questions,
-    reviews,
-    category,
+    brand,
     subCategory,
-    offerTag,
-    freeShipping,
+    // specs,
+    // id,
+    // name,
+    // slug,
+    // rating,
+    // sales,
+    // numReviews,
+    // shippingFeeMethod,
+    // views,
+    // isFeatured,
+    // isSale,
+    // saleEndDate,
+    // keywords,
+    // weight,
+    // createdAt,
+    // updatedAt,
+    // questions,
+    // reviews,
+    // category,
+    // offerTag,
+    // freeShipping,
   } = data
   //   console.log(specs, name)
 
@@ -157,7 +155,7 @@ const ProductPage = ({ data }: { data: ProductDetails }) => {
             className="flex flex-end flex-col gap-4 text-sm md:text-base"
           >
             <p className="font-semibold">Dimensions</p>
-            <article className="flex gap-4 justify-between">
+            {/* <article className="flex gap-4 justify-between">
               <span className="flex gap-2">
                 <strong>Width</strong>{' '}
                 {specs.map((spec: ProductSpec) => spec.value)[0].split('*')[0]}{' '}
@@ -174,7 +172,7 @@ const ProductPage = ({ data }: { data: ProductDetails }) => {
                 {specs.map((spec: ProductSpec) => spec.value)[0].split('*')[2]}{' '}
                 cm
               </span>
-            </article>
+            </article> */}
           </div>
         </article>
         <ProductStatements />

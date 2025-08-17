@@ -166,7 +166,7 @@ export type ProductReview = {
   createdAt: Date
   user: {
     name: string | null
-    avatar: string | null
+    // avatar: string | null
   }
   images: BasicProductImage[]
 }

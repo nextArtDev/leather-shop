@@ -115,13 +115,13 @@ export default async function Home() {
       </div> */}
       <Hero subCategories={subCategories} />
       <StoreStatement />
-      <section className="flex flex-col gap-8 py-8 px-3 ">
+      <section className="w-full h-full flex flex-col gap-8 py-8 px-3 ">
         <h2 className="text-xl md:text-3xl font-bold uppercase">
           پرفروش‌ترینها
         </h2>
         <MainPageCarousel items={products} />
       </section>
-      <section className="flex flex-col gap-8 py-8 px-3 ">
+      <section className="w-full h-full flex flex-col gap-8 py-8 px-3 ">
         <h2 className="text-xl md:text-3xl font-bold uppercase">جدیدترینها</h2>
         <MainPageCarousel items={products} />
       </section>
@@ -132,7 +132,7 @@ export default async function Home() {
         <h2 className="uppercase adad">Our commitments </h2>
         <Commitments />
       </section>
-      <section className="flex flex-col w-full gap-6 text-3xl text-center py-12 ">
+      <section className="flex flex-col w-full h-full gap-6 text-3xl text-center py-12 ">
         <h2 className="uppercase">بیشتر </h2>
         <DiscoverMoreCarousel categories={categories} />
       </section>

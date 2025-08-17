@@ -2,7 +2,11 @@
 // 1. MAIN PAGE QUERIES - Fetch only what you display
 
 import prisma from '@/lib/prisma'
-import { CategoryWithStats, SubCategoryForHomePage } from '@/lib/types/home'
+import {
+  CategoryWithStats,
+  ProductDetails,
+  SubCategoryForHomePage,
+} from '@/lib/types/home'
 
 // Homepage Products (with basic info + first image)
 export async function getHomepageProducts(limit: number = 12) {
@@ -339,7 +343,7 @@ export async function searchProducts({
 }
 
 // 6. SINGLE PRODUCT PAGE - Full details
-export async function getProductDetails(slug: string) {
+export async function getProductDetails(slug: string): Promise<ProductDetails> {
   const product = await prisma.product.findUnique({
     where: { slug },
     include: {
