@@ -1,7 +1,7 @@
 import React from 'react'
 import { Bounded } from '@/components/shared/Bounded'
 import Image from 'next/image'
-import heroImage from '../../../../public/images/hero-image.jpg'
+import heroImage from '../../../public/images/hero-image.jpg'
 // import Link from 'next/link'
 // import { RevealText } from '@/components/shared/reveal-text'
 
@@ -17,7 +17,9 @@ import Link from 'next/link'
 // }) => {
 const Hero = () => {
   return (
-    <Bounded className={`relative w-full h-full  overflow-hidden pb-28 `}>
+    <Bounded
+      className={`relative w-full h-full  overflow-hidden pb-[6.25rem] `}
+    >
       <div className="absolute inset-0">
         <CoverLayer />
       </div>
@@ -43,7 +45,7 @@ const Hero = () => {
         /> */}
         <FadeIn
           // important factor to go up or down: translate-y-8
-          className="mt-6 max-w-md translate-y-8  text-lg text-neutral-600"
+          className="mt-6 max-w-md translate-y-8  text-lg text-neutral-300"
           vars={{ delay: 1, duration: 1.3 }}
         >
           <p className="text-center  ">

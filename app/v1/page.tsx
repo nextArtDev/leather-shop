@@ -1,7 +1,6 @@
 import DiscoverMoreCarousel from '@/components/home/discover-more/DiscoverMoreCarousel'
 
 import Commitments from '@/components/home/shared/Commitments'
-import StoreStatement from '@/components/home/shared/StoreStatement'
 import WorkVideo from '@/components/home/shared/WorkVideo'
 import TestimonialCarousel from '@/components/home/testemonial/Testemonial'
 import MainPageCarousel from '@/components/product/main-page-carousel'
@@ -11,6 +10,7 @@ import {
   //   getSubCategories,
 } from '@/lib/home/queries/products'
 import Hero from './components/Hero'
+import StoreStatement from './components/StareStatement'
 
 export default async function Home() {
   const products = await getHomepageProducts()
