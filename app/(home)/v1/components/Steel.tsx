@@ -1,4 +1,5 @@
 'use client'
+import { cn } from '@/lib/utils'
 import React, { ReactNode } from 'react'
 
 type Props = {
@@ -8,8 +9,8 @@ type Props = {
 
 const Steel = ({ className, children }: Props) => {
   return (
-    <div className={className}>
-      <article className=" relative flex-1 metal rounded-3xl w-full h-full  text-5xl flex items-center justify-center  text-center">
+    <div className={cn(className, ' ')}>
+      <article className=" relative flex-1 metal rounded-xl w-full h-full  text-5xl flex items-center justify-center  text-center">
         <p
           style={{
             textShadow:

@@ -1,5 +1,5 @@
 import DiscoverMoreCarousel from '@/components/home/discover-more/DiscoverMoreCarousel'
-import Hero from '@/components/home/hero/hero'
+
 import Commitments from '@/components/home/shared/Commitments'
 import StoreStatement from '@/components/home/shared/StoreStatement'
 import WorkVideo from '@/components/home/shared/WorkVideo'
@@ -8,13 +8,14 @@ import MainPageCarousel from '@/components/product/main-page-carousel'
 import {
   getCategoriesWithStats,
   getHomepageProducts,
-  getSubCategories,
+  //   getSubCategories,
 } from '@/lib/home/queries/products'
+import Hero from './components/Hero'
 
 export default async function Home() {
   const products = await getHomepageProducts()
   const categories = await getCategoriesWithStats()
-  const subCategories = await getSubCategories()
+  //   const subCategories = await getSubCategories()
 
   // #eceae8
 
@@ -26,7 +27,7 @@ export default async function Home() {
       {/* <div className=" ">
         <FadeMenu />
       </div> */}
-      <Hero subCategories={subCategories} />
+      <Hero />
       <StoreStatement />
       <section className="w-full h-full flex flex-col gap-8 py-8 px-3 ">
         <h2 className="text-xl md:text-3xl font-bold uppercase">

@@ -7,7 +7,7 @@ import Steel from './Steel'
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
 const leatherTextureStyle = {
-  backgroundImage: 'url(/images/leather/whiteleather.svg)',
+  backgroundImage: 'url(/images/whiteleather.svg)',
   backgroundRepeat: 'repeat',
   // backgroundSize: '200px 200px',
   backgroundBlendMode: 'multiply',
@@ -20,10 +20,13 @@ const CoverLayer = () => {
         trigger: '.top-box',
         start: 'top top',
         end: '+=100vh',
-        scrub: true,
+        scrub: 1,
         pin: true,
-        pinSpacing: true,
+        pinSpacing: '100vh',
       },
+    })
+    tl.to('.top-box', {
+      opacity: 1,
     })
     tl.from('.quarte-red', {
       clipPath: 'polygon(0 0, 0% 0, 0% 30%, 0 30%)',
@@ -67,7 +70,10 @@ const CoverLayer = () => {
   })
 
   return (
-    <section className="top-box w-full h-screen absolute inset-0">
+    <section
+      dir="ltr"
+      className=" top-box opacity-0 z-20 w-full h-screen absolute inset-0"
+    >
       <article className="size-full max-h-screen bg-transparent video-box flex flex-wrap relative">
         <article
           style={{
@@ -119,17 +125,9 @@ const CoverLayer = () => {
             left: '50%',
             transform: 'translate(-50%, 0)',
             clipPath: 'polygon(0% 100%, 70% 100%, 70% 70%, 30% 70%)',
-            // Option 1: Use noise texture with color
             backgroundColor: '#f37932',
             ...leatherTextureStyle,
             backgroundBlendMode: 'multiply',
-
-            // Option 2: If you want to use your own leather texture instead
-            // backgroundColor: '#f37932',
-            // backgroundImage: 'url(/images/leather/whiteleather.svg)',
-            // backgroundRepeat: 'repeat',
-            // backgroundSize: '200px 200px',
-            // backgroundBlendMode: 'multiply',
           }}
           className="quarter-yellow relative outline-dashed outline-[2px] -outline-offset-4 outline-[#d1c7bb] shadow-lg h-full w-full"
         ></article>
@@ -150,8 +148,8 @@ const CoverLayer = () => {
           }}
           className="center-green-box  "
         >
-          <Steel className="w-[40vw] h-[50vh] !rounded-3xl">
-            Sepid <br /> Leather
+          <Steel className="w-[41vw] h-[41vh] text-5xl !rounded-xl">
+            <p className="pt-16">چرم سپیده</p>
           </Steel>
         </div>
       </article>

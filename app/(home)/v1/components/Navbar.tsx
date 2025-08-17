@@ -106,7 +106,7 @@ const NavBar = () => {
       {/* <p className="logo !text-white bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent font-bold  [text-shadow:_0_3px_2px_rgb(240_240_240_/_1)] transform  tracking-wide flex-1 mx-auto !max-w-[98vw]  md:text-center mix-blend-difference ">
         SEPIDAR
       </p> */}
-      <p className="logo !text-white bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text  font-bold  [text-shadow:_0_3px_2px_rgb(240_240_240_/_1)] transform  tracking-wide flex-1 mx-auto !max-w-[98vw] scale-50 md:scale-100 md:text-center mix-blend-difference ">
+      <p className="logo !text-white bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text  font-bold  [text-shadow:_0_3px_2px_rgb(240_240_240_/_1)] transform  tracking-wide flex-1 mx-auto !max-w-[98vw] scale-50 md:scale-100 md:text-center   ">
         SEPIDAR
       </p>
 
