@@ -82,8 +82,14 @@ export default function Commitments() {
                   className="object-contain mix-blend-darken  " // Uncommented; remove if not needed
                 />
               </Steel>
-              <article className="isolate flex flex-col gap-3 justify-evenly py-3 px-2 text-pretty text-xs md:text-sm lg:text-base">
-                <p className="font-bold text-lg text-left">{item.title}</p>
+              <article
+                style={{
+                  textShadow:
+                    '1px 1px 1px #c2a38f, 0 0 2px #948378, 0 0 0.2px #d3d3d3',
+                }}
+                className="isolate ml-2 text-white flex flex-col gap-3 justify-evenly py-3 px-2 text-pretty text-base md:text-lg lg:text-xl"
+              >
+                <p className="font-bold   text-left">{item.title}</p>
                 <p className="text-sm">{item.description}</p>
               </article>
             </div>

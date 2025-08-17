@@ -25,12 +25,12 @@ const Steel = ({ className, children }: Props) => {
       </article>
       <style jsx>{`
         .metal {
-          /* box-shadow: inset 0 -3px 10px rgba(0, 0, 0, 0.8),
+          /* box-shadow: inset 0 -3px 10px rgba(0, 0, 0, 0.5),
             inset 0 3px 20px rgba(255, 255, 255, 0.5),
-            0 10px 30px rgba(0, 0, 0, 0.7); */
-          box-shadow: inset 0 -3px 4px rgba(0, 0, 0, 0.8),
+            0 10px 30px rgba(0, 0, 0, 0.4); */
+          box-shadow: inset 0 -3px 4px rgba(0, 0, 0, 0.5),
             inset 0 3px 4px rgba(255, 255, 255, 0.5),
-            0 4px 5px rgba(0, 0, 0, 0.7);
+            0 4px 5px rgba(0, 0, 0, 0.4);
           /* border-radius: 2px; */
           /* Fresnel effect */
           --fresnel: radial-gradient(
@@ -77,9 +77,9 @@ const Steel = ({ className, children }: Props) => {
             #c4c4c4 50%,
             #a0a0a0 100%
           );
-          box-shadow: inset 0 -3px 4px rgba(0, 0, 0, 0.8),
+          box-shadow: inset 0 -3px 4px rgba(0, 0, 0, 0.5),
             inset 0 3px 4px rgba(255, 255, 255, 0.5),
-            0 2px 3px rgba(0, 0, 0, 0.7);
+            0 2px 3px rgba(0, 0, 0, 0.4);
         }
         .metal::after {
           content: '';
@@ -96,9 +96,9 @@ const Steel = ({ className, children }: Props) => {
             #c4c4c4 50%,
             #a0a0a0 100%
           );
-          box-shadow: inset 0 -3px 4px rgba(0, 0, 0, 0.8),
+          box-shadow: inset 0 -3px 4px rgba(0, 0, 0, 0.5),
             inset 0 3px 4px rgba(255, 255, 255, 0.5),
-            0 2px 3px rgba(0, 0, 0, 0.7);
+            0 2px 3px rgba(0, 0, 0, 0.4);
         }
         .metal-dot::after {
           content: '';
@@ -115,9 +115,9 @@ const Steel = ({ className, children }: Props) => {
             #c4c4c4 50%,
             #a0a0a0 100%
           );
-          box-shadow: inset 0 -3px 4px rgba(0, 0, 0, 0.8),
+          box-shadow: inset 0 -3px 4px rgba(0, 0, 0, 0.5),
             inset 0 3px 4px rgba(255, 255, 255, 0.5),
-            0 2px 3px rgba(0, 0, 0, 0.7);
+            0 2px 3px rgba(0, 0, 0, 0.4);
         }
         .metal-dot::before {
           content: '';
@@ -134,9 +134,9 @@ const Steel = ({ className, children }: Props) => {
             #c4c4c4 50%,
             #a0a0a0 100%
           );
-          box-shadow: inset 0 -3px 4px rgba(0, 0, 0, 0.8),
+          box-shadow: inset 0 -3px 4px rgba(0, 0, 0, 0.5),
             inset 0 3px 4px rgba(255, 255, 255, 0.5),
-            0 2px 3px rgba(0, 0, 0, 0.7);
+            0 2px 3px rgba(0, 0, 0, 0.4);
         }
       `}</style>
     </div>

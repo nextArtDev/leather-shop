@@ -3,14 +3,14 @@
 
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
-import { useMediaQuery } from 'react-responsive'
+// import { useMediaQuery } from 'react-responsive'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
 const VideoPin = () => {
-  const isMobile = useMediaQuery({
-    query: '(max-width: 768px)',
-  })
+  // const isMobile = useMediaQuery({
+  //   query: '(max-width: 768px)',
+  // })
 
   useGSAP(() => {
     const tl = gsap.timeline({

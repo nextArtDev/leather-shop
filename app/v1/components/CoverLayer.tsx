@@ -98,7 +98,7 @@ const CoverLayer = () => {
             left: '0',
             clipPath: 'polygon(0 0, 100% 0, 70% 40%, 0 40%)',
             // backgroundColor: '#981e1e',
-            backgroundColor: '#f37932',
+            backgroundColor: '#8A3B1D',
             ...leatherTextureStyle,
             backgroundBlendMode: 'multiply',
           }}
