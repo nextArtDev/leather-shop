@@ -17,9 +17,7 @@ import Link from 'next/link'
 // }) => {
 const Hero = () => {
   return (
-    <Bounded
-      className={`relative w-full h-full  overflow-hidden pb-[6.25rem] `}
-    >
+    <Bounded className={`relative trigger w-full h-full  overflow-hidden  `}>
       <div className="absolute inset-0">
         <CoverLayer />
       </div>

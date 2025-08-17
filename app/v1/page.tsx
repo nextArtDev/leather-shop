@@ -12,6 +12,7 @@ import {
 import Hero from './components/Hero'
 import StoreStatement from './components/StareStatement'
 import MainPageCarousel from './components/MainPageCarousel'
+import VideoPin from './components/VideoPin'
 
 export default async function Home() {
   const products = await getHomepageProducts()
@@ -21,7 +22,7 @@ export default async function Home() {
   // #eceae8
 
   return (
-    <div className="relative bg-[#87431b] w-full h-full items-center justify-items-center min-h-screen mx-auto">
+    <div className="relative  overflow-hidden bg-[#87431b] w-full h-full items-center justify-items-center min-h-screen mx-auto">
       {/* <div className="sticky w-full h-full top-0 z-20 ">
         <BannerText />
       </div> */}
@@ -32,7 +33,7 @@ export default async function Home() {
       <StoreStatement />
       <section className="relative w-full h-full flex flex-col gap-8 py-8 px-3 ">
         <div
-          className="isolate  absolute inset-0  !rounded-lg flex flex-col md:flex-row gap-4 max-w-xl mx-auto p-2 !textLight   text-[#eed49b]  border border-[#87431b] outline-[0.125rem] outline-dashed outline-[#c2a38f88] -outline-offset-[5px] bg-gradient-to-b  from-[#e2a57f] via-[#855b43e0]   to-[#87431b]    shadow-[1px_1px_10px_#522910,_-1px_-1px_10px_#aa5522]   "
+          className="isolate  absolute inset-0  !rounded-lg flex flex-col md:flex-row gap-4  mx-auto p-2 !textLight   text-[#eed49b]  border border-[#87431b] outline-[0.125rem] outline-dashed outline-[#c2a38f88] -outline-offset-[5px] bg-gradient-to-b  from-[#e2a57f] via-[#855b43e0]   to-[#87431b]    shadow-[1px_1px_10px_#522910,_-1px_-1px_10px_#aa5522]   "
           style={{
             textShadow:
               '1px 1px 1px #c2a38f, 0 0 2px #948378, 0 0 0.2px #d3d3d3',
@@ -56,9 +57,9 @@ export default async function Home() {
         </h2>
         <MainPageCarousel items={products} />
       </section>
-      <section className="relative w-full h-full flex flex-col gap-8 py-8 px-3 ">
+      <section className="relative w-full h-full flex flex-col gap-8 pt-8 px-3 ">
         <div
-          className="  absolute inset-0  !rounded-lg flex flex-col md:flex-row gap-4 max-w-xl mx-auto p-2 !textLight   text-[#eed49b]  border border-[#87431b] outline-[0.125rem] outline-dashed outline-[#c2a38f88] -outline-offset-[5px] bg-gradient-to-b  from-[#e2a57f] via-[#855b43e0]   to-[#87431b]    shadow-[1px_1px_10px_#522910,_-1px_-1px_10px_#aa5522]   "
+          className="  absolute inset-0  !rounded-lg flex flex-col md:flex-row gap-4 mx-auto p-2 !textLight   text-[#eed49b]  border border-[#87431b] outline-[0.125rem] outline-dashed outline-[#c2a38f88] -outline-offset-[5px] bg-gradient-to-b  from-[#e2a57f] via-[#855b43e0]   to-[#87431b]    shadow-[1px_1px_10px_#522910,_-1px_-1px_10px_#aa5522]   "
           style={{
             textShadow:
               '1px 1px 1px #c2a38f, 0 0 2px #948378, 0 0 0.2px #d3d3d3',
@@ -82,8 +83,9 @@ export default async function Home() {
         </h2>
         <MainPageCarousel items={products} />
       </section>
-      <section>
-        <WorkVideo />
+      <section className="relative overflow-hidden">
+        {/* <WorkVideo /> */}
+        <VideoPin />
       </section>
       <section className="flex flex-col items-center gap-6 text-3xl text-left">
         <h2 className="uppercase adad">Our commitments </h2>

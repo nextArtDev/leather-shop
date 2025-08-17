@@ -17,10 +17,11 @@ const CoverLayer = () => {
   useGSAP(() => {
     const tl = gsap.timeline({
       scrollTrigger: {
-        trigger: '.top-box',
+        trigger: '.trigger',
         start: 'top top',
-        end: '+=100vh',
-        scrub: 2,
+        // end: '+=100vh',
+        end: '250% top',
+        scrub: 1.5,
         pin: true,
         pinSpacing: '100vh',
       },
@@ -29,13 +30,13 @@ const CoverLayer = () => {
       opacity: 1,
     })
     tl.from('.quarte-red', {
-      clipPath: 'polygon(0 0, 0% 0, 0% 30%, 0 30%)',
+      clipPath: 'polygon(0 0, 0% 0, 0% 40%, 0 40%)',
       ease: 'power1.in',
     })
       .from(
         '.quarter-blue',
         {
-          clipPath: 'polygon(70% 30%, 100% 0%, 100% 0%, 70% 30%)',
+          clipPath: 'polygon(70% 40%, 100% 0%, 100% 0%, 70% 40%)',
           ease: 'power1.in',
         },
         '<+0.5'
@@ -51,7 +52,7 @@ const CoverLayer = () => {
       .from(
         '.quarter-green',
         {
-          clipPath: 'polygon(0 100%, 0% 100%, 30% 70%, 30% 70%)',
+          clipPath: 'polygon(0 100%, 0% 100%, 40% 70%, 40% 70%)',
           ease: 'power1.in',
         },
         '<+0.5'
@@ -81,7 +82,7 @@ const CoverLayer = () => {
             height: '100vh',
             top: '0',
             left: '0',
-            clipPath: 'polygon(0% 30%, 0 100%, 30% 70%, 30% 30%)',
+            clipPath: 'polygon(0% 40%, 0 100%, 40% 70%, 40% 40%)',
             backgroundColor: '#6b4a23',
             ...leatherTextureStyle,
             backgroundBlendMode: 'multiply',
@@ -95,7 +96,7 @@ const CoverLayer = () => {
             position: 'absolute',
             top: '0',
             left: '0',
-            clipPath: 'polygon(0 0, 100% 0, 70% 30%, 0 30%)',
+            clipPath: 'polygon(0 0, 100% 0, 70% 40%, 0 40%)',
             backgroundColor: '#981e1e',
             ...leatherTextureStyle,
             backgroundBlendMode: 'multiply',
@@ -109,7 +110,7 @@ const CoverLayer = () => {
             position: 'absolute',
             bottom: '0',
             right: '0',
-            clipPath: 'polygon(70% 30%, 100% 0%, 100% 100%, 70% 100%)',
+            clipPath: 'polygon(70% 40%, 100% 0%, 100% 100%, 70% 100%)',
             backgroundColor: '#2c5282',
             ...leatherTextureStyle,
             backgroundBlendMode: 'multiply',
@@ -124,7 +125,7 @@ const CoverLayer = () => {
             bottom: '0',
             left: '50%',
             transform: 'translate(-50%, 0)',
-            clipPath: 'polygon(0% 100%, 70% 100%, 70% 70%, 30% 70%)',
+            clipPath: 'polygon(0% 100%, 70% 100%, 70% 70%, 40% 70%)',
             backgroundColor: '#f37932',
             ...leatherTextureStyle,
             backgroundBlendMode: 'multiply',
@@ -148,8 +149,8 @@ const CoverLayer = () => {
           }}
           className="center-green-box  "
         >
-          <Steel className="w-[41vw] h-[41vh]  !rounded-xl">
-            <p className="pt-16 text-4xl text-amber-600 ">چرم سپیده</p>
+          <Steel className="w-[45vw] h-[32vh] mt-20 !rounded-xl">
+            <p className=" text-4xl text-amber-600 -mt-20 ">چرم سپیده</p>
           </Steel>
         </div>
       </article>

@@ -11,6 +11,7 @@ import React from 'react'
 import Link from 'next/link'
 import { HomepageProduct } from '@/lib/types/home'
 import Steel from './Steel'
+import Autoplay from 'embla-carousel-autoplay'
 
 export type item = {
   id: string
@@ -33,6 +34,11 @@ export default function MainPageCarousel({ items }: MainPageCarousel) {
         direction: 'rtl',
         loop: true,
       }}
+      plugins={[
+        Autoplay({
+          delay: 3000,
+        }),
+      ]}
       dir="rtl"
       className="w-full"
     >
