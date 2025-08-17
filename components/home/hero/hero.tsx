@@ -13,7 +13,6 @@ const Hero = ({
 }: {
   subCategories: SubCategoryForHomePage[]
 }) => {
-  console.log({ subCategories })
   return (
     <Bounded
       className={`relative w-full h-full  overflow-hidden bg-neutral-950 `}

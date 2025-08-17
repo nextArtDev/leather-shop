@@ -1,30 +1,6 @@
-const ProductDescriptions = () => {
+const ProductStatements = () => {
   return (
     <section className="grid gap-7 content-start">
-      <div className="flex flex-col gap-4 justify-around">
-        <p className="text-sm">PRODUCT NAME</p>
-        <p>
-          PRODUCT DESC:Medium handbag with a double flap, signature T jewellery
-          and Le Tanneur branding. Carried by hand, on the shoulder or across
-          the body with its adjustable and detachable shoulder strap.
-        </p>
-        <p className="text-xs">SKU:</p>
-      </div>
-      <div className="flex flex-col gap-4 text-sm md:text-base">
-        <p className="font-semibold">Dimensions</p>
-        <article className="flex gap-4 justify-between">
-          <span className="flex gap-2">
-            <strong>Width</strong> 26 cm
-          </span>
-          <span className="flex gap-2">
-            <strong>Height</strong> 20 cm
-          </span>
-          <span className="flex gap-2">
-            {' '}
-            <strong>Depth</strong> 11 cm
-          </span>
-        </article>
-      </div>
       <div className="w-full h-fit grid grid-cols-2 md:grid-cols-3 grid-rows-2 gap-4 grid-flow-row-dense">
         <span className=" flex flex-col gap-2">
           <span>
@@ -114,4 +90,4 @@ const ProductDescriptions = () => {
   )
 }
 
-export default ProductDescriptions
+export default ProductStatements
