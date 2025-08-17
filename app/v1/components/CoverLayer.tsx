@@ -97,7 +97,8 @@ const CoverLayer = () => {
             top: '0',
             left: '0',
             clipPath: 'polygon(0 0, 100% 0, 70% 40%, 0 40%)',
-            backgroundColor: '#981e1e',
+            // backgroundColor: '#981e1e',
+            backgroundColor: '#f37932',
             ...leatherTextureStyle,
             backgroundBlendMode: 'multiply',
           }}
@@ -111,7 +112,8 @@ const CoverLayer = () => {
             bottom: '0',
             right: '0',
             clipPath: 'polygon(70% 40%, 100% 0%, 100% 100%, 70% 100%)',
-            backgroundColor: '#2c5282',
+            // backgroundColor: '#2c5282',
+            backgroundColor: '#A16F49',
             ...leatherTextureStyle,
             backgroundBlendMode: 'multiply',
           }}
@@ -126,7 +128,8 @@ const CoverLayer = () => {
             left: '50%',
             transform: 'translate(-50%, 0)',
             clipPath: 'polygon(0% 100%, 70% 100%, 70% 70%, 40% 70%)',
-            backgroundColor: '#f37932',
+            // backgroundColor: '#f37932',
+            backgroundColor: '#F5F5DC',
             ...leatherTextureStyle,
             backgroundBlendMode: 'multiply',
           }}

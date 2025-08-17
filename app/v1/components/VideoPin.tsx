@@ -39,7 +39,7 @@ const VideoPin = () => {
           backgroundRepeat: 'repeat',
           // backgroundSize: '280px 450px',
           backgroundBlendMode: 'multiply',
-          backgroundColor: '#7e4a28',
+          backgroundColor: '#8A3B1D',
           filter: 'drop-shadow(0 0 0.15rem #44291755)',
           boxShadow: '2px 2px 4px #87431b,-2px -2px 4px #633d26',
         }}

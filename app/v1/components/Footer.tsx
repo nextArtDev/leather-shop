@@ -37,7 +37,20 @@ export default function Footer() {
 
   return (
     <footer className="relative border-t bg-background text-foreground transition-colors duration-300">
-      <div className="container mx-auto px-4 py-12 md:px-6 lg:px-8">
+      <div
+        className="isolate  absolute inset-0  !rounded-lg flex flex-col md:flex-row gap-4  mx-auto p-2 !textLight   text-[#eed49b]  border border-[#87431b] outline-[0.125rem] outline-dashed outline-[#c2a38f88] -outline-offset-[5px] bg-gradient-to-b  from-[#e2a57f] via-[#855b43e0]   to-[#87431b]    shadow-[1px_1px_10px_#522910,_-1px_-1px_10px_#aa5522]   "
+        style={{
+          textShadow: '1px 1px 1px #c2a38f, 0 0 2px #948378, 0 0 0.2px #d3d3d3',
+          backgroundImage: 'url(/images/whiteleather.svg)',
+          backgroundRepeat: 'repeat',
+          // backgroundSize: '280px 450px',
+          backgroundBlendMode: 'multiply',
+          backgroundColor: '#8A3B1D',
+          filter: 'drop-shadow(0 0 0.15rem #44291755)',
+          boxShadow: '2px 2px 4px #87431b,-2px -2px 4px #633d26',
+        }}
+      />
+      <div className="isolate text-white container mx-auto px-4 py-12 md:px-6 lg:px-8">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
           {/* <div className="relative">
             <h2 className="mb-4 text-3xl font-bold tracking-tight">
@@ -107,7 +120,7 @@ export default function Footer() {
               <p>Email: hello@example.com</p>
             </address>
           </div>
-          <div className="relative">
+          <div className="relative text-black">
             <h3 className="mb-4 text-lg font-semibold">Follow Us</h3>
             <div className="mb-6 flex space-x-4">
               <TooltipProvider>
@@ -198,15 +211,15 @@ export default function Footer() {
             © {new Date().getFullYear()} Le Tanneur. All rights reserved.
           </p>
           <nav className="flex gap-4 text-sm">
-            <Link href="#" className="transition-colors hover:text-primary">
+            <a href="#" className="transition-colors hover:text-primary">
               Privacy Policy
-            </Link>
-            <Link href="#" className="transition-colors hover:text-primary">
+            </a>
+            <a href="#" className="transition-colors hover:text-primary">
               Terms of Service
-            </Link>
-            <Link href="#" className="transition-colors hover:text-primary">
+            </a>
+            <a href="#" className="transition-colors hover:text-primary">
               Cookie Settings
-            </Link>
+            </a>
           </nav>
         </div>
       </div>

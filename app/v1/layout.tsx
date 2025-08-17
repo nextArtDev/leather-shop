@@ -1,3 +1,4 @@
+import Footer from './components/Footer'
 import NavBar from './components/Navbar'
 
 export default function layout({
@@ -9,6 +10,8 @@ export default function layout({
     <section className="relative w-full h-full ">
       <NavBar />
       {children}
+
+      <Footer />
     </section>
   )
 }
