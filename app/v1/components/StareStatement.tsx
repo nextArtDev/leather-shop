@@ -7,7 +7,7 @@ const StoreStatement = () => {
     text: ' Since 1898, we have been dreaming up, designing and crafting premium and essential bags and accessories that have stood the test of the years, with their truly timeless design.',
   }
   return (
-    <section className="relative w-full mx-auto">
+    <section className=" relative w-full mx-auto">
       <ScrollText scrollText={scrollText} />
     </section>
   )

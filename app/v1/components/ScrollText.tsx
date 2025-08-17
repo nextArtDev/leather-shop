@@ -87,7 +87,7 @@ const ScrollText = ({ scrollText }: ScrollTextProps) => {
       dir="ltr"
       //   data-slice-type={slice.slice_type}
       //   data-slice-variation={slice.variation}
-      className="relative outline-dashed outline-[#3b2b17] outline-[2px] -outline-offset-4 flex h-[80vh] md:h-screen items-center justify-center "
+      className="isolate relative outline-dashed outline-[#3b2b17] outline-[2px] -outline-offset-4 flex h-[80vh] md:h-screen items-center justify-center "
     >
       <div className="glow-background absolute inset-0 z-0 h-full w-full opacity-0"></div>
       {/* <div className="absolute inset-0 bg-[url('/royal/noisetexture.jpg')] opacity-30 mix-blend-multiply"></div> */}

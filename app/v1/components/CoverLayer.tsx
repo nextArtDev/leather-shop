@@ -20,7 +20,7 @@ const CoverLayer = () => {
         trigger: '.top-box',
         start: 'top top',
         end: '+=100vh',
-        scrub: 1,
+        scrub: 2,
         pin: true,
         pinSpacing: '100vh',
       },
