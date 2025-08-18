@@ -84,7 +84,6 @@ const ScrollText = ({ scrollText }: ScrollTextProps) => {
   return (
     <Bounded
       ref={componentRef}
-      dir="ltr"
       //   data-slice-type={slice.slice_type}
       //   data-slice-variation={slice.variation}
       className="isolate relative outline-dashed outline-[#3b2b17] outline-[2px] -outline-offset-4 flex h-[80vh] md:h-screen items-center justify-center "

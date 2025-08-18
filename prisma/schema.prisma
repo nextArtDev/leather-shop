@@ -1,4 +1,4 @@
-
+//npx prisma migrate dev --name realMigrateName
 generator client {
   provider = "prisma-client-js"
   output   = "../lib/generated/prisma"
@@ -351,21 +351,22 @@ model FreeShippingCity {
 }
 
 model Review {
-  id           String  @id @default(uuid())
-  variant      String
-  variantImage String?
-  review       String
-  rating       Float
-  color        String
-  size         String
-  quantity     String
-  likes        Int     @default(0)
-  isFeatured   Boolean @default(false)
-  isPending    Boolean @default(true)
-  images       Image[]
+  id String @id @default(uuid())
 
-  user   User   @relation("ReviewToUser", fields: [userId], references: [id])
-  userId String
+  title              String
+  description        String
+  isVerifiedPurchase Boolean @default(true)
+
+  rating Float
+
+  isFeatured Boolean @default(false)
+  isPending  Boolean @default(true)
+  images     Image[]
+
+  quantity String
+  likes    Int    @default(0)
+  user     User   @relation("ReviewToUser", fields: [userId], references: [id])
+  userId   String
 
   productId String
   product   Product @relation("ReviewToProduct", fields: [productId], references: [id])

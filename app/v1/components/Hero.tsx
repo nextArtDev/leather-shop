@@ -18,7 +18,7 @@ const Hero = () => {
     <Bounded className={`relative  w-full h-full  overflow-hidden  `}>
       <FadeIn
         vars={{ scale: 1, opacity: 1 }}
-        className=" absolute inset-0  max-h-svh origin-center lg:h-screen motion-safe:scale-125 motion-reduce:opacity-50 "
+        className=" absolute inset-0   origin-center lg:h-screen motion-safe:scale-125 motion-reduce:opacity-50 "
       >
         <Image
           src={heroImage}

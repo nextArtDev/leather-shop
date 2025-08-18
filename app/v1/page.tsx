@@ -12,6 +12,8 @@ import StoreStatement from './components/StareStatement'
 import MainPageCarousel from './components/MainPageCarousel'
 import Commitments from './components/Commitments'
 import FixedVideoPlay from './components/FixedMotionVideo'
+import SlideTop from './components/SlideTo'
+import SideUp from './components/SideUp'
 
 export default async function Home() {
   const products = await getHomepageProducts()
@@ -135,9 +137,27 @@ export default async function Home() {
         </h2>
         <Commitments />
       </section>
-      <section className="flex flex-col w-full h-full gap-6 text-3xl text-center py-12 ">
-        <h2 className="uppercase">بیشتر </h2>
-        <DiscoverMoreCarousel categories={categories} />
+      <section className="relative  flex flex-col w-full h-full gap-6 text-3xl text-center py-12 ">
+        <div
+          className="isolate  absolute inset-0  !rounded-lg flex flex-col md:flex-row gap-4  mx-auto p-2 !textLight   text-[#eed49b]  border border-[#87431b] outline-[0.125rem] outline-dashed outline-[#c2a38f88] -outline-offset-[5px] bg-gradient-to-b  from-[#e2a57f] via-[#855b43e0]   to-[#87431b]    shadow-[1px_1px_10px_#522910,_-1px_-1px_10px_#aa5522]   "
+          style={{
+            textShadow:
+              '1px 1px 1px #c2a38f, 0 0 2px #948378, 0 0 0.2px #d3d3d3',
+            backgroundImage: 'url(/images/whiteleather.svg)',
+            backgroundRepeat: 'repeat',
+            // backgroundSize: '280px 450px',
+            backgroundBlendMode: 'multiply',
+            backgroundColor: '#8A3B1D',
+            filter: 'drop-shadow(0 0 0.15rem #44291755)',
+            boxShadow: '2px 2px 4px #87431b,-2px -2px 4px #633d26',
+          }}
+        />
+        <h2 className="uppercase ">بیشتر </h2>
+        {/* <DiscoverMoreCarousel categories={categories} /> */}
+        <div dir="ltr" className="relative w-full h-full  ">
+          {/* <SlideTop /> */}
+          <SideUp />
+        </div>
       </section>
       <TestimonialCarousel />
 
