@@ -6,8 +6,6 @@ import heroImage from '../../../public/images/hero-image.jpg'
 // import { RevealText } from '@/components/shared/reveal-text'
 
 import { FadeIn } from '@/components/shared/fade-in'
-// import { SubCategoryForHomePage } from '@/lib/types/home'
-import CoverLayer from './CoverLayer'
 import Link from 'next/link'
 
 // const Hero = ({
@@ -17,10 +15,7 @@ import Link from 'next/link'
 // }) => {
 const Hero = () => {
   return (
-    <Bounded className={`relative trigger w-full h-full  overflow-hidden  `}>
-      <div className="absolute inset-0">
-        <CoverLayer />
-      </div>
+    <Bounded className={`relative  w-full h-full  overflow-hidden  `}>
       <FadeIn
         vars={{ scale: 1, opacity: 1 }}
         className=" absolute inset-0  max-h-svh origin-center lg:h-screen motion-safe:scale-125 motion-reduce:opacity-50 "

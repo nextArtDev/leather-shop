@@ -10,7 +10,6 @@ import {
 import Hero from './components/Hero'
 import StoreStatement from './components/StareStatement'
 import MainPageCarousel from './components/MainPageCarousel'
-import VideoPin from './components/VideoPin'
 import Commitments from './components/Commitments'
 import FixedVideoPlay from './components/FixedMotionVideo'
 
@@ -104,7 +103,7 @@ export default async function Home() {
             filter: 'drop-shadow(0 0 0.15rem #44291755)',
             boxShadow: '2px 2px 4px #87431b,-2px -2px 4px #633d26',
           }}
-          className="text-white w-[60vw] px-4 max-w-sm text-center md:max-w-md mx-auto  text-xl md:text-3xl xl:text-4xl uppercase tracking-[10px] font-light"
+          className="text-white w-[60vw] px-4 max-w-sm text-center md:max-w-md mx-auto  text-xl md:text-3xl xl:text-4xl uppercase tracking-[10px] font-light rounded-md"
         >
           loyal Lorem dolor sit ame.
         </h2>

@@ -20,8 +20,8 @@ const CoverLayer = () => {
         trigger: '.trigger',
         start: 'top top',
         // end: '+=100vh',
-        end: '250% top',
-        scrub: 1.5,
+        end: 'bottom top',
+        scrub: 1,
         pin: true,
         pinSpacing: '100vh',
       },
@@ -39,7 +39,8 @@ const CoverLayer = () => {
           clipPath: 'polygon(70% 40%, 100% 0%, 100% 0%, 70% 40%)',
           ease: 'power1.in',
         },
-        '<+0.5'
+        // '<+0.5'
+        0
       )
       .from(
         '.quarter-yellow',
@@ -47,7 +48,8 @@ const CoverLayer = () => {
           clipPath: 'polygon(70% 100%, 70% 100%, 70% 70%, 70% 70%)',
           ease: 'power1.in',
         },
-        '<+0.5'
+        // '<+0.5'
+        0
       )
       .from(
         '.quarter-green',
@@ -55,7 +57,8 @@ const CoverLayer = () => {
           clipPath: 'polygon(0 100%, 0% 100%, 40% 70%, 40% 70%)',
           ease: 'power1.in',
         },
-        '<+0.5'
+        // '<+0.5'
+        0
       )
       .from(
         '.center-green-box',
@@ -64,7 +67,7 @@ const CoverLayer = () => {
           scale: 3,
           // rotation: 45,
           ease: 'power1.in',
-          duration: 0.6,
+          duration: 0.2,
         },
         '80%'
       )
@@ -73,7 +76,7 @@ const CoverLayer = () => {
   return (
     <section
       dir="ltr"
-      className=" top-box opacity-0 z-20 w-full h-screen absolute inset-0"
+      className="  top-box opacity-0 z-20 w-full h-screen absolute inset-0"
     >
       <article className="size-full max-h-screen bg-transparent video-box flex flex-wrap relative">
         <article
