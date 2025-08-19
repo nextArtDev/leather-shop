@@ -199,7 +199,7 @@ const ProductPage: FC<ProductPageProp> = ({
           productId={id}
           userId={userId}
           productSlug={slug}
-          numReviews={numReviews}
+          // numReviews={numReviews}
           userReview={userReview}
         />
         <Separator />

@@ -4,57 +4,72 @@ import { AnimatePresence, motion, stagger } from 'framer-motion'
 import { Dot } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SingleStarRating } from './SingleStartRating'
+import { formatTimeToNow } from '@/lib/utils'
 
-const testimonials1 = [
-  {
-    text: 'First testimonial goes here. Praising your product or service and expressing satisfaction.',
-    author: 'Ansub',
-    rating: 4,
-  },
-  {
-    text: 'Another testimonial goes here. Praising your product or service and expressing satisfaction.',
-    author: 'Lex Collins',
-
-    rating: 3,
-  },
-  {
-    text: 'Third testimonial goes here. Praising your product or service and expressing satisfaction.',
-    author: 'Alex Jones',
-    rating: 5,
-  },
-  {
-    text: 'Fourth testimonial goes here. Praising your product or service and expressing satisfaction.',
-    author: 'John Doe',
-    rating: 4,
-  },
-]
+// const testimonials = [
+//   {
+//     title: '',
+//     description:
+//       'First testimonial goes here. Praising your product or service and expressing satisfaction.',
+//     user: 'Ansub',
+//     rating: 4,
+//     createdAt: '',
+//   },
+//   {
+//     title:
+//       'Another testimonial goes here. Praising your product or service and expressing satisfaction.',
+//     description: 'Lex Collins',
+//     user: 3,
+//     rating: 3,
+//     createdAt: 3,
+//   },
+//   {
+//     title:
+//       'Third testimonial goes here. Praising your product or service and expressing satisfaction.',
+//     description: 'Alex Jones',
+//     user: 5,
+//     rating: 5,
+//     createdAt: 5,
+//   },
+//   {
+//     title:
+//       'Fourth testimonial goes here. Praising your product or service and expressing satisfaction.',
+//     description: 'John Doe',
+//     user: 4,
+//     rating: 4,
+//     createdAt: 4,
+//   },
+// ]
 interface TestimonialCarouselProps {
   testimonials?: {
-    text: string
-    author: string
+    title: string
+    description: string
+    user: string
     rating: number
-    created_time: Date
+    createdAt: Date
   }[]
 }
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TestimonialCarousel = ({ testimonials }: TestimonialCarouselProps) => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0)
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setCurrentTestimonial(
-        (prevTestimonial) => (prevTestimonial + 1) % testimonials1.length
-      )
+      if (!!testimonials?.length) {
+        setCurrentTestimonial(
+          (prevTestimonial) => (prevTestimonial + 1) % testimonials.length
+        )
+      }
     }, 9000) // Change Time here
 
     return () => {
       clearInterval(intervalId)
     }
-  }, [])
+  }, [testimonials?.length])
 
+  if (!testimonials?.length) return
   // const { text, author, rating, created_time } =
-  const { text, author, rating } = testimonials1[currentTestimonial]
+  const { title, description, user, rating, createdAt } =
+    testimonials?.[currentTestimonial]
 
   const variants = {
     initial: { opacity: 0, y: '100%', scale: 0.9 },
@@ -87,16 +102,26 @@ const TestimonialCarousel = ({ testimonials }: TestimonialCarouselProps) => {
               delayChildren: stagger(0.25),
             }}
           >
-            <motion.div variants={variants} className="pb-4 flex gap-2 ">
+            <motion.div
+              dir="ltr"
+              variants={variants}
+              className="pb-4 flex gap-2 "
+            >
               {/* <StarRating value={rating} disabled /> */}
               <SingleStarRating rating={rating} />
               <span className="font-semibold">{rating}</span>/5
             </motion.div>
             <motion.p
               variants={variants}
+              className="m-0 text-center  text-sm md:text-base font-semibold tracking-tight line-clamp-1 md:line-clamp-2"
+            >
+              {title}
+            </motion.p>
+            <motion.p
+              variants={variants}
               className="m-0 text-center  text-sm md:text-base font-medium tracking-tight line-clamp-7 md:line-clamp-5"
             >
-              &quot;{text}&quot;
+              &quot;{description}&quot;
             </motion.p>
             <motion.div variants={variants} className="mx-auto mt-5">
               <div className="flex flex-col items-center justify-center space-x-3">
@@ -105,18 +130,21 @@ const TestimonialCarousel = ({ testimonials }: TestimonialCarouselProps) => {
                 </div> */}
 
                 <div className="flex justify-center items-center">
-                  <span className=" text-[1rem] ">{author}</span>
+                  <span dir="ltr" className=" text-[1rem] ">{`${user.slice(
+                    0,
+                    5
+                  )}...${user.slice(-3)}`}</span>
                   <Dot className="" />
 
                   <span className=" text-xs md:text-sm ">
-                    {/* {formatTimeToNow(new Date(created_time))} */}
+                    {formatTimeToNow(new Date(createdAt))}
                   </span>
                 </div>
               </div>
             </motion.div>
           </motion.div>
           <div className="mt-8 flex justify-center">
-            {testimonials1.map((_, index) => (
+            {testimonials?.map((_, index) => (
               <motion.div
                 key={index}
                 className="mx-0.5 h-2  w-2  cursor-pointer "

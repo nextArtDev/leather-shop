@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -30,7 +29,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2, StarIcon } from 'lucide-react'
 import { useState, useTransition } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 import { toast } from 'sonner'
@@ -45,11 +44,9 @@ import { createReview, editReview } from '@/lib/home/actions/review'
 // } from '../lib/actions/review.actions'
 
 const ReviewForm = ({
-  userId,
   productId,
   initialData,
 }: {
-  userId: string
   productId: string
   initialData?: Review | null
 }) => {
@@ -109,8 +106,13 @@ const ReviewForm = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button onClick={handleOpenForm} variant="default">
-          نظر خود راجع به این محصول را بنویسید
+        <Button
+          onClick={handleOpenForm}
+          variant={initialData ? 'link' : 'default'}
+        >
+          {initialData
+            ? 'نظر خود را ویرایش کنید'
+            : 'نظر خود راجع به این محصول را بنویسید'}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
@@ -188,13 +190,9 @@ const ReviewForm = ({
                 type="submit"
                 size="lg"
                 className="w-full"
-                disabled={form.formState.isSubmitting}
+                disabled={isPending}
               >
-                {form.formState.isSubmitting ? (
-                  <Loader2 className="animate-spin" />
-                ) : (
-                  'تایید'
-                )}
+                {isPending ? <Loader2 className="animate-spin" /> : 'تایید'}
               </Button>
             </DialogFooter>
           </form>
