@@ -9,21 +9,24 @@ import {
 import Image from 'next/image'
 import React from 'react'
 import Link from 'next/link'
-import { HomepageProduct } from '@/lib/types/home'
+// import { HomepageProduct } from '@/lib/types/home'
 import Steel from './Steel'
-import Autoplay from 'embla-carousel-autoplay'
+// import Autoplay from 'embla-carousel-autoplay'
 
 export type item = {
   id: string
-  link: string
+  name: string
+  images: string[]
   category: string
-  title: string
+  link: string
   price: number
-  imageSrc: string
+  description: string
+  slug: string
 }
 
 type MainPageCarousel = {
-  items: HomepageProduct[]
+  // items: HomepageProduct[]
+  items: item[]
 }
 
 export default function MainPageCarousel({ items }: MainPageCarousel) {
@@ -34,11 +37,11 @@ export default function MainPageCarousel({ items }: MainPageCarousel) {
         direction: 'rtl',
         loop: true,
       }}
-      plugins={[
-        Autoplay({
-          delay: 3000,
-        }),
-      ]}
+      // plugins={[
+      //   Autoplay({
+      //     delay: 3000,
+      //   }),
+      // ]}
       dir="rtl"
       className="w-full"
     >
@@ -68,7 +71,8 @@ export default function MainPageCarousel({ items }: MainPageCarousel) {
               />
               <Steel className="relative w-[90%] h-full pt-2 md:pt-4 mx-auto aspect-square">
                 <Image
-                  src={item.images.map((img) => img.url)[0]}
+                  // src={item.images.map((img) => img.url)[0]}
+                  src={item.images?.[0]}
                   fill
                   alt={item.name}
                   className="object-contain mix-blend-darken  " // Uncommented; remove if not needed
@@ -82,12 +86,14 @@ export default function MainPageCarousel({ items }: MainPageCarousel) {
                 }}
                 className="isolate px-auto  w-full flex flex-col gap-1 justify-evenly py-3  text-white md:text-lg lg:text-base text-base  mx-10"
               >
-                <p className="font-semibold  ">{item.subCategory.name}</p>
+                {/* <p className="font-semibold  ">{item.subCategory.name}</p> */}
+                <p className="font-semibold  ">{item.category}</p>
                 <p className="font-bold">{item.name}</p>
                 <p>
-                  {item.sizes.map((size) =>
+                  {/* {item.sizes.map((size) =>
                     size.discount ? size.price * size.discount : size.price
-                  )}
+                  )} */}
+                  {item.price}
                 </p>
               </article>
             </Link>

@@ -6,7 +6,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel'
-import Autoplay from 'embla-carousel-autoplay'
+// import Autoplay from 'embla-carousel-autoplay'
 import Image from 'next/image'
 import React from 'react'
 import Steel from './Steel'
@@ -43,11 +43,11 @@ export default function Commitments() {
         direction: 'rtl',
         // loop: true, // Added for infinite looping; remove if not wanted
       }}
-      plugins={[
-        Autoplay({
-          delay: 3000,
-        }),
-      ]}
+      // plugins={[
+      //   Autoplay({
+      //     delay: 3000,
+      //   }),
+      // ]}
       dir="rtl"
       className="w-full "
     >

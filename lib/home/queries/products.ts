@@ -397,11 +397,13 @@ export async function getProductDetails(slug: string): Promise<ProductDetails> {
         },
         select: {
           id: true,
-          review: true,
+          isFeatured: true,
+          isPending: true,
+          isVerifiedPurchase: true,
           rating: true,
-          variant: true,
-          color: true,
-          size: true,
+          title: true,
+          description: true,
+
           likes: true,
           createdAt: true,
           user: {

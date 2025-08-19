@@ -47,7 +47,7 @@ import slugify from 'slugify'
 import { Loader2 } from 'lucide-react'
 
 interface SubCategoryDetailsProps {
-  initialData?: SubCategory & { images: Image[] }
+  initialData?: SubCategory & { images: Partial<Image>[] }
   categories: Partial<Category>[]
 }
 

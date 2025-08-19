@@ -21,7 +21,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import * as React from 'react'
-import CoverLayer from './CoverLayer'
+// import CoverLayer from './CoverLayer'
 
 export default function Footer() {
   const [isDarkMode, setIsDarkMode] = React.useState(false)

@@ -157,11 +157,14 @@ export type ProductQuestion = {
 
 export type ProductReview = {
   id: string
-  review: string
+  title: string
+  description: string
+  isVerifiedPurchase: boolean
+  isFeatured: boolean
+  isPending: boolean
+
   rating: number
-  variant: string
-  color: string
-  size: string
+
   likes: number
   createdAt: Date
   user: {

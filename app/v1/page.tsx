@@ -1,23 +1,179 @@
-import DiscoverMoreCarousel from '@/components/home/discover-more/DiscoverMoreCarousel'
+// import DiscoverMoreCarousel from '@/components/home/discover-more/DiscoverMoreCarousel'
 
 import TestimonialCarousel from '@/components/home/testemonial/Testemonial'
 
-import {
-  getCategoriesWithStats,
-  getHomepageProducts,
-  //   getSubCategories,
-} from '@/lib/home/queries/products'
-import Hero from './components/Hero'
+import // getCategoriesWithStats,
+// getHomepageProducts,
+//   getSubCategories,
+'@/lib/home/queries/products'
+// import Hero from './components/Hero'
 import StoreStatement from './components/StareStatement'
 import MainPageCarousel from './components/MainPageCarousel'
 import Commitments from './components/Commitments'
 import FixedVideoPlay from './components/FixedMotionVideo'
-import SlideTop from './components/SlideTo'
+// import SlideTop from './components/SlideTo'
 import SideUp from './components/SideUp'
+import HeroLeather from './components/HeroLeather'
 
+// const bestSellersItems = [
+//   {
+//     id: '1',
+//     name: 'small handbag in grained leather',
+//     images: '/images/bag.webp',
+//     category: 'Juliette',
+//     link: '/products/1',
+//     price: 750,
+//   },
+//   {
+//     id: '2',
+//     name: 'medium handbag with double flap in grained leather',
+//     images: '/images/bag-2.webp',
+//     category: 'Emilie',
+//     link: '/products/1',
+//     price: 690,
+//   },
+//   {
+//     id: '3',
+//     name: 'Louise small tote bag in grained leather',
+//     images: '/images/bag-3.webp',
+//     category: 'Louise',
+//     link: '/products/1',
+//     price: 570,
+//   },
+//   {
+//     id: '4',
+//     name: 'medium-sized handbag in grained leather',
+//     images: '/images/bag-4.webp',
+//     category: 'Emilie',
+//     link: '/products/1',
+//     price: 580,
+//   },
+//   {
+//     id: '5',
+//     name: 'medium handbag in smooth leather and nubuck',
+//     images: '/images/bag-5.webp',
+//     category: 'Juliette',
+//     link: '/products/1',
+//     price: 670,
+//   },
+// ]
+export const CollectionItems = [
+  {
+    id: '1',
+    name: 'medium handbag in smooth leather and nubuck',
+    images: ['/images/bag-5.webp'],
+    category: 'Juliette',
+    link: '/',
+    price: 670,
+    description: 'A medium handbag crafted from smooth leather and nubuck.',
+    slug: 'medium-handbag-smooth-leather-nubuck',
+    // rating: 4.5,
+    // reviewsCount: 12,
+    // stock: 10,
+    // tags: ['handbag', 'leather', 'nubuck'],
+    // isBestSeller: false,
+    // isNewArrival: true,
+    // isFeatured: false,
+    // isSale: false,
+    // saleEndDate: null,
+    // images: ['/images/bag-5.webp'],
+    // createdAt: new Date().toISOString(),
+    // updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '2',
+    name: 'medium-sized handbag in grained leather',
+    images: ['/images/bag-4.webp'],
+    category: 'Emilie',
+    link: '/',
+    price: 580,
+
+    description: 'A medium-sized handbag made from grained leather.',
+    slug: 'medium-sized-handbag-grained-leather',
+    // rating: 4.2,
+    // reviewsCount: 8,
+    // stock: 7,
+    // tags: ['handbag', 'grained leather'],
+    // isBestSeller: false,
+    // isNewArrival: true,
+    // isFeatured: false,
+    // isSale: false,
+    // saleEndDate: null,
+    // images: ['/images/bag-4.webp'],
+    // createdAt: new Date().toISOString(),
+    // updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '3',
+    name: 'Louise small tote bag in grained leather',
+    images: ['/images/bag-3.webp'],
+    category: 'Louise',
+    link: '/',
+    price: 570,
+
+    description: 'Small tote bag in grained leather from Louise collection.',
+    slug: 'louise-small-tote-grained-leather',
+    // rating: 4.7,
+    // reviewsCount: 15,
+    // stock: 5,
+    // tags: ['tote', 'grained leather', 'louise'],
+    // isBestSeller: false,
+    // isNewArrival: true,
+    // isFeatured: false,
+    // isSale: false,
+    // saleEndDate: null,
+    // images: ['/images/bag-3.webp'],
+    // createdAt: new Date().toISOString(),
+    // updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '4',
+    name: 'medium handbag with double flap in grained leather',
+    images: ['/images/bag-2.webp'],
+    category: 'Emilie',
+    link: '/',
+    price: 690,
+    description: 'Medium handbag with double flap in grained leather.',
+    slug: 'medium-handbag-double-flap-grained-leather',
+    // rating: 4.3,
+    // reviewsCount: 10,
+    // stock: 8,
+    // tags: ['handbag', 'double flap', 'grained leather'],
+    // isBestSeller: false,
+    // isNewArrival: true,
+    // isFeatured: false,
+    // isSale: false,
+    // saleEndDate: null,
+    // images: ['/images/bag-2.webp'],
+    // createdAt: new Date().toISOString(),
+    // updatedAt: new Date().toISOString(),
+  },
+  {
+    id: '5',
+    name: 'small handbag in grained leather',
+    images: ['/images/bag.webp'],
+    category: 'Juliette',
+    link: '/',
+    price: 750,
+    description: 'Small handbag in grained leather from Juliette collection.',
+    slug: 'small-handbag-grained-leather',
+    // rating: 4.8,
+    // reviewsCount: 20,
+    // stock: 3,
+    // tags: ['handbag', 'grained leather', 'juliette'],
+    // isBestSeller: false,
+    // isNewArrival: true,
+    // isFeatured: false,
+    // isSale: false,
+    // saleEndDate: null,
+    // images: ['/images/bag.webp'],
+    // createdAt: new Date().toISOString(),
+    // updatedAt: new Date().toISOString(),
+  },
+]
 export default async function Home() {
-  const products = await getHomepageProducts()
-  const categories = await getCategoriesWithStats()
+  // const products = await getHomepageProducts()
+  // const categories = await getCategoriesWithStats()
   //   const subCategories = await getSubCategories()
 
   // #eceae8
@@ -30,7 +186,8 @@ export default async function Home() {
       {/* <div className=" ">
         <FadeMenu />
       </div> */}
-      <Hero />
+      {/* <Hero /> */}
+      <HeroLeather />
       <StoreStatement />
       <section className="relative w-full h-full flex flex-col gap-8 py-8 px-3 ">
         <div
@@ -56,7 +213,7 @@ export default async function Home() {
         >
           پرفروش‌ترینها
         </h2>
-        <MainPageCarousel items={products} />
+        <MainPageCarousel items={CollectionItems} />
       </section>
       <section className="relative w-full h-full flex flex-col gap-8 pt-8 px-3 ">
         <div
@@ -82,7 +239,7 @@ export default async function Home() {
         >
           جدیدترینها
         </h2>
-        <MainPageCarousel items={products} />
+        <MainPageCarousel items={CollectionItems} />
       </section>
       {/* <section className="relative overflow-hidden">
  
