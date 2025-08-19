@@ -20,13 +20,27 @@ const ProductDetailsPage = async (props: {
       userId: user?.id,
     },
   })
-  // console.log(product)
+
+  const productAverageRating = await prisma.review.aggregate({
+    _avg: { rating: true },
+    _count: true,
+    where: { productId: product.id, isPending: false },
+  })
+
+  // console.log(productAverageRating)
   return (
     <div>
       <ProductPage
         data={product}
+        productAverageRating={
+          !!productAverageRating._avg.rating && !!productAverageRating._count
+            ? {
+                rating: productAverageRating._avg.rating,
+                count: productAverageRating._count,
+              }
+            : null
+        }
         reviews={product.reviews}
-        numReviews={product.numReviews}
         userId={!!user?.id ? user.id : null}
         userReview={userReview}
       />

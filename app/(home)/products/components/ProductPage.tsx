@@ -13,6 +13,7 @@ import {
 import { FC } from 'react'
 import ReviewList from './ReviewList'
 import { Review } from '@/lib/generated/prisma'
+import { SingleStarRating } from '@/components/home/testemonial/SingleStartRating'
 
 // const images = [
 //   { id: '1', url: bag },
@@ -65,17 +66,18 @@ type ProductPageProp = {
   data: NonNullable<ProductDetails>
   userId?: string | null
   reviews: ProductReview[]
-  numReviews: number
+  productAverageRating: { rating: number; count: number } | null
   userReview: Review | null
 }
 const ProductPage: FC<ProductPageProp> = ({
   data,
   reviews,
-  numReviews,
+  productAverageRating,
+
   userId,
   userReview,
 }) => {
-  console.log({ reviews, numReviews })
+  // console.log({ reviews, numReviews })
   const {
     description,
     sku,
@@ -113,8 +115,20 @@ const ProductPage: FC<ProductPageProp> = ({
     <section className="pb-24 w-full h-full">
       <div className="max-w-2xl px-4 mx-auto  flex flex-col gap-4">
         <ProductDetailCarousel images={[...images, ...variantImages]} />
+
         {/* <ProductDetails /> */}
-        <article className="grid grid-row-4 gap-4">
+        <article className="grid grid-row-5 gap-4">
+          <div className="flex gap-2">
+            {productAverageRating && (
+              <>
+                <SingleStarRating rating={productAverageRating.rating} />
+                {productAverageRating.rating}
+                <p>{' از'}</p>
+                {productAverageRating.count}
+                <p>{' نظر'}</p>
+              </>
+            )}
+          </div>
           <p className="text-sm font-semibold">{subCategory.name}</p>
           <p className="text-base font-bold">
             {/* medium handbag with double flap in grained leather */}
