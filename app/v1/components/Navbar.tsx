@@ -99,8 +99,8 @@ const NavBar = () => {
       <article className="LeftText hidden flex-1 md:block text-white">
         ARM
       </article>
-      <p className="logo !text-white bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text  font-bold  [text-shadow:_0_3px_2px_rgb(240_240_240_/_1)] transform  tracking-wide flex-1 mx-auto !max-w-[98vw] scale-50 md:scale-100 md:text-center   ">
-        SEPIDAR
+      <p className="logo !text-white bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text  font-bold  [text-shadow:_0_3px_2px_rgb(240_240_240_/_1)] transform  tracking-wide flex-1 mx-auto !max-w-[98vw] scale-60 md:scale-100 md:text-center pl-8 md:pl-0 ">
+        رودخونه
       </p>
 
       <article className="menu flex flex-1 justify-end gap-2 opacity-0 md:opacity-100">

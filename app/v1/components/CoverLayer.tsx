@@ -156,7 +156,7 @@ const CoverLayer = () => {
           className="center-green-box  "
         >
           <Steel className="w-[45vw] h-[32vh] mt-20 !rounded-xl">
-            <p className=" text-4xl text-amber-600 -mt-20 ">چرم سپیده</p>
+            <p className=" text-4xl text-amber-600 -mt-20 ">رودخونه</p>
           </Steel>
         </div>
       </article>

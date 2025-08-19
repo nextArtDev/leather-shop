@@ -13,7 +13,7 @@ export const SingleStarRating: React.FC<SingleStarRatingProps> = ({
   const fillPercentage = (clampedRating / 5) * 100
 
   return (
-    <div className="relative inline-block w-6 h-6">
+    <div dir="ltr" className="relative inline-block w-6 h-6">
       {/* Background empty star */}
       <Star className="w-6 h-6 text-gray-300" fill="none" />
       {/* Filled star with dynamic width */}

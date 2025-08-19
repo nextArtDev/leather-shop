@@ -132,7 +132,7 @@ const ReviewForm = ({
                   <FormItem>
                     <FormLabel>عنوان</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter title" {...field} />
+                      <Input placeholder="عنوان را بنویسید" {...field} />
                     </FormControl>
                   </FormItem>
                 )}
@@ -145,7 +145,10 @@ const ReviewForm = ({
                     <FormItem>
                       <FormLabel>توضیحات</FormLabel>
                       <FormControl>
-                        <Textarea placeholder="Enter description" {...field} />
+                        <Textarea
+                          placeholder="توضیحات را بنویسید...."
+                          {...field}
+                        />
                       </FormControl>
                     </FormItem>
                   )

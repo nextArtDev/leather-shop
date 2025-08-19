@@ -37,8 +37,7 @@ export default function Footer() {
   }, [isDarkMode])
 
   return (
-    <footer className="relative trigger pb-[10vh] xl:pb-[30vh] border-t bg-background text-foreground transition-colors duration-300">
-      <div className="absolute inset-0">{/* <CoverLayer /> */}</div>
+    <footer className="relative  pb-[10vh] xl:pb-[30vh] border-t bg-background text-foreground transition-colors duration-300">
       <div
         className="isolate  absolute inset-0  !rounded-lg flex flex-col md:flex-row gap-4  mx-auto p-2 !textLight   text-[#eed49b]  border border-[#87431b] outline-[0.125rem] outline-dashed outline-[#c2a38f88] -outline-offset-[5px] bg-gradient-to-b  from-[#e2a57f] via-[#855b43e0]   to-[#87431b]    shadow-[1px_1px_10px_#522910,_-1px_-1px_10px_#aa5522]   "
         style={{
