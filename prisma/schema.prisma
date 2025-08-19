@@ -363,10 +363,10 @@ model Review {
   isPending  Boolean @default(true)
   images     Image[]
 
-  quantity String
-  likes    Int    @default(0)
-  user     User   @relation("ReviewToUser", fields: [userId], references: [id])
-  userId   String
+  // quantity String
+  likes  Int    @default(0)
+  user   User   @relation("ReviewToUser", fields: [userId], references: [id])
+  userId String
 
   productId String
   product   Product @relation("ReviewToProduct", fields: [productId], references: [id])

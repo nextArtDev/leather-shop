@@ -4,8 +4,15 @@ import AddToCardBtn from '@/components/product/product-detail/AddToCardBtn'
 import ProductStatements from '@/components/product/product-detail/ProductStatemeents'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { ProductColor, ProductDetails, ProductSize } from '@/lib/types/home'
+import {
+  ProductColor,
+  ProductDetails,
+  ProductReview,
+  ProductSize,
+} from '@/lib/types/home'
 import { FC } from 'react'
+import ReviewList from './ReviewList'
+import { Review } from '@/lib/generated/prisma'
 
 // const images = [
 //   { id: '1', url: bag },
@@ -56,8 +63,19 @@ import { FC } from 'react'
 // ]
 type ProductPageProp = {
   data: NonNullable<ProductDetails>
+  userId?: string | null
+  reviews: ProductReview[]
+  numReviews: number
+  userReview: Review | null
 }
-const ProductPage: FC<ProductPageProp> = ({ data }) => {
+const ProductPage: FC<ProductPageProp> = ({
+  data,
+  reviews,
+  numReviews,
+  userId,
+  userReview,
+}) => {
+  console.log({ reviews, numReviews })
   const {
     description,
     sku,
@@ -68,9 +86,9 @@ const ProductPage: FC<ProductPageProp> = ({ data }) => {
     brand,
     subCategory,
     // specs,
-    // id,
+    id,
     // name,
-    // slug,
+    slug,
     // rating,
     // sales,
     // numReviews,
@@ -176,6 +194,14 @@ const ProductPage: FC<ProductPageProp> = ({ data }) => {
           </div>
         </article>
         <ProductStatements />
+        <ReviewList
+          reviews={reviews}
+          productId={id}
+          userId={userId}
+          productSlug={slug}
+          numReviews={numReviews}
+          userReview={userReview}
+        />
         <Separator />
       </div>
       <section className="  flex gap-6 flex-col justify-center items-center py-8">
