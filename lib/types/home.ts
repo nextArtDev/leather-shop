@@ -1,5 +1,3 @@
-import { Image } from '../generated/prisma'
-
 // Base types for common structures
 export type ProductImage = {
   id: string
@@ -369,6 +367,7 @@ export type ProductListProps<T extends AnyProductType> = {
   error?: string | null
 }
 
+//Cart
 export type CartProductType = {
   productId: string
 

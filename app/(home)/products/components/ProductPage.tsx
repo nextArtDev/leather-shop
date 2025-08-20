@@ -96,15 +96,15 @@ const ProductPage: FC<ProductPageProp> = ({
     id,
     name,
     slug,
+    weight,
+    shippingFeeMethod,
     rating,
     sales,
-    shippingFeeMethod,
     views,
     isFeatured,
     isSale,
     saleEndDate,
     keywords,
-    weight,
     createdAt,
     updatedAt,
     questions,
@@ -194,11 +194,20 @@ const ProductPage: FC<ProductPageProp> = ({
             ))}
           </ul>
         </article>
+        <span className="text-green-600 flex gap-1 text-sm items-center">
+          <span className="w-2 h-2 animate-pulse rounded-full bg-green-600"></span>
+          {sizes.map((s: ProductSize) => s.quantity)[0] > 1
+            ? 'موجود'
+            : 'اتمام موجودی'}
+        </span>
         {!!sizes.length && currentSize && (
           <AddToCardBtn
             sizeId={sizeId}
             weight={weight}
-            size={currentSize}
+            size={currentSize.size}
+            discount={currentSize.discount}
+            price={currentSize.price}
+            stockQuantity={currentSize.quantity}
             productId={id}
             slug={slug}
             name={name}
@@ -208,12 +217,16 @@ const ProductPage: FC<ProductPageProp> = ({
             image={images.map((image) => image.url)[0]}
           />
         )}
-        <span className="text-green-600 flex gap-1 text-sm items-center">
-          <span className="w-2 h-2 animate-pulse rounded-full bg-green-600"></span>
-          {sizes.map((s: ProductSize) => s.quantity)[0] > 1
-            ? 'موجود'
-            : 'اتمام موجودی'}
-        </span>
+        <Link
+          className={cn(
+            buttonVariants({ variant: 'outline' }),
+            'max-w-sm mx-auto '
+          )}
+          href={'/cart'}
+        >
+          سبد خرید
+        </Link>
+
         <article className="flex flex-col gap-6 items-start">
           <div className="flex flex-col gap-4 justify-around">
             {/* <p className="text-sm">{name}</p> */}
