@@ -1,3 +1,5 @@
+import { Image } from '../generated/prisma'
+
 // Base types for common structures
 export type ProductImage = {
   id: string
@@ -365,4 +367,27 @@ export type ProductListProps<T extends AnyProductType> = {
   viewAllLink?: string
   loading?: boolean
   error?: string | null
+}
+
+export type CartProductType = {
+  productId: string
+
+  slug: string
+
+  name: string
+
+  // images: Image[]
+  image: string
+  sizeId: string
+  size: string
+  quantity: number
+  price: number
+  stock: number
+  weight: number
+  shippingMethod: string
+  shippingFee: number
+  extraShippingFee: number
+  // deliveryTimeMin: number
+  // deliveryTimeMax: number
+  // isFreeShipping: boolean
 }

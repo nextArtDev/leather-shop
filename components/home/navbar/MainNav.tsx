@@ -34,6 +34,8 @@ import {
 } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
 import TextRotate from '../shared/text-rotate'
+import useFromStore from '@/hooks/useFromStore'
+import { useCartStore } from '@/hooks/useCartStore'
 
 // --- TypeScript Definitions for Navigation Data ---
 interface FeaturedItem {
@@ -245,6 +247,7 @@ const MobileNav = () => (
 
 export default function MainNav() {
   const [isSearchOpen, setIsSearchOpen] = React.useState(false)
+  const cartItems = useFromStore(useCartStore, (state) => state.cart)
   return (
     <div className="bg-background">
       <header className="relative">
@@ -340,11 +343,14 @@ export default function MainNav() {
                       size="icon"
                       aria-label="Cart"
                       className="relative "
+                      asChild
                     >
-                      <ShoppingBag className="h-4 w-4" />
-                      <span className="ml-1 w-fit h-fit p-1 text-sm font-medium text-red-500 rounded-full absolute left-1.5 -top-1.5 ">
-                        1
-                      </span>
+                      <Link href={'/cart'}>
+                        <ShoppingBag className="h-4 w-4" />
+                        <span className="ml-1 w-fit h-fit p-1 text-sm font-medium text-red-500 rounded-full absolute left-1.5 -top-1.5 ">
+                          {cartItems?.length ?? null}
+                        </span>
+                      </Link>
                     </Button>
                   </div>
                 </div>

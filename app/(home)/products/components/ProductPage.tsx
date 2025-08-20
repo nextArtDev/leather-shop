@@ -94,25 +94,23 @@ const ProductPage: FC<ProductPageProp> = ({
     subCategory,
     // specs,
     id,
-    // name,
+    name,
     slug,
-    // rating,
-    // sales,
-    // numReviews,
-    // shippingFeeMethod,
-    // views,
-    // isFeatured,
-    // isSale,
-    // saleEndDate,
-    // keywords,
-    // weight,
-    // createdAt,
-    // updatedAt,
-    // questions,
-    // reviews,
-    // category,
-    // offerTag,
-    // freeShipping,
+    rating,
+    sales,
+    shippingFeeMethod,
+    views,
+    isFeatured,
+    isSale,
+    saleEndDate,
+    keywords,
+    weight,
+    createdAt,
+    updatedAt,
+    questions,
+    category,
+    offerTag,
+    freeShipping,
   } = data
   //   console.log(specs, name)
   // const pathname = usePathname()
@@ -197,7 +195,18 @@ const ProductPage: FC<ProductPageProp> = ({
           </ul>
         </article>
         {!!sizes.length && currentSize && (
-          <AddToCardBtn sizeId={sizeId} size={currentSize} />
+          <AddToCardBtn
+            sizeId={sizeId}
+            weight={weight}
+            size={currentSize}
+            productId={id}
+            slug={slug}
+            name={name}
+            qty={1}
+            shippingFeeMethod={shippingFeeMethod}
+            // stock={stock}
+            image={images.map((image) => image.url)[0]}
+          />
         )}
         <span className="text-green-600 flex gap-1 text-sm items-center">
           <span className="w-2 h-2 animate-pulse rounded-full bg-green-600"></span>

@@ -3,6 +3,7 @@ import { twMerge } from 'tailwind-merge'
 import { formatDistanceToNowStrict } from 'date-fns'
 import * as locale from 'date-fns/locale/fa-IR'
 import qs from 'query-string'
+import { CartProductType } from './types/home'
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -119,5 +120,32 @@ export const formUrlQuery = ({ params, key, value }: UrlQueryParams) => {
     },
     // options: we don't need null values
     { skipNull: true }
+  )
+}
+
+// Cart
+export const isProductValidToAdd = (product: CartProductType): boolean => {
+  const {
+    productId,
+    name,
+    image,
+    quantity,
+    price,
+    sizeId,
+    size,
+    stock,
+    weight,
+  } = product
+
+  return !!(
+    productId?.trim() &&
+    name?.trim() &&
+    image?.trim() &&
+    quantity > 0 &&
+    price > 0 &&
+    sizeId?.trim() &&
+    size?.trim() &&
+    stock > 0 &&
+    weight > 0
   )
 }
