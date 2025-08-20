@@ -2,7 +2,7 @@ import ProductDetailCarousel from '@/components/product/product-detail-carousel'
 import AddToCardBtn from '@/components/product/product-detail/AddToCardBtn'
 
 import ProductStatements from '@/components/product/product-detail/ProductStatemeents'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import {
   ProductColor,
@@ -14,6 +14,9 @@ import { FC } from 'react'
 import ReviewList from './ReviewList'
 import { Review } from '@/lib/generated/prisma'
 import { SingleStarRating } from '@/components/home/testemonial/SingleStartRating'
+// import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import Link from 'next/link'
+import { cn } from '@/lib/utils'
 
 // const images = [
 //   { id: '1', url: bag },
@@ -68,6 +71,7 @@ type ProductPageProp = {
   reviews: ProductReview[]
   productAverageRating: { rating: number; count: number } | null
   userReview: Review | null
+  sizeId: string
 }
 const ProductPage: FC<ProductPageProp> = ({
   data,
@@ -76,6 +80,7 @@ const ProductPage: FC<ProductPageProp> = ({
 
   userId,
   userReview,
+  sizeId,
 }) => {
   // console.log({ reviews, numReviews })
   const {
@@ -110,6 +115,22 @@ const ProductPage: FC<ProductPageProp> = ({
     // freeShipping,
   } = data
   //   console.log(specs, name)
+  // const pathname = usePathname()
+  // const { replace, refresh } = useRouter()
+  // const searchParams = useSearchParams()
+  // const params = new URLSearchParams(searchParams)
+
+  // let updatedSizeId = sizeId
+
+  // useEffect(() => {
+  //   params.set('sizeId', sizeId)
+  //   replace(`${pathname}?${params.toString()}`, {
+  //     scroll: false,
+  //   })
+  //   return () => refresh()
+  // }, [sizeId])
+  // updatedSizeId = searchParams.get('sizeId')
+  const currentSize = sizes.find((s) => sizeId === s.id)
 
   return (
     <section className="pb-24 w-full h-full">
@@ -151,19 +172,33 @@ const ProductPage: FC<ProductPageProp> = ({
           <Separator />
 
           <p className="text-sm font-semibold">سایزها</p>
-          <div className="flex gap-1">
+          <ul className="flex gap-1">
             {sizes.map((size: ProductSize) => (
-              <Button
-                className="rounded-sm  cursor-pointer"
-                variant={'outline'}
-                key={size.id}
-              >
-                {size.size}
-              </Button>
+              <li key={size.id}>
+                <Link
+                  // href={`/products/${slug}/?sizeId=${size.id}`}
+                  href={{
+                    pathname: `/products/${slug}`,
+                    query: { sizeId: `${size.id}` },
+                  }}
+                  replace
+                  scroll={false}
+                  className={cn(
+                    'rounded-sm  cursor-pointer',
+                    buttonVariants({
+                      variant: size.id === sizeId ? 'default' : 'outline',
+                    })
+                  )}
+                >
+                  {size.size}
+                </Link>
+              </li>
             ))}
-          </div>
+          </ul>
         </article>
-        <AddToCardBtn />
+        {!!sizes.length && currentSize && (
+          <AddToCardBtn sizeId={sizeId} size={currentSize} />
+        )}
         <span className="text-green-600 flex gap-1 text-sm items-center">
           <span className="w-2 h-2 animate-pulse rounded-full bg-green-600"></span>
           {sizes.map((s: ProductSize) => s.quantity)[0] > 1

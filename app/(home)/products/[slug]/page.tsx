@@ -5,13 +5,32 @@ import ProductPage from '../components/ProductPage'
 import { currentUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 
-const ProductDetailsPage = async (props: {
+const ProductDetailsPage = async ({
+  params,
+  searchParams,
+}: {
   params: Promise<{ slug: string }>
+  searchParams: Promise<{
+    sizeId: string
+    page: string
+    // sort: string
+    // rating: string
+  }>
 }) => {
-  const { slug } = await props.params
+  const page = Number((await searchParams).page) || 1
+  const pageSize = 4
+
+  const slug = (await params).slug
+  const searchParamsSizeId = (await searchParams).sizeId
 
   const product = await getProductDetails(slug)
   if (!product) notFound()
+
+  const sizeId =
+    product.sizes.find((s) => s.id === searchParamsSizeId)?.id ||
+    product.sizes?.[0].id ||
+    searchParamsSizeId
+
   const user = await currentUser()
 
   const userReview = await prisma.review.findFirst({
@@ -32,6 +51,7 @@ const ProductDetailsPage = async (props: {
     <div>
       <ProductPage
         data={product}
+        sizeId={sizeId}
         productAverageRating={
           !!productAverageRating._avg.rating && !!productAverageRating._count
             ? {
