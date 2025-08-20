@@ -23,7 +23,7 @@ const NavBar = () => {
 
       gsap.set('.logo', {
         fontSize: '8rem',
-        yPercent: 150,
+        yPercent: 160,
       })
 
       const heroTl = gsap.timeline({
@@ -63,7 +63,7 @@ const NavBar = () => {
         color: 'black',
         ease: 'power2.out',
 
-        duration: 2,
+        duration: 3,
       })
 
       heroTl.to(
@@ -97,9 +97,9 @@ const NavBar = () => {
       className="navbar bg-transparent fixed top-0 left-0 z-50 w-full h-20   md:p-9 p-3 flex justify-between items-center "
     >
       <article className="LeftText hidden flex-1 md:block text-white">
-        ARM
+        LOGO
       </article>
-      <p className="logo !text-white bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text  font-bold  [text-shadow:_0_3px_2px_rgb(240_240_240_/_1)] transform  tracking-wide flex-1 mx-auto !max-w-[98vw] scale-60 md:scale-100 md:text-center pl-8 md:pl-0 ">
+      <p className="logo !text-black/60 bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text  font-bold  [text-shadow:_0_3px_2px_rgb(240_240_240_/_1)] transform  tracking-wide flex-1 mx-auto !max-w-[98vw] scale-50 md:scale-100 md:text-center pl-8 md:pl-0 ">
         رودخونه
       </p>
 

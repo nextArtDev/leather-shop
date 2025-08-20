@@ -12,33 +12,7 @@ const HeroLeather = () => {
         <CoverLayer />
       </div>
       <div
-        className="isolate  absolute inset-0 h-5/11 !rounded-t-lg flex flex-col md:flex-row gap-4  mx-auto p-2 !textLight   text-[#eed49b]  border border-[#87431b]  outline-[0.125rem] outline-dashed outline-[#87431b88] -outline-offset-[5px] bg-gradient-to-b  from-[#e2a57f] via-[#855b43e0]   to-[#87431b]    shadow-[1px_1px_10px_#522910,_-1px_-1px_10px_#aa5522]   "
-        style={{
-          textShadow: '1px 1px 1px #c2a38f, 0 0 2px #948378, 0 0 0.2px #d3d3d3',
-          backgroundImage: 'url(/images/whiteleather.svg)',
-          backgroundRepeat: 'repeat',
-          // backgroundSize: '280px 450px',
-          backgroundBlendMode: 'multiply',
-          backgroundColor: '#eed49b',
-          filter: 'drop-shadow(0 0 0.15rem #44291755)',
-          boxShadow: '2px 2px 4px #87431b,-2px -2px 4px #633d26',
-        }}
-      />
-      <div
-        className="isolate  absolute inset-0 h-1/11 top-5/11   flex flex-col md:flex-row gap-4  mx-auto p-2 !textLight   text-[#eed49b]  border border-[#87431b]  outline-[0.125rem] outline-dashed outline-[#c2a38f88] -outline-offset-[5px] bg-gradient-to-b  from-[#e2a57f] via-[#855b43e0]   to-[#87431b]    shadow-[1px_1px_10px_#522910,_-1px_-1px_10px_#aa5522]   "
-        style={{
-          textShadow: '1px 1px 1px #c2a38f, 0 0 2px #948378, 0 0 0.2px #d3d3d3',
-          backgroundImage: 'url(/images/whiteleather.svg)',
-          backgroundRepeat: 'repeat',
-          // backgroundSize: '280px 450px',
-          backgroundBlendMode: 'overlay',
-          backgroundColor: '#383877',
-          filter: 'drop-shadow(0 0 0.15rem #44291755)',
-          boxShadow: '2px 2px 4px #87431b,-2px -2px 4px #633d26',
-        }}
-      />
-      <div
-        className="isolate  absolute inset-0 h-5/11 top-6/11 !rounded-b-lg flex flex-col md:flex-row gap-4  mx-auto p-2 !textLight   text-[#eed49b]  border border-[#87431b]  outline-[0.125rem] outline-dashed outline-[#c2a38f88] -outline-offset-[5px] bg-gradient-to-b  from-[#e2a57f] via-[#855b43e0]   to-[#87431b]    shadow-[1px_1px_10px_#522910,_-1px_-1px_10px_#aa5522]   "
+        className="isolate  absolute inset-0 h-5/11 !rounded-t-lg  flex flex-col md:flex-row gap-4  mx-auto p-2 !textLight   text-[#eed49b]  border border-[#87431b]  outline-[0.125rem] outline-dashed outline-[#c2a38f88] -outline-offset-[5px] bg-gradient-to-b  from-[#e2a57f] via-[#855b43e0]   to-[#87431b]    shadow-[1px_1px_10px_#522910,_-1px_-1px_10px_#aa5522]   "
         style={{
           textShadow: '1px 1px 1px #c2a38f, 0 0 2px #948378, 0 0 0.2px #d3d3d3',
           backgroundImage: 'url(/images/whiteleather.svg)',
@@ -46,11 +20,38 @@ const HeroLeather = () => {
           // backgroundSize: '280px 450px',
           backgroundBlendMode: 'multiply',
           backgroundColor: '#855943',
+          filter: 'drop-shadow(0 0 0.15rem #442917)',
+          boxShadow: '2px 2px 4px #87431b,-2px -2px 4px #633d26',
+        }}
+      />
+      <div
+        className="   absolute inset-0 h-1/11 top-5/11   flex flex-col md:flex-row gap-4  mx-auto p-2 !textLight   text-[#eed49b]  border border-[#87431b]  outline-[0.125rem] outline-dashed outline-[#c2a38f88] -outline-offset-[5px] bg-gradient-to-b  from-[#e2a57f] via-[#855b43e0]   to-[#87431b]    shadow-[1px_1px_10px_#522910,_-1px_-1px_10px_#aa5522]   "
+        style={{
+          textShadow: '1px 1px 1px #c2a38f, 0 0 2px #948378, 0 0 0.2px #d3d3d3',
+          backgroundImage: 'url(/images/whiteleather.svg)',
+          backgroundRepeat: 'repeat',
+          // backgroundSize: '280px 450px',
+          backgroundBlendMode: 'overlay',
+          backgroundColor: '#eed49b',
           filter: 'drop-shadow(0 0 0.15rem #44291755)',
           boxShadow: '2px 2px 4px #87431b,-2px -2px 4px #633d26',
         }}
       />
-      <div className="isolate relative w-full h-full flex flex-col items-center justify-center gap-4 p-4">
+      <div
+        className="   absolute inset-0 h-5/11 top-6/11 !rounded-b-lg flex flex-col md:flex-row gap-4  mx-auto p-2 !textLight   text-[#eed49b]  border border-[#87431b]  outline-[0.125rem] outline-dashed outline-[#87431b88] -outline-offset-[5px] bg-gradient-to-b  from-[#e2a57f] via-[#855b43e0]   to-[#87431b]    shadow-[1px_1px_10px_#522910,_-1px_-1px_10px_#aa5522]   "
+        style={{
+          textShadow: '1px 1px 1px #c2a38f, 0 0 2px #948378, 0 0 0.2px #d3d3d3',
+          backgroundImage: 'url(/images/whiteleather.svg)',
+          backgroundRepeat: 'repeat',
+          // backgroundSize: '280px 450px',
+          backgroundBlendMode: 'multiply',
+          backgroundColor: '#87431b',
+          filter: 'drop-shadow(0 0 0.15rem #44291755)',
+          boxShadow: '2px 2px 4px #87431b,-2px -2px 4px #633d26',
+        }}
+      />
+
+      <div className="isolate relative w-full h-full flex flex-col items-center justify-center gap-4 p-4 pt-16">
         {/* <Image
           src={brderImage}
           alt="Leather"
@@ -77,7 +78,7 @@ const HeroLeather = () => {
               src="/images/border-rounded.webp"
               alt="Border Frame"
               fill
-              className="pointer-events-none select-none origin-center scale-125 mix-blend-luminosity"
+              className="pointer-events-none select-none origin-center scale-125 mix-blend-multiply"
             />
           </figure>
         </article>
@@ -89,9 +90,7 @@ const HeroLeather = () => {
             }}
             className="isolate text-center px-1 max-w-md mx-auto "
           >
-            An expression of quiet luxury, Côte Royale is designed for the man
-            who commands attention without seeking it. A reflection of nature’s
-            raw beauty.
+            An expression of quiet luxury, Côte Royale is designed for the man.
           </p>
           <div className="flex items-center !text-base justify-center gap-6 w-full h-full flex-wrap">
             <Link href={'/'} className="relative w-fit">

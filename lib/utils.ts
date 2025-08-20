@@ -2,7 +2,7 @@ import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import { formatDistanceToNowStrict } from 'date-fns'
 import * as locale from 'date-fns/locale/fa-IR'
-
+import qs from 'query-string'
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -94,4 +94,30 @@ export const compareTimeStrings = (time1: string, time2: string) => {
   const [hour2, minute2] = time2.split(':').map(Number)
 
   return hour1 > hour2 || (hour1 === hour2 && minute1 > minute2)
+}
+
+//Query string for pagination
+interface UrlQueryParams {
+  params: string
+  key: string
+  value: string | null
+}
+export const formUrlQuery = ({ params, key, value }: UrlQueryParams) => {
+  // accessing the current url
+  const currentUrl = qs.parse(params)
+  // query-string package automatically gives you the search params
+
+  // it only updates the one we want to update, while keeping everything else the same in component's useState
+  currentUrl[key] = value
+
+  return qs.stringifyUrl(
+    {
+      // base url
+      url: window.location.pathname,
+      // current url
+      query: currentUrl,
+    },
+    // options: we don't need null values
+    { skipNull: true }
+  )
 }

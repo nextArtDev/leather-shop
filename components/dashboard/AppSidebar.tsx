@@ -78,6 +78,16 @@ const data = {
       ],
     },
     {
+      title: 'کامنت‌ها',
+      url: '/dashboard/comments',
+      items: [
+        {
+          title: 'کامنت‌ها',
+          url: '/dashboard/comments',
+        },
+      ],
+    },
+    {
       title: 'کاربران',
       url: '/dashboard/users',
       items: [
