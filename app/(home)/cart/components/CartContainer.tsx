@@ -1,7 +1,7 @@
 'use client'
 
 import useFromStore from '@/hooks/useFromStore'
-import React, { useEffect, useRef, useState } from 'react'
+import React from 'react'
 import ShoppingList from './ShoppingList'
 import OrderSummary from './OrderSummary'
 import CheckoutBtn from './CheckoutBtn'
@@ -9,9 +9,7 @@ import { useCartStore } from '@/hooks/useCartStore'
 import Link from 'next/link'
 import { buttonVariants } from '@/components/ui/button'
 
-type Props = {}
-
-function CartContainer({}: Props) {
+function CartContainer() {
   const cartItems = useFromStore(useCartStore, (state) => state.cart)
   // const setCart = useCartStore((state) => state.setCart)
   // const [loading, setLoading] = useState<boolean>(false)

@@ -1,3 +1,4 @@
+import { saveAllToCart } from '@/lib/home/actions/cart'
 import { CartProductType } from '@/lib/types/home'
 import { Loader } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -14,13 +15,13 @@ const CheckoutBtn = ({ cartItems }: Props) => {
 
   const handleSaveCart = async () => {
     startTransition(async () => {
-      // const res = await saveAllToCart(cartItems)
-      // console.log(res)
-      // if (!res.success) {
-      //   toast.success(res.message)
-      //   return
-      // }
-      router.push('/shipping-address')
+      const res = await saveAllToCart(cartItems)
+      console.log(res)
+      if (!res.success) {
+        toast.success(res.message)
+        return
+      }
+      // router.push('/shipping-address')
       // Handle success add to cart
       // toast.promise({ res.message,
       //   action: (

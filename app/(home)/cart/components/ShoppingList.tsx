@@ -1,5 +1,6 @@
 import AddToCardBtn from '@/components/product/product-detail/AddToCardBtn'
 import { Badge } from '@/components/ui/badge'
+import { CartItem } from '@/lib/generated/prisma'
 import { CartProductType } from '@/lib/types/home'
 import { cn } from '@/lib/utils'
 import { CheckIcon, ClockIcon } from 'lucide-react'
@@ -8,7 +9,7 @@ import Link from 'next/link'
 import React from 'react'
 
 type Props = {
-  cartItems: CartProductType[]
+  cartItems: CartItem[]
   mutable?: boolean
 }
 
@@ -19,7 +20,7 @@ const ShoppingList = ({ cartItems, mutable = false }: Props) => {
       className=" divide-y divide-foreground border-t border-b border-foreground"
     >
       {cartItems?.map((item) => (
-        <li key={item.slug} className={cn(' flex py-6 sm:py-10')}>
+        <li key={item.productSlug} className={cn(' flex py-6 sm:py-10')}>
           <div className="relative shrink-0 size-20 sm:size:32">
             <Image
               fill
@@ -34,7 +35,7 @@ const ShoppingList = ({ cartItems, mutable = false }: Props) => {
               <div className="flex justify-between sm:grid sm:grid-cols-2">
                 <div className="pl-6">
                   <Link
-                    href={`/product/${item.slug}`}
+                    href={`/product/${item.productSlug}`}
                     className="font-medium line-clamp-1  hover:underline"
                   >
                     <h3 className="text-sm">{item.name}</h3>
@@ -77,13 +78,13 @@ const ShoppingList = ({ cartItems, mutable = false }: Props) => {
                     // <AddToCardBtn  item={product} />
                     <AddToCardBtn
                       sizeId={item.sizeId}
-                      weight={item.weight}
+                      weight={item.}
                       size={item.size}
                       discount={0}
                       price={item.price}
-                      stockQuantity={item.stock}
+                      stockQuantity={p.stock}
                       productId={item.productId}
-                      slug={item.slug}
+                      slug={item.productSlug}
                       name={item.name}
                       qty={item.quantity}
                       shippingFeeMethod={item.shippingMethod}

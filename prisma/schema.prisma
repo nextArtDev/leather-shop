@@ -400,10 +400,8 @@ model Cart {
 model CartItem {
   id          String @id @default(uuid())
   productId   String
-  variantId   String
   sizeId      String
   productSlug String
-  variantSlug String
   sku         String
   name        String
   image       String
@@ -439,8 +437,8 @@ model ShippingAddress {
   userId String
   user   User   @relation("UserShippingAddresses", fields: [userId], references: [id])
 
-  countryId String
-  country   Country @relation("CountryToShippingAddress", fields: [countryId], references: [id])
+  countryId String?
+  country   Country? @relation("CountryToShippingAddress", fields: [countryId], references: [id])
 
   provinceId Int
   province   Province @relation("ProvinceToShippingAddress", fields: [provinceId], references: [id])
