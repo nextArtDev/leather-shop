@@ -12,7 +12,6 @@ interface CreateSubCategoryFormState {
   success?: string
   errors: {
     name?: string[]
-    name_fa?: string[]
     url?: string[]
     featured?: string[]
     categoryId?: string[]
@@ -121,7 +120,6 @@ export async function createSubCategory(
 interface EditSubCategoryFormState {
   errors: {
     name?: string[]
-    name_fa?: string[]
     description?: string[]
     categoryId?: string[]
     images?: string[]

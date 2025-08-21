@@ -406,6 +406,7 @@ model CartItem {
   name        String
   image       String
   size        String
+  weight      Float?
   price       Float
   quantity    Int    @default(1)
   shippingFee Float  @default(0)
@@ -421,16 +422,15 @@ model CartItem {
 }
 
 model ShippingAddress {
-  id        String  @id @default(uuid())
-  firstName String
-  lastName  String
-  phone     String
-  address1  String
-  address2  String?
+  id       String  @id @default(uuid())
+  name     String?
+  phone    String
+  address1 String
+  address2 String?
   // state     String
   // city      String
-  zip_code  String
-  default   Boolean @default(false)
+  zip_code String
+  default  Boolean @default(false)
 
   orders Order[] @relation("ShippingAddressToOrder")
 

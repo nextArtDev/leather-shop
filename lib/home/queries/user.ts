@@ -32,6 +32,14 @@ export async function getMyCart() {
 export async function getUserById(userId: string) {
   const user = await prisma.user.findFirst({
     where: { id: userId },
+    include: {
+      shippingAddresses: {
+        include: {
+          city: true,
+          province: true,
+        },
+      },
+    },
   })
   if (!user) throw new Error('User not found')
 

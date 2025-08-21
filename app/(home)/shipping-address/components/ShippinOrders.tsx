@@ -3,6 +3,7 @@
 import OrderSummary from '../../cart/components/OrderSummary'
 import ShoppingList from '../../cart/components/ShoppingList'
 import { CartItem } from '@/lib/generated/prisma'
+import ShippingShoppingList from './ShippingShoppingList'
 
 export default function ShippingOrders({
   cartItems,
@@ -21,9 +22,9 @@ export default function ShippingOrders({
           Order summary
         </h2>
         <div className="divide-y divide-white/10 text-sm font-medium">
-          <ShoppingList mutable products={cartItems} />
+          <ShippingShoppingList cartItems={cartItems} />
         </div>
-        <OrderSummary cartItems={cartItems} />
+        {/* <OrderSummary cartItems={cartItems} /> */}
       </div>
     </section>
   )

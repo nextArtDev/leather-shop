@@ -1,6 +1,5 @@
 import AddToCardBtn from '@/components/product/product-detail/AddToCardBtn'
 import { Badge } from '@/components/ui/badge'
-import { CartItem } from '@/lib/generated/prisma'
 import { CartProductType } from '@/lib/types/home'
 import { cn } from '@/lib/utils'
 import { CheckIcon, ClockIcon } from 'lucide-react'
@@ -9,7 +8,7 @@ import Link from 'next/link'
 import React from 'react'
 
 type Props = {
-  cartItems: CartItem[]
+  cartItems: CartProductType[]
   mutable?: boolean
 }
 
@@ -20,7 +19,7 @@ const ShoppingList = ({ cartItems, mutable = false }: Props) => {
       className=" divide-y divide-foreground border-t border-b border-foreground"
     >
       {cartItems?.map((item) => (
-        <li key={item.productSlug} className={cn(' flex py-6 sm:py-10')}>
+        <li key={item.slug} className={cn(' flex py-6 sm:py-10')}>
           <div className="relative shrink-0 size-20 sm:size:32">
             <Image
               fill
@@ -35,7 +34,7 @@ const ShoppingList = ({ cartItems, mutable = false }: Props) => {
               <div className="flex justify-between sm:grid sm:grid-cols-2">
                 <div className="pl-6">
                   <Link
-                    href={`/product/${item.productSlug}`}
+                    href={`/product/${item.slug}`}
                     className="font-medium line-clamp-1  hover:underline"
                   >
                     <h3 className="text-sm">{item.name}</h3>
@@ -73,18 +72,18 @@ const ShoppingList = ({ cartItems, mutable = false }: Props) => {
                   )}
                 >
                   {mutable ? (
-                    (+item.price * item.quantity).toFixed(1)
+                    +item.price * item.quantity
                   ) : (
                     // <AddToCardBtn  item={product} />
                     <AddToCardBtn
                       sizeId={item.sizeId}
-                      weight={item.}
+                      weight={item.weight}
                       size={item.size}
-                      discount={0}
+                      discount={item.price}
                       price={item.price}
-                      stockQuantity={p.stock}
+                      stockQuantity={item.stock}
                       productId={item.productId}
-                      slug={item.productSlug}
+                      slug={item.slug}
                       name={item.name}
                       qty={item.quantity}
                       shippingFeeMethod={item.shippingMethod}

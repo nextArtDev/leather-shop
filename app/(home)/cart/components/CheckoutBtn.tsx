@@ -21,7 +21,7 @@ const CheckoutBtn = ({ cartItems }: Props) => {
         toast.success(res.message)
         return
       }
-      // router.push('/shipping-address')
+      router.push('/shipping-address')
       // Handle success add to cart
       // toast.promise({ res.message,
       //   action: (
