@@ -1,7 +1,7 @@
 'use client'
 
 import useFromStore from '@/hooks/useFromStore'
-import React from 'react'
+import React, { useEffect } from 'react'
 import ShoppingList from './ShoppingList'
 import OrderSummary from './OrderSummary'
 import CheckoutBtn from './CheckoutBtn'
@@ -10,7 +10,15 @@ import Link from 'next/link'
 import { buttonVariants } from '@/components/ui/button'
 
 function CartContainer() {
-  const cartItems = useFromStore(useCartStore, (state) => state.cart)
+  const cartItems = useCartStore((state) => state.cart)
+  const totalPrice = useCartStore((state) => state.totalPrice)
+  const { validateAndUpdatePrices } = useCartStore()
+
+  useEffect(() => {
+    validateAndUpdatePrices()
+  }, [])
+
+  console.log('Cart items:', cartItems)
   // const setCart = useCartStore((state) => state.setCart)
   // const [loading, setLoading] = useState<boolean>(false)
 
@@ -18,7 +26,7 @@ function CartContainer() {
   // const [selectedItems, setSelectedItems] = useState<CartItem[]>([])
   // const [totalShipping, setTotalShipping] = useState<number>(0)
 
-  // const hasMounted = useRef(false)
+  // // const hasMounted = useRef(false)
 
   // useEffect(() => {
   //   if (cartItems !== undefined) {
@@ -28,14 +36,14 @@ function CartContainer() {
   // useEffect(() => {
   //   const loadAndSyncCart = () => {
   //     if (!cartItems) return
-  //     //   try {
-  //     //     setLoading(true)
-  //     //     const updatedCart = await updateCartWithLatest(cartItems)
-  //     //     setCart(updatedCart)
-  //     //     setLoading(false)
-  //     //   } catch (error) {
-  //     //     setLoading(false)
-  //     //   }
+  //       try {
+  //         setLoading(true)
+  //         const updatedCart = await updateCartWithLatest(cartItems)
+  //         setCart(updatedCart)
+  //         setLoading(false)
+  //       } catch (error) {
+  //         setLoading(false)
+  //       }
   //   }
 
   //   // Run only when userCountry changes and after the initial mount

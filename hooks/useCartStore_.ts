@@ -1,4 +1,3 @@
-import { fetchCurrentPricesAndStock } from '@/lib/home/actions/cart'
 import { CartProductType } from '@/lib/types/home'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
@@ -17,7 +16,6 @@ interface Actions {
   removeFromCart: (Item: CartProductType) => void // Single product removal
   emptyCart: () => void // Empty cart
   setCart: (newCart: CartProductType[]) => void // Added setCart method
-  validateAndUpdatePrices: () => Promise<void>
 }
 
 // Initialize a default state
@@ -134,6 +132,7 @@ export const useCartStore = create(
           totalPrice,
         }))
 
+        // Manually sync with localStorage after removal
         localStorage.setItem('cart', JSON.stringify(updatedCart))
       },
       emptyCart: () => {
@@ -157,90 +156,6 @@ export const useCartStore = create(
           totalItems,
           totalPrice,
         }))
-      },
-      validateAndUpdatePrices: async () => {
-        const cart = get().cart
-        if (cart.length === 0) return
-
-        try {
-          const sizeIds = cart.map((item) => item.sizeId)
-
-          const currentData = await fetchCurrentPricesAndStock(sizeIds)
-
-          let hasChanges = false
-          const outOfStockItems: CartProductType[] = []
-
-          const updatedCart = cart.map((item) => {
-            const currentSize = currentData.find(
-              (data) => data.sizeId === item.sizeId
-            )
-
-            if (!currentSize) return item
-
-            const updatedItem = { ...item }
-            const currentFinalPrice =
-              currentSize.price -
-              currentSize.price * (currentSize.discount / 100)
-            // Check price changes
-            if (currentSize.price !== item.price) {
-              hasChanges = true
-              updatedItem.price = currentFinalPrice
-            }
-
-            // Check stock availability
-            if (currentSize.stock !== item.stock) {
-              updatedItem.stock = currentSize.stock
-
-              // If item is out of stock
-              if (currentSize.stock === 0) {
-                outOfStockItems.push(updatedItem)
-              } else if (item.quantity > currentSize.stock) {
-                // Reduce quantity to available stock
-                updatedItem.quantity = currentSize.stock
-                hasChanges = true
-              }
-            }
-
-            return updatedItem
-          })
-
-          if (hasChanges) {
-            const finalCart = updatedCart.filter((item) => {
-              const isOutOfStock = outOfStockItems.some(
-                (outOfStockItem) =>
-                  outOfStockItem.productId === item.productId &&
-                  outOfStockItem.sizeId === item.sizeId
-              )
-              return !isOutOfStock
-            })
-
-            const totalPrice = updatedCart.reduce(
-              (sum, item) => sum + item.price * item.quantity,
-              0
-            )
-
-            set(() => ({
-              cart: finalCart,
-              totalItems: finalCart.length,
-              totalPrice,
-            }))
-
-            // Handle out of stock items notification
-            // if (outOfStockItems.length > 0) {
-            //   const outOfStockNames = outOfStockItems
-            //     .map((item) => `${item.name} (${item.size})`)
-            //     .join(', ')
-            //   // console.log(
-            //   //   `محصولات زیر از سبد خرید حذف شدند (تمام شده): ${outOfStockNames}`
-            //   // )
-
-            //   // Optional: You can also set an error message for the user
-            //   // set(() => ({ error: `محصولات زیر تمام شده و از سبد خرید حذف شدند: ${outOfStockNames}` }))
-            // }
-          }
-        } catch (error) {
-          console.error('Failed to validate cart:', error)
-        }
       },
     }),
     {

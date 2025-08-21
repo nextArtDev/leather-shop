@@ -370,12 +370,8 @@ export type ProductListProps<T extends AnyProductType> = {
 //Cart
 export type CartProductType = {
   productId: string
-
   slug: string
-
   name: string
-
-  // images: Image[]
   image: string
   sizeId: string
   size: string
@@ -386,7 +382,4 @@ export type CartProductType = {
   shippingMethod: string
   shippingFee: number
   extraShippingFee: number
-  // deliveryTimeMin: number
-  // deliveryTimeMax: number
-  // isFreeShipping: boolean
 }

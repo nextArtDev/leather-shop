@@ -313,6 +313,7 @@ export async function saveAllToCart(
           quantity: validQuantity,
           price,
           totalPrice,
+          weight: product.weight || 0,
         })
       }
 
@@ -522,4 +523,34 @@ function calculateShippingFee(cartItem: any, shippingAddress: any): number {
   // Implement your shipping calculation logic here
   // This could be based on weight, location, item type, etc.
   return 0 // Placeholder
+}
+
+export async function fetchCurrentPricesAndStock(sizeIds: string[]) {
+  try {
+    const productSizes = await prisma.size.findMany({
+      where: {
+        id: {
+          in: sizeIds,
+        },
+      },
+      select: {
+        id: true,
+        price: true,
+        quantity: true,
+        productId: true,
+        discount: true,
+      },
+    })
+
+    return productSizes.map((size) => ({
+      productId: size.productId,
+      sizeId: size.id,
+      price: size.price,
+      stock: size.quantity,
+      discount: size.discount,
+    }))
+  } catch (error) {
+    console.error('Failed to fetch current prices and stock:', error)
+    throw new Error('Unable to fetch current prices')
+  }
 }

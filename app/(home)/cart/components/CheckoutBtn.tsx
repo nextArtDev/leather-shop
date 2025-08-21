@@ -1,6 +1,7 @@
 import { saveAllToCart } from '@/lib/home/actions/cart'
 import { CartProductType } from '@/lib/types/home'
 import { Loader } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import React, { useTransition } from 'react'
 import { toast } from 'sonner'
@@ -16,24 +17,12 @@ const CheckoutBtn = ({ cartItems }: Props) => {
   const handleSaveCart = async () => {
     startTransition(async () => {
       const res = await saveAllToCart(cartItems)
-      console.log(res)
+      // console.log(res)
       if (!res.success) {
         toast.success(res.message)
         return
       }
       router.push('/shipping-address')
-      // Handle success add to cart
-      // toast.promise({ res.message,
-      //   action: (
-      //     <ToastAction
-      //       className="bg-primary text-white hover:bg-gray-800"
-      //       altText="Go To Cart"
-      //       onClick={() => router.push('/cart')}
-      //     >
-      //       Go To Cart
-      //     </ToastAction>
-      //   ),
-      // })
     })
   }
   return (
@@ -49,17 +38,15 @@ const CheckoutBtn = ({ cartItems }: Props) => {
       </button>
       {/* </Link> */}
 
-      <div className="mt-6 text-center text-sm ">
-        <p>
-          یا{' '}
-          <a
-            href="#"
-            className="font-medium text-indigo-600 hover:text-indigo-500"
-          >
-            ادامه خرید
-            <span aria-hidden="true"> &larr;</span>
-          </a>
-        </p>
+      <div className="mt-6 flex items-center justify-center gap-1 text-center text-sm ">
+        <p>یا </p>
+        <Link
+          href="/"
+          className="font-medium text-indigo-600 hover:text-indigo-500"
+        >
+          ادامه خرید
+          <span aria-hidden="true"> &larr;</span>
+        </Link>
       </div>
     </div>
   )
