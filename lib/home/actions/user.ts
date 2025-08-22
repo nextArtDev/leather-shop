@@ -57,21 +57,8 @@ export async function createShippingAddress(
         },
       }
     }
-    await prisma.user.findFirst({
-      where: {
-        id: cUser.id,
-      },
-      include: {
-        shippingAddresses: {
-          include: {
-            city: true,
-            province: true,
-          },
-        },
-      },
-    })
     // console.log(user)
-    await prisma.shippingAddress.create({
+    const shippingAddress = await prisma.shippingAddress.create({
       data: {
         name: result.data.name,
         zip_code: result.data.zip_code,
@@ -86,8 +73,36 @@ export async function createShippingAddress(
         //    })),
         //  },
       },
+      include: {
+        province: {
+          select: {
+            name: true,
+          },
+        },
+        city: {
+          select: {
+            name: true,
+          },
+        },
+        user: {
+          select: {
+            name: true,
+          },
+        },
+      },
     })
-    // console.log(res)
+
+    const AddressToSaveForUser = `${shippingAddress?.province.name}-${shippingAddress?.city.name} | ${shippingAddress.address1} - ${shippingAddress.zip_code}`
+
+    await prisma.user.update({
+      where: {
+        id: cUser.id,
+      },
+      data: {
+        address: AddressToSaveForUser,
+        name: result.data.name,
+      },
+    })
   } catch (err: unknown) {
     const message =
       err instanceof Error ? err.message : 'مشکلی در سرور پیش آمده.'
@@ -178,7 +193,7 @@ export async function editShippingAddress(
       },
     })
     // console.log(user)
-    await prisma.shippingAddress.update({
+    const shippingAddress = await prisma.shippingAddress.update({
       where: { id: shippingAddressId },
       data: {
         name: result.data.name,
@@ -194,7 +209,36 @@ export async function editShippingAddress(
         //    })),
         //  },
       },
+      include: {
+        province: {
+          select: {
+            name: true,
+          },
+        },
+        city: {
+          select: {
+            name: true,
+          },
+        },
+        user: {
+          select: {
+            name: true,
+          },
+        },
+      },
     })
+    const AddressToSaveForUser = `${shippingAddress?.province.name}-${shippingAddress?.city.name} | ${shippingAddress.address1} - ${shippingAddress.zip_code}`
+
+    await prisma.user.update({
+      where: {
+        id: cUser.id,
+      },
+      data: {
+        address: AddressToSaveForUser,
+        name: result.data.name,
+      },
+    })
+
     // console.log(res)
   } catch (err: unknown) {
     const message =

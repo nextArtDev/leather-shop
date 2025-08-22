@@ -29,7 +29,7 @@ model User {
   sessions            Session[]
   accounts            Account[]
 
-  address           Json?             @db.Json
+  address           String?           @db.Text
   reviews           Review[]          @relation("ReviewToUser")
   cart              Cart?             @relation("UserCart")
   shippingAddresses ShippingAddress[] @relation("UserShippingAddresses")
@@ -487,9 +487,10 @@ model Order {
   subTotal     Float
   total        Float
 
-  groups OrderGroup[] @relation("OrderGroupToOrder")
+  // groups OrderGroup[] @relation("OrderGroupToOrder")
 
-  orderStatus    OrderStatus     @default(Pending)
+  orderStatus OrderStatus @default(Pending)
+
   paymentStatus  PaymentStatus   @default(Pending)
   authority      String?
   paymentDetails PaymentDetails? @relation("PaymentDetailsToOrder")
@@ -498,7 +499,11 @@ model Order {
   shippingAddress   ShippingAddress @relation("ShippingAddressToOrder", fields: [shippingAddressId], references: [id])
 
   userId String
-  user   User   @relation("UserOrders", fields: [userId], references: [id])
+  user   User        @relation("UserOrders", fields: [userId], references: [id])
+  items  OrderItem[] @relation("OrderToItem")
+
+  //  orderGroupId String
+  // orderGroup   OrderItem @relation("OrderItemToGroup", fields: [orderGroupId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -507,11 +512,33 @@ model Order {
   @@index([userId])
 }
 
+model OrderItem {
+  id String @id @default(uuid())
+
+  productId String
+  sizeId    String
+
+  productSlug String
+  sku         String
+  name        String
+  image       String
+  size        String
+  quantity    Int    @default(1)
+  shippingFee Float  @default(0)
+  price       Float
+  totalPrice  Float
+
+  status ProductStatus @default(Pending)
+
+  orderId   String
+  order     Order    @relation("OrderToItem", fields: [orderId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model OrderGroup {
   id     String      @id @default(uuid())
   status OrderStatus @default(Pending)
-
-  items OrderItem[] @relation("OrderItemToGroup")
 
   shippingService     String
   shippingDeliveryMin Int
@@ -521,8 +548,8 @@ model OrderGroup {
   subTotal     Float
   total        Float
 
-  orderId String
-  order   Order  @relation("OrderGroupToOrder", fields: [orderId], references: [id])
+  // orderId String
+  // order   Order  @relation("OrderGroupToOrder", fields: [orderId], references: [id])
 
   couponId String?
   coupon   Coupon? @relation("CouponToOrderGroup", fields: [couponId], references: [id])
@@ -530,7 +557,7 @@ model OrderGroup {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([orderId])
+  // @@index([orderId])
   @@index([couponId])
 }
 
@@ -576,35 +603,6 @@ enum ProductStatus {
 
   /// Product is awaiting customer pickup (for pickup orders)
   AwaitingPickup
-}
-
-model OrderItem {
-  id String @id @default(uuid())
-
-  productId String
-  variantId String
-  sizeId    String
-
-  productSlug String
-  variantSlug String
-  sku         String
-  name        String
-  image       String
-  size        String
-  quantity    Int    @default(1)
-  shippingFee Float  @default(0)
-  price       Float
-  totalPrice  Float
-
-  orderGroupId String
-  orderGroup   OrderGroup @relation("OrderItemToGroup", fields: [orderGroupId], references: [id], onDelete: Cascade)
-
-  status ProductStatus @default(Pending)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([orderGroupId])
 }
 
 model Wishlist {

@@ -3,9 +3,11 @@ import { useRouter } from 'next/navigation'
 import { Check, Loader } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useFormStatus } from 'react-dom'
-import { createOrder } from '@/app/(home)/lib/actions/order.action'
-import { useCartStore } from '@/cart-store/useCartStore'
+// import { createOrder } from '@/app/(home)/lib/actions/order.action'
+
 import { useTransition } from 'react'
+import { useCartStore } from '@/hooks/useCartStore_'
+import { createOrder } from '@/lib/home/actions/order'
 
 const PlaceOrderForm = () => {
   const emptyCart = useCartStore((state) => state.emptyCart)
@@ -35,8 +37,9 @@ const PlaceOrderForm = () => {
         // Create order - this will redirect on success
         const res = await createOrder()
         emptyCart()
-        // console.log({ res })
-        if (res.redirectTo) {
+        console.log({ res })
+
+        if (res?.redirectTo) {
           router.push(res.redirectTo)
         }
       } catch (error) {

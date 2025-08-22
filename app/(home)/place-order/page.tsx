@@ -61,7 +61,7 @@ const PlaceOrderPage = async () => {
   if (!shippingAddress) redirect('/shipping-address')
   //   if (!user.paymentMethod) redirect('/payment-method')
 
-  console.log(shippingAddress)
+  // console.log(shippingAddress)
   return (
     <section className="px-2">
       <CheckoutSteps current={2} />
@@ -177,7 +177,7 @@ const PlaceOrderPage = async () => {
                 <div>مجموع</div>
                 <div>{cart.cart?.total}</div>
               </div>
-              {/* <PlaceOrderForm /> */}
+              <PlaceOrderForm />
             </CardContent>
           </Card>
         </div>

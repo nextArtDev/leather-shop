@@ -5,7 +5,7 @@ import {
   Menu,
   Package2,
   Search,
-  ShoppingBag,
+  // ShoppingBag,
   //   X,
   User,
 } from 'lucide-react'
@@ -34,9 +34,9 @@ import {
 } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
 import TextRotate from '../shared/text-rotate'
-import useFromStore from '@/hooks/useFromStore'
-import { useCartStore } from '@/hooks/useCartStore'
-import CartSheet from './CartSheet'
+// import useFromStore from '@/hooks/useFromStore'
+// import { useCartStore } from '@/hooks/useCartStore'
+// import CartSheet from './CartSheet'
 import DrawerCart from './DrawerCart'
 
 // --- TypeScript Definitions for Navigation Data ---
@@ -249,8 +249,8 @@ const MobileNav = () => (
 
 export default function MainNav() {
   const [isSearchOpen, setIsSearchOpen] = React.useState(false)
-  const [isSheetOpen, setIsSheetOpen] = React.useState(false)
-  const cartItems = useFromStore(useCartStore, (state) => state.cart)
+  // const [isSheetOpen, setIsSheetOpen] = React.useState(false)
+  // const cartItems = useFromStore(useCartStore, (state) => state.cart)
 
   return (
     <div className="bg-background">

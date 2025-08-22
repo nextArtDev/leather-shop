@@ -1,6 +1,5 @@
 'use client'
 
-import useFromStore from '@/hooks/useFromStore'
 import React, { useEffect } from 'react'
 import ShoppingList from './ShoppingList'
 import OrderSummary from './OrderSummary'
@@ -10,12 +9,13 @@ import Link from 'next/link'
 import { buttonVariants } from '@/components/ui/button'
 
 function CartContainer() {
-  const totalPrice = useCartStore((state) => state.totalPrice)
+  // const totalPrice = useCartStore((state) => state.totalPrice)
   const cartItems = useCartStore((state) => state.cart)
   const { validateAndUpdatePrices } = useCartStore()
 
   useEffect(() => {
     validateAndUpdatePrices()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // console.log('Cart items:', cartItems)
