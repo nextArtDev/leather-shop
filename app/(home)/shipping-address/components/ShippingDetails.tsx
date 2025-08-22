@@ -85,9 +85,11 @@ const ShippingDetails = ({
         if (initialData?.id) {
           const res = await editShippingAddress(data, initialData.id, path)
           if (res?.errors) handleServerErrors(res.errors, form.setError)
+          router.push('/place-order')
         } else {
           const res = await createShippingAddress(data, phone, path)
           if (res?.errors) handleServerErrors(res.errors, form.setError)
+          router.push('/place-order')
         }
       } catch (error) {
         if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {

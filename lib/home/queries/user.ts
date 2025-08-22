@@ -1,4 +1,5 @@
 import { currentUser } from '@/lib/auth'
+import { City, Province, ShippingAddress } from '@/lib/generated/prisma'
 import prisma from '@/lib/prisma'
 
 export async function getMyCart() {
@@ -44,4 +45,27 @@ export async function getUserById(userId: string) {
   if (!user) throw new Error('User not found')
 
   return user
+}
+export async function getUserShippingAddressById(
+  userId: string
+): Promise<
+  | (ShippingAddress & { city: City | null } & { province: Province | null })
+  | null
+> {
+  const user = await prisma.user.findFirst({
+    where: { id: userId },
+    include: {
+      shippingAddresses: {
+        include: {
+          city: true,
+          province: true,
+        },
+      },
+    },
+  })
+  if (!user) throw new Error('User not found')
+
+  // Return the first shipping address or null if none exist
+  const shippingAddress = user.shippingAddresses?.[0] ?? null
+  return shippingAddress
 }

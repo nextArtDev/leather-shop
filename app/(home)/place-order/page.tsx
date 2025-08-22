@@ -18,45 +18,87 @@ import Image from 'next/image'
 // import { ShippingAddress } from '../../types'
 // import CheckoutSteps from '../../components/checkout-steps'
 import PlaceOrderForm from './components/place-order-form'
-import { getMyCart, getUserById } from '@/lib/home/queries/user'
+import {
+  getMyCart,
+  getUserById,
+  getUserShippingAddressById,
+} from '@/lib/home/queries/user'
 import { currentUser } from '@/lib/auth'
 import CheckoutSteps from '../shipping-address/components/checkout-steps'
-import { ShippingAddress } from '@/lib/generated/prisma'
+import { City, Province, ShippingAddress } from '@/lib/generated/prisma'
+import { getCartForCheckout, getValidatedCart } from '@/lib/home/actions/cart'
+import { toast } from 'sonner'
+import { Dialog } from '@/components/ui/dialog'
+import { DialogContent } from '@radix-ui/react-dialog'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 
 export const metadata: Metadata = {
   title: 'Place Order',
 }
 
 const PlaceOrderPage = async () => {
-  const cart = await getMyCart()
+  const cart = await getValidatedCart()
+  // if (cart.cart?.validationErrors)
+  //   return toast(cart.cart?.validationErrors.map((er) => er.issue).join(' '))
   const cUser = await currentUser()
   const userId = cUser?.id
 
   if (!userId) redirect('/sign-in')
 
-  const user = await getUserById(userId)
+  const shippingAddress = await getUserShippingAddressById(userId)
 
-  if (!cart || cart.cartItems.length === 0) redirect('/cart')
-  if (!user.address) redirect('/shipping-address')
+  if (!cart || cart.cart?.items.length === 0) redirect('/cart')
+  if (!shippingAddress) redirect('/shipping-address')
   //   if (!user.paymentMethod) redirect('/payment-method')
 
-  const userAddress = user.address as Partial<ShippingAddress>
-
+  console.log(shippingAddress)
   return (
-    <>
+    <section className="px-2">
       <CheckoutSteps current={2} />
-      <h1 className="py-4 text-2xl font-bold">تایید سفارش</h1>
+      <h1 className="py-4 text-2xl font-bold text-center">تایید سفارش</h1>
+
+      {cart.cart?.validationErrors && (
+        <AlertDialog open={!!cart.cart?.validationErrors.length}>
+          {/* <AlertDialogTrigger>Open</AlertDialogTrigger> */}
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-red-500">
+                سبد خرید معتبر نیست!
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {cart.cart?.validationErrors.map((er) => er.issue).join(', ')}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              {/* <AlertDialogCancel>Cancel</AlertDialogCancel> */}
+              <AlertDialogAction asChild>
+                <Link href={'/cart'}>برگشت به سبد خرید &larr;</Link>
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
       <div className="grid md:grid-cols-3 md:gap-5">
         <div className="md:col-span-2 overflow-x-auto space-y-4">
           <Card>
-            <CardContent className="p-4 gap-4">
+            <CardContent className="p-4 flex flex-col gap-2">
               <h2 className="text-xl pb-4 font-bold">آدرس ارسال</h2>
-              <p>{userAddress.name}</p>
+              <p>{shippingAddress?.name}</p>
               <p>
-                {userAddress.address1}, <br />
-                {`${userAddress?.city?.name} - ${userAddress?.province?.name}`}{' '}
-                {/* {userAddress.postalCode}, {userAddress?.country}{' '} */}
+                {`${shippingAddress?.city?.name} - ${shippingAddress?.province?.name}`}{' '}
               </p>
+              <p>{shippingAddress.address1}</p>
+              <p>{shippingAddress.zip_code}</p>
               <div className="mt-3">
                 <Link href="/shipping-address">
                   <Button variant="outline">ویرایش</Button>
@@ -85,19 +127,19 @@ const PlaceOrderPage = async () => {
                   <TableRow>
                     <TableHead>سفارش</TableHead>
                     <TableHead>تعداد</TableHead>
-                    <TableHead>قیمت</TableHead>
+                    <TableHead>قیمت واحد</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {cart.cartItems.map((item) => (
+                  {cart.cart?.items?.map((item) => (
                     <TableRow key={item.productSlug}>
                       <TableCell>
                         <Link
-                          href={`/product/{item.slug}`}
+                          href={`/products/${item.productSlug}`}
                           className="flex items-center"
                         >
                           <Image
-                            src={item?.image?.[0] || ''}
+                            src={item?.image || ''}
                             alt={item.name}
                             width={50}
                             height={50}
@@ -108,9 +150,7 @@ const PlaceOrderPage = async () => {
                       <TableCell>
                         <span className="px-2">{item.quantity}</span>
                       </TableCell>
-                      <TableCell className="text-right">
-                        ${item.price}
-                      </TableCell>
+                      <TableCell className="text-right">{item.price}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -123,7 +163,7 @@ const PlaceOrderPage = async () => {
             <CardContent className="p-4 gap-4 space-y-4">
               <div className="flex justify-between">
                 <div>سفارشها</div>
-                <div>{cart.subTotal}</div>
+                <div>{cart.cart?.subTotal}</div>
               </div>
               {/* <div className="flex justify-between">
                 <div>مالیات</div>
@@ -131,18 +171,18 @@ const PlaceOrderPage = async () => {
               </div> */}
               <div className="flex justify-between">
                 <div>هزینه ارسال</div>
-                <div>{cart.shippingFees}</div>
+                {/* <div>{cart.shippingFees}</div> */}
               </div>
               <div className="flex justify-between">
                 <div>مجموع</div>
-                <div>{cart.total}</div>
+                <div>{cart.cart?.total}</div>
               </div>
               {/* <PlaceOrderForm /> */}
             </CardContent>
           </Card>
         </div>
       </div>
-    </>
+    </section>
   )
 }
 
