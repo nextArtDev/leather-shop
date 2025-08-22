@@ -124,26 +124,26 @@ const AddToCardBtn: FC<AddToCardBtnProps> = ({
           <Button
             type="button"
             variant="outline"
-            size={'icon'}
-            className="rounded-full cursor-pointer"
+            // size={'icon'}
+            className="rounded-md cursor-pointer w-7 h-7 sm:w-9 sm:h-9"
             onClick={handleRemoveFromCart}
           >
-            <Minus className="w-4 h-4" />
+            <Minus className="w-2 h-2 sm:w-4 sm:h-4" />
           </Button>
 
-          <span className="px-2 text-green-500 text-xl">
+          <span className="px-1 sm:px-2 text-green-500 text-xl">
             {existItem.quantity}
           </span>
 
           <Button
             type="button"
-            size={'icon'}
+            // size={'icon'}
             variant="outline"
-            className="rounded-full cursor-pointer"
+            className="rounded-md cursor-pointer w-7 h-7 sm:w-9 sm:h-9"
             onClick={handleAddQtyToCart}
             disabled={existItem.quantity >= stock}
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-2 h-2 sm:w-4 sm:h-4" />
           </Button>
         </article>
         <article className="flex  w-full h-full items-center justify-center">

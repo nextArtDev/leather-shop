@@ -36,6 +36,8 @@ import { cn } from '@/lib/utils'
 import TextRotate from '../shared/text-rotate'
 import useFromStore from '@/hooks/useFromStore'
 import { useCartStore } from '@/hooks/useCartStore'
+import CartSheet from './CartSheet'
+import DrawerCart from './DrawerCart'
 
 // --- TypeScript Definitions for Navigation Data ---
 interface FeaturedItem {
@@ -247,7 +249,9 @@ const MobileNav = () => (
 
 export default function MainNav() {
   const [isSearchOpen, setIsSearchOpen] = React.useState(false)
+  const [isSheetOpen, setIsSheetOpen] = React.useState(false)
   const cartItems = useFromStore(useCartStore, (state) => state.cart)
+
   return (
     <div className="bg-background">
       <header className="relative">
@@ -338,20 +342,23 @@ export default function MainNav() {
                     <Button variant="ghost" size="icon" aria-label="Help">
                       <User className="h-6 w-6" />
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      aria-label="Cart"
-                      className="relative "
-                      asChild
-                    >
-                      <Link href={'/cart'}>
-                        <ShoppingBag className="h-4 w-4" />
+
+                    {/* <Link href={'/cart'}>
+                        <ShoppingBag
+                          className="h-4 w-4"
+                          onClick={() => setIsSheetOpen(!isSheetOpen)}
+                        />
                         <span className="ml-1 w-fit h-fit p-1 text-sm font-medium text-red-500 rounded-full absolute left-1.5 -top-1.5 ">
                           {cartItems?.length ?? null}
                         </span>
                       </Link>
-                    </Button>
+                      <article className="sm:hidden">
+                        <CartSheet
+                          isOpen={isSheetOpen}
+                          onClose={() => setIsSheetOpen(!isSheetOpen)}
+                        />
+                      </article> */}
+                    <DrawerCart />
                   </div>
                 </div>
               </div>

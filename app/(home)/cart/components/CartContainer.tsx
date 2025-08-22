@@ -10,15 +10,15 @@ import Link from 'next/link'
 import { buttonVariants } from '@/components/ui/button'
 
 function CartContainer() {
-  const cartItems = useCartStore((state) => state.cart)
   const totalPrice = useCartStore((state) => state.totalPrice)
+  const cartItems = useCartStore((state) => state.cart)
   const { validateAndUpdatePrices } = useCartStore()
 
   useEffect(() => {
     validateAndUpdatePrices()
   }, [])
 
-  console.log('Cart items:', cartItems)
+  // console.log('Cart items:', cartItems)
   // const setCart = useCartStore((state) => state.setCart)
   // const [loading, setLoading] = useState<boolean>(false)
 

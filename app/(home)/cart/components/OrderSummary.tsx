@@ -36,7 +36,7 @@ const OrderSummary = ({ cartItems }: Props) => {
         <div className="flow-root">
           <dl className="-my-4 divide-y divide-foreground text-sm">
             <div className="flex items-center justify-between py-4">
-              <dt className="">مجمموع قیمت سفارش</dt>
+              <dt className="">مجموع قیمت سفارش</dt>
               <dd className="font-medium ">{subtotal}</dd>
             </div>
             <div className="flex items-center justify-between py-4">

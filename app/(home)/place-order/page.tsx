@@ -47,7 +47,6 @@ export const metadata: Metadata = {
 }
 
 const PlaceOrderPage = async () => {
-  const cart = await getValidatedCart()
   // if (cart.cart?.validationErrors)
   //   return toast(cart.cart?.validationErrors.map((er) => er.issue).join(' '))
   const cUser = await currentUser()
@@ -55,9 +54,10 @@ const PlaceOrderPage = async () => {
 
   if (!userId) redirect('/sign-in')
 
-  const shippingAddress = await getUserShippingAddressById(userId)
+  const cart = await getValidatedCart()
 
   if (!cart || cart.cart?.items.length === 0) redirect('/cart')
+  const shippingAddress = await getUserShippingAddressById(userId)
   if (!shippingAddress) redirect('/shipping-address')
   //   if (!user.paymentMethod) redirect('/payment-method')
 
@@ -67,7 +67,7 @@ const PlaceOrderPage = async () => {
       <CheckoutSteps current={2} />
       <h1 className="py-4 text-2xl font-bold text-center">تایید سفارش</h1>
 
-      {cart.cart?.validationErrors && (
+      {(!cart.success || cart.cart?.validationErrors) && (
         <AlertDialog open={!!cart.cart?.validationErrors.length}>
           {/* <AlertDialogTrigger>Open</AlertDialogTrigger> */}
           <AlertDialogContent>
