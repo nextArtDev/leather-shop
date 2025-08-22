@@ -1,6 +1,6 @@
 'use client'
 import { useQueries } from '@tanstack/react-query'
-import { FC } from 'react'
+import { FC, useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 import {
@@ -16,7 +16,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-// import { getDistance, isPointWithinRadius } from 'geolib'
 import { cn } from '@/lib/utils'
 import { Province } from '@/lib/generated/prisma'
 import { getCityById, getCityByProvinceId } from '@/lib/home/actions/location'
@@ -24,109 +23,103 @@ import { getCityById, getCityByProvinceId } from '@/lib/home/actions/location'
 interface ProvinceCityProps {
   isPending?: boolean
   provinceLabel?: string
-  // provinceName: string
-  // cityName: string
-  // cityLabel?: string
   provinces: Province[]
   className?: string
-  initialData?: string
-  initialProvince: string
-  initialCity: string
 }
 
 const ProvinceCity: FC<ProvinceCityProps> = ({
   isPending = false,
-  provinceLabel,
   provinces,
-  initialData,
-  // provinceName,
-  // cityName,
   className,
-
-  initialProvince,
-  initialCity,
 }) => {
-  console.log(initialProvince)
-  console.log(initialCity)
-  // online :https://iran-locations-api.ir/api/v1/fa/states
-
-  // const [initialProvince, initialCity] = initialData?.split('-')
-
   const form = useFormContext()
 
+  // Get current form values as numbers
+  const currentProvinceId = form.watch('provinceId')
+  const currentCityId = form.watch('cityId')
+
+  // console.log('Form values:', {
+  //   currentProvinceId,
+  //   currentCityId,
+  //   type: typeof currentProvinceId,
+  // })
+
+  // Use queries with proper dependencies
   const [{ data: cities, isPending: isPendingProvince }, { data: city }] =
     useQueries({
       queries: [
         {
-          queryKey: ['cityByProvince', form.watch().provinceId],
-          queryFn: () =>
-            getCityByProvinceId(+initialProvince || form.watch().provinceId),
-          // staleTime: Infinity,
+          queryKey: ['cityByProvince', currentProvinceId],
+          queryFn: () => {
+            return currentProvinceId && currentProvinceId > 0
+              ? getCityByProvinceId(currentProvinceId)
+              : Promise.resolve([])
+          },
+          enabled: !!(currentProvinceId && currentProvinceId > 0),
+          staleTime: 5 * 60 * 1000,
         },
         {
-          queryKey: ['cityById', form.watch().cityId],
-          queryFn: () => getCityById(+initialCity || form.watch().cityId),
-          // queryFn: () => getCityById(form.watch().cityId),
-          // staleTime: Infinity,
-
-          enabled: !!form.watch().provinceId,
+          queryKey: ['cityById', currentCityId],
+          queryFn: () => {
+            return currentCityId && currentCityId > 0
+              ? getCityById(currentCityId)
+              : Promise.resolve(null)
+          },
+          enabled: !!(
+            currentCityId &&
+            currentCityId > 0 &&
+            currentProvinceId &&
+            currentProvinceId > 0
+          ),
+          staleTime: 5 * 60 * 1000,
         },
       ],
     })
 
-  // console.log({ cities })
-  // console.log({ city })
-  // const distance = getDistance(
-  //   {
-  //     latitude: '32.390',
+  // Handle province change
+  const handleProvinceChange = (value: string) => {
+    const numericValue = parseInt(value, 10)
+    // console.log('Province changed to:', numericValue)
+    form.setValue('provinceId', numericValue)
+    // Clear city selection when province changes
+    form.setValue('cityId', 0)
+  }
 
-  //     longitude: '51.400',
-  //   },
-  //   {
-  //     latitude: `${city?.latitude}`,
-  //     longitude: `${city?.longitude}`,
-  //   }
-  // )
-  // const isThePointWithinRadius = isPointWithinRadius(
-  //   {
-  //     latitude: '32.390',
+  // Handle city change
+  const handleCityChange = (value: string) => {
+    const numericValue = parseInt(value, 10)
+    // console.log('City changed to:', numericValue)
+    form.setValue('cityId', numericValue)
+  }
 
-  //     longitude: '51.400',
-  //   },
-  //   {
-  //     latitude: `${city?.latitude}`,
-  //     longitude: `${city?.longitude}`,
-  //   },
-  //   500000
-  // )
-  // console.log(city?.name)
-  // console.log({ distance })
-  // console.log({ isThePointWithinRadius })
+  // Clear city when province changes to ensure consistency
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === 'provinceId' && value.provinceId !== currentProvinceId) {
+        form.setValue('cityId', 0)
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [form, currentProvinceId])
 
   return (
     <div className={cn('w-full h-full relative', className)}>
       <div className="flex gap-4">
         <FormField
-          disabled={isPending}
           control={form.control}
-          name={'provinceId'}
+          name="provinceId"
           render={({ field }) => (
             <FormItem className="flex-1">
               <Select
-                disabled={
-                  isPending || isPendingProvince || provinces?.length == 0
+                disabled={isPending || provinces?.length === 0}
+                onValueChange={handleProvinceChange}
+                value={
+                  field.value && field.value > 0 ? String(field.value) : ''
                 }
-                onValueChange={field.onChange}
-                value={field.value}
-                defaultValue={initialProvince ? initialProvince : field.value}
-                // defaultValue={field.value}
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue
-                      defaultValue={field.value?.[0]}
-                      placeholder="استان"
-                    />
+                    <SelectValue placeholder="استان" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -141,30 +134,29 @@ const ProvinceCity: FC<ProvinceCityProps> = ({
             </FormItem>
           )}
         />
+
         <FormField
-          disabled={isPending}
           control={form.control}
-          name={'cityId'}
+          name="cityId"
           render={({ field }) => (
             <FormItem className="flex-1">
               <Select
                 disabled={
-                  // isPending ||
+                  isPending ||
                   isPendingProvince ||
-                  provinces.length == 0 ||
-                  !form.getValues().provinceId
+                  !cities ||
+                  cities.length === 0 ||
+                  !currentProvinceId ||
+                  currentProvinceId <= 0
                 }
-                onValueChange={field.onChange}
-                value={field.value}
-                defaultValue={initialCity ? +initialCity : field.value}
-                // defaultValue={field.value}
+                onValueChange={handleCityChange}
+                value={
+                  field.value && field.value > 0 ? String(field.value) : ''
+                }
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue
-                      defaultValue={field.value?.[0]}
-                      placeholder="شهرستان"
-                    />
+                    <SelectValue placeholder="شهرستان" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -185,3 +177,30 @@ const ProvinceCity: FC<ProvinceCityProps> = ({
 }
 
 export default ProvinceCity
+
+// const distance = getDistance(
+//   {
+//     latitude: '32.390',
+
+//     longitude: '51.400',
+//   },
+//   {
+//     latitude: `${city?.latitude}`,
+//     longitude: `${city?.longitude}`,
+//   }
+// )
+// const isThePointWithinRadius = isPointWithinRadius(
+//   {
+//     latitude: '32.390',
+
+//     longitude: '51.400',
+//   },
+//   {
+//     latitude: `${city?.latitude}`,
+//     longitude: `${city?.longitude}`,
+//   },
+//   500000
+// )
+// console.log(city?.name)
+// console.log({ distance })
+// console.log({ isThePointWithinRadius })

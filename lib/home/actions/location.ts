@@ -4,14 +4,17 @@ import prisma from '@/lib/prisma'
 
 export const getCityByProvinceId = async (provinceId: string | number) => {
   try {
-    // Add validation to prevent invalid queries
-    if (!provinceId || isNaN(Number(provinceId))) {
+    // Convert to number and validate
+    const numericProvinceId =
+      typeof provinceId === 'string' ? parseInt(provinceId, 10) : provinceId
+
+    if (!provinceId || isNaN(numericProvinceId) || numericProvinceId <= 0) {
       return []
     }
 
     const cities = await prisma.city.findMany({
       where: {
-        provinceId: Number(provinceId),
+        provinceId: numericProvinceId,
       },
       orderBy: {
         id: 'asc',
@@ -20,52 +23,56 @@ export const getCityByProvinceId = async (provinceId: string | number) => {
 
     return cities
   } catch (error) {
-    console.log('getCityByProvinceId error:', error)
+    console.error('getCityByProvinceId error:', error)
     return []
   }
 }
 
 export const getCityById = async (cityId: string | number) => {
   try {
-    // Add validation to prevent invalid queries
-    if (!cityId || isNaN(Number(cityId))) {
+    // Convert to number and validate
+    const numericCityId =
+      typeof cityId === 'string' ? parseInt(cityId, 10) : cityId
+
+    if (!cityId || isNaN(numericCityId) || numericCityId <= 0) {
       return null
     }
 
     const city = await prisma.city.findFirst({
       where: {
-        id: Number(cityId),
+        id: numericCityId,
       },
     })
 
     return city
   } catch (error) {
-    console.log('getCityById error:', error)
+    console.error('getCityById error:', error)
     return null
   }
 }
 
 export const getProvinceById = async (provinceId: string | number) => {
-  console.log('query provinceId', provinceId)
   try {
-    // Add validation to prevent invalid queries
-    if (!provinceId || isNaN(Number(provinceId))) {
+    // Convert to number and validate
+    const numericProvinceId =
+      typeof provinceId === 'string' ? parseInt(provinceId, 10) : provinceId
+
+    if (!provinceId || isNaN(numericProvinceId) || numericProvinceId <= 0) {
       return null
     }
 
     const province = await prisma.province.findFirst({
       where: {
-        id: Number(provinceId),
+        id: numericProvinceId,
       },
     })
-    console.log('query province', province)
+
     return province
   } catch (error) {
     console.log('getProvinceById error:', error)
     return null
   }
 }
-
 // export async function getProvinces() {
 //   const apiKey = process.env.POSTEX_API_KEY
 //   try {

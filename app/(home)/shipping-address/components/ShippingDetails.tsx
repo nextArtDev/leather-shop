@@ -29,7 +29,10 @@ import ProvinceCity from './LocationSelection'
 import { City, Province, ShippingAddress, User } from '@/lib/generated/prisma'
 import { shippingAddressSchema } from '@/lib/home/schemas'
 import { handleServerErrors } from '@/app/(dashboard)/dashboard/lib/server-utils'
-import { createShippingAddress } from '@/lib/home/actions/user'
+import {
+  createShippingAddress,
+  editShippingAddress,
+} from '@/lib/home/actions/user'
 
 const ShippingDetails = ({
   provinces,
@@ -37,14 +40,16 @@ const ShippingDetails = ({
   initialData,
 }: {
   provinces: Province[]
-  phone: number
-  initialData?: ShippingAddress & {
-    city: City
-    province: Province
-    User: User
-  }
+  phone: string
+  initialData?: Partial<
+    ShippingAddress & {
+      city: City
+      province: Province
+      User: User
+    }
+  > | null
 }) => {
-  console.log(initialData)
+  // console.log(initialData)
   // const [provinceName, setProvinceName] = useState<string>(
   //   initialData?.provinceId || ''
   // )
@@ -57,13 +62,13 @@ const ShippingDetails = ({
   const form = useForm<z.infer<typeof shippingAddressSchema>>({
     resolver: zodResolver(shippingAddressSchema),
     defaultValues: {
-      name: initialData.name!,
+      name: initialData?.name,
       address1: initialData?.address1 || '',
       // address2: initialData?.address2 || '',
       // countryId: initialData?.countryId,
       // phone: initialData?.phone,
-      cityId: initialData?.city?.id.toString(),
-      provinceId: initialData?.province?.id.toString(),
+      cityId: Number(initialData?.cityId) || 0,
+      provinceId: Number(initialData?.provinceId) || 0,
       // state: initialData?.state,
       zip_code: initialData?.zip_code,
       // default: typeof initialData?.default === 'boolean' ? initialData.default : false,
@@ -74,12 +79,12 @@ const ShippingDetails = ({
   })
 
   function onSubmit(data: z.infer<typeof shippingAddressSchema>) {
-    console.log('Form submitted:', data)
+    // console.log('Form submitted:', data)
     startTransition(async () => {
       try {
-        if (initialData) {
-          // const res = await editShippingAddress(data, initialData.id, path)
-          // if (res?.errors) handleServerErrors(res.errors, form.setError)
+        if (initialData?.id) {
+          const res = await editShippingAddress(data, initialData.id, path)
+          if (res?.errors) handleServerErrors(res.errors, form.setError)
         } else {
           const res = await createShippingAddress(data, phone, path)
           if (res?.errors) handleServerErrors(res.errors, form.setError)
@@ -115,6 +120,7 @@ const ShippingDetails = ({
         Payment and shipping details
       </h2>
 
+      <Input dir="ltr" disabled className="text-right max-w-sm" value={phone} />
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -123,12 +129,6 @@ const ShippingDetails = ({
           <h3 id="contact-info-heading" className="text-lg font-medium ">
             اطلاعات ارسال و تماس
           </h3>
-          <Input
-            dir="ltr"
-            disabled
-            className="text-right max-w-sm"
-            value={phone}
-          />
 
           <FormField
             control={form.control}
@@ -150,14 +150,18 @@ const ShippingDetails = ({
 
             <ProvinceCity
               provinces={provinces}
-              initialProvince={
-                initialData?.provinceId
-                  ? initialData?.provinceId.toString()
-                  : ''
-              }
-              initialCity={
-                initialData?.cityId ? initialData?.cityId.toString() : ''
-              }
+              // initialData={{
+              //   city: initialData?.city,
+              //   province: initialData?.province,
+              // }}
+              // initialProvince={
+              //   initialData?.provinceId
+              //     ? initialData?.provinceId.toString()
+              //     : ''
+              // }
+              // initialCity={
+              //   initialData?.cityId ? initialData?.cityId.toString() : ''
+              // }
             />
 
             {/* <FormMessage /> */}

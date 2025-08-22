@@ -10,8 +10,7 @@ import ShippingOrders from './components/ShippinOrders'
 import { currentUser } from '@/lib/auth'
 import { getMyCart, getUserById } from '@/lib/home/queries/user'
 import CheckoutSteps from './components/checkout-steps'
-import { ShippingAddress } from '@/lib/generated/prisma'
-import { seed } from '@/lib/home/actions/seed'
+
 import prisma from '@/lib/prisma'
 const page = async () => {
   //خوزستان ->18
@@ -22,10 +21,9 @@ const page = async () => {
   const provinces = await prisma.province.findMany()
   const userId = cUser?.id
 
+  if (!userId || !cUser.phoneNumber) redirect('/sign-in')
   const cart = await getMyCart()
   if (!cart || cart.cartItems.length === 0) redirect('/cart')
-
-  if (!userId) redirect('/sign-in')
 
   const user = await getUserById(userId)
   const shippingAddress = await prisma.shippingAddress.findFirst({
@@ -39,7 +37,7 @@ const page = async () => {
     },
   })
   // const provinces = getProvinces()
-  console.log(user)
+  // console.log(user)
   return (
     <section>
       <CheckoutSteps current={1} />
@@ -58,7 +56,7 @@ const page = async () => {
         <ShippingDetails
           provinces={provinces}
           initialData={shippingAddress}
-          phone={user.phoneNumber}
+          phone={cUser.phoneNumber}
         />
       </article>
     </section>

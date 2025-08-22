@@ -42,9 +42,8 @@ export const shippingAddressSchema = z.object({
   //   .string()
   //   .max(100, { message: 'آدرس حداکثر باید 100 کاراکتر باشد.' })
   //   .optional(),
-  cityId: z.string().min(1, { message: 'نام شهر نمی‌تواند خالی باشد.' }),
-  provinceId: z.string().min(1, { message: 'استان نمی‌تواند خالی باشد.' }),
-
+  cityId: z.number().min(1, { message: 'نام شهر نمی‌تواند خالی باشد.' }),
+  provinceId: z.number().min(1, { message: 'استان نمی‌تواند خالی باشد.' }),
   zip_code: z.string().min(10, 'کدپستی باید 10 رقمی باشد.'),
 
   // default: z.boolean().default(false),

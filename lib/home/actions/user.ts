@@ -20,7 +20,7 @@ interface CreateShippingAddressFormState {
 
 export async function createShippingAddress(
   data: unknown,
-  phone: number,
+  phone: string,
   path: string
 ): Promise<CreateShippingAddressFormState> {
   const result = shippingAddressSchema.safeParse(data)
@@ -31,9 +31,11 @@ export async function createShippingAddress(
       errors: result.error.flatten().fieldErrors,
     }
   }
+  // console.log('phone', phone)
+  // console.log('result.data', result.data)
   try {
-    // console.log({ address })
     const cUser = await currentUser()
+    // console.log('cUser', cUser)
     if (!cUser || !cUser.phoneNumber) {
       return {
         errors: {
@@ -44,9 +46,10 @@ export async function createShippingAddress(
 
     const userAddress = await prisma.user.findFirst({
       where: {
-        phoneNumber: phone.toString(),
+        id: cUser.id,
       },
     })
+
     if (cUser.id !== userAddress?.id) {
       return {
         errors: {
@@ -54,7 +57,7 @@ export async function createShippingAddress(
         },
       }
     }
-    const user = await prisma.user.findFirst({
+    await prisma.user.findFirst({
       where: {
         id: cUser.id,
       },
@@ -67,7 +70,7 @@ export async function createShippingAddress(
         },
       },
     })
-
+    // console.log(user)
     await prisma.shippingAddress.create({
       data: {
         name: result.data.name,
@@ -76,7 +79,7 @@ export async function createShippingAddress(
         provinceId: +result.data.provinceId,
         address1: result.data.address1,
         userId: cUser.id,
-        phone: cUser.phoneNumber,
+        phone: phone.toString(),
         //  images: {
         //    connect: imageIds.map((id) => ({
         //      id: id,
@@ -84,11 +87,120 @@ export async function createShippingAddress(
         //  },
       },
     })
+    // console.log(res)
   } catch (err: unknown) {
     const message =
       err instanceof Error ? err.message : 'مشکلی در سرور پیش آمده.'
     return { errors: { _form: [message] } }
   }
   revalidatePath(path)
-  //   redirect(`/place-order`)
+  redirect(`/place-order`)
+}
+interface EditShippingAddressFormState {
+  success?: string
+  errors: {
+    name?: string[]
+    address1?: string[]
+    cityId?: string[]
+    provinceId?: string[]
+    zip_code?: string[]
+    _form?: string[]
+  }
+}
+
+export async function editShippingAddress(
+  data: unknown,
+  shippingAddressId: string,
+  path: string
+): Promise<EditShippingAddressFormState> {
+  const result = shippingAddressSchema.safeParse(data)
+
+  if (!result.success) {
+    console.error(result.error.flatten().fieldErrors)
+    return {
+      errors: result.error.flatten().fieldErrors,
+    }
+  }
+
+  if (!shippingAddressId) {
+    return {
+      errors: {
+        _form: ['آدرس مورد نظر در دسترس نیست!'],
+      },
+    }
+  }
+  try {
+    const cUser = await currentUser()
+    if (!cUser || !cUser.phoneNumber) {
+      return {
+        errors: {
+          _form: ['شما اجازه دسترسی ندارید!'],
+        },
+      }
+    }
+    const isExisting = await prisma.shippingAddress.findFirst({
+      where: {
+        id: shippingAddressId,
+      },
+    })
+    if (!isExisting) {
+      return {
+        errors: {
+          _form: ['آدرس مورد نظر در دسترس نیست!'],
+        },
+      }
+    }
+
+    const userAddress = await prisma.user.findFirst({
+      where: {
+        id: cUser.id,
+      },
+    })
+
+    if (cUser.id !== userAddress?.id) {
+      return {
+        errors: {
+          _form: ['شما اجازه دسترسی ندارید!'],
+        },
+      }
+    }
+    await prisma.user.findFirst({
+      where: {
+        id: cUser.id,
+      },
+      include: {
+        shippingAddresses: {
+          include: {
+            city: true,
+            province: true,
+          },
+        },
+      },
+    })
+    // console.log(user)
+    await prisma.shippingAddress.update({
+      where: { id: shippingAddressId },
+      data: {
+        name: result.data.name,
+        zip_code: result.data.zip_code,
+        cityId: +result.data.cityId,
+        provinceId: +result.data.provinceId,
+        address1: result.data.address1,
+        userId: cUser.id,
+        // phone: phone.toString(),
+        //  images: {
+        //    connect: imageIds.map((id) => ({
+        //      id: id,
+        //    })),
+        //  },
+      },
+    })
+    // console.log(res)
+  } catch (err: unknown) {
+    const message =
+      err instanceof Error ? err.message : 'مشکلی در سرور پیش آمده.'
+    return { errors: { _form: [message] } }
+  }
+  revalidatePath(path)
+  redirect(`/place-order`)
 }
