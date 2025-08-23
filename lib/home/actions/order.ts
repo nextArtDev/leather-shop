@@ -105,7 +105,7 @@ export async function updateOrderToPaidCOD(orderId: string) {
 
     revalidatePath(`/order/${orderId}`)
 
-    return { success: true, message: 'Order marked as paid' }
+    return { success: true, message: 'وضعیت سفارش به پرداخت شده تغییر کرد.' }
   } catch (error) {
     // return { success: false, message: formatError(error) }
     return { success: false, message: error }

@@ -47,9 +47,6 @@ const PlaceOrderPage = async () => {
   if (!cart || cart.cart?.items.length === 0) redirect('/cart')
   const shippingAddress = await getUserShippingAddressById(userId)
   if (!shippingAddress) redirect('/shipping-address')
-  //   if (!user.paymentMethod) redirect('/payment-method')
-
-  // console.log(shippingAddress)
   return (
     <section className="px-2">
       <CheckoutSteps current={2} />
