@@ -3,6 +3,7 @@
 import { currentUser } from '@/lib/auth'
 import { Cart, CartItem } from '@/lib/generated/prisma'
 import prisma from '@/lib/prisma'
+import { calculateComprehensiveShippingCost } from '@/lib/shipping-price'
 import { CartProductType } from '@/lib/types/home'
 import { revalidatePath } from 'next/cache'
 
@@ -481,25 +482,45 @@ export async function updateCartWithShipping(
 
     // Calculate shipping fees based on your business logic
     // This is where you'd implement your shipping calculation
-    let totalShippingFee = 0
-    const updatedItems = cart.cartItems.map((item) => {
-      // Calculate shipping for each item
-      const itemShippingFee = calculateShippingFee(item, shippingAddress)
-      totalShippingFee += itemShippingFee
-      return { ...item, shippingFee: itemShippingFee }
+    // let totalShippingFee = 0
+    const totalShippingFee = calculateComprehensiveShippingCost({
+      originProvince: 'خوزستان',
+      destinationProvince: shippingAddress.province.name,
+      destinationCity: shippingAddress.city.name,
+      // actualWeightInGrams:cart.cartItems.map(c=>c.weight),
+      actualWeightInGrams: cart.cartItems.reduce(
+        (acc, item) => acc + (item.weight ?? 1000),
+        0
+      ),
+      productValueInRials: cart.cartItems.reduce(
+        (acc, item) => acc + item.price,
+        0
+      ),
+      dimensions: { lengthCm: 50, widthCm: 50, heightCm: 50 },
+      includePickupService: true,
+      handlingFeeInRials: 500000,
     })
+    // const updatedItems = cart.cartItems.map((item) => {
+    //   // Calculate shipping for each item
+    //     // item,
+    //     // shippingAddress
+    //   )
+    //   totalShippingFee += itemShippingFee
+    //   return { ...item, shippingFee: itemShippingFee }
+    // })
 
     // Update cart with shipping information
     await prisma.cart.update({
       where: { id: cartId },
       data: {
-        total: cart.subTotal + totalShippingFee,
-        cartItems: {
-          updateMany: updatedItems.map((item) => ({
-            where: { id: item.id },
-            data: { shippingFee: item.shippingFee },
-          })),
-        },
+        total: cart.subTotal + totalShippingFee.finalCost,
+        shippingFees: totalShippingFee.finalCost,
+        // cartItems: {
+        //   updateMany: updatedItems.map((item) => ({
+        //     where: { id: item.id },
+        //     data: { shippingFee: item.shippingFee },
+        //   })),
+        // },
       },
     })
 
@@ -507,7 +528,7 @@ export async function updateCartWithShipping(
       success: true,
       message: 'هزینه ارسال محاسبه شد.',
       totalShippingFee,
-      total: cart.subTotal + totalShippingFee,
+      total: cart.subTotal + totalShippingFee.finalCost,
     }
   } catch (error) {
     console.error('Update shipping error:', error)
@@ -519,11 +540,11 @@ export async function updateCartWithShipping(
 }
 
 // Helper function to calculate shipping fee
-function calculateShippingFee(cartItem: any, shippingAddress: any): number {
-  // Implement your shipping calculation logic here
-  // This could be based on weight, location, item type, etc.
-  return 0 // Placeholder
-}
+// function calculateShippingFee(cartItem: any, shippingAddress: any): number {
+//   // Implement your shipping calculation logic here
+//   // This could be based on weight, location, item type, etc.
+//   return 0 // Placeholder
+// }
 
 export async function fetchCurrentPricesAndStock(sizeIds: string[]) {
   try {

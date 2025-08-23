@@ -41,7 +41,6 @@ import {
 } from '@/lib/home/actions/payment1'
 import { deliverOrder, updateOrderToPaidCOD } from '@/lib/home/actions/order'
 import { formatDateTime, formatId } from '@/lib/utils'
-import { useFormState } from 'react-dom'
 
 // Types
 interface ZarinpalResponse {
@@ -149,7 +148,7 @@ const OrderDetailsTable = ({ order, isAdmin }: OrderDetailsTableProps) => {
   // Debug logging
 
   // Payment action state
-  const [actionState, zarinpalPaymentAction, isPending] = useFormState(
+  const [actionState, zarinpalPaymentAction, isPending] = useActionState(
     zarinpalPayment.bind(null, pathname, id),
     {
       errors: {},
