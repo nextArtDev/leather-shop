@@ -33,6 +33,7 @@ import {
   createShippingAddress,
   editShippingAddress,
 } from '@/lib/home/actions/user'
+import { updateCartWithShipping } from '@/lib/home/actions/cart'
 
 const ShippingDetails = ({
   provinces,
@@ -89,6 +90,7 @@ const ShippingDetails = ({
         } else {
           const res = await createShippingAddress(data, phone, path)
           if (res?.errors) handleServerErrors(res.errors, form.setError)
+
           router.push('/place-order')
         }
       } catch (error) {

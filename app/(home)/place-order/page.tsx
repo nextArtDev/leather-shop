@@ -171,7 +171,7 @@ const PlaceOrderPage = async () => {
               </div> */}
               <div className="flex justify-between">
                 <div>هزینه ارسال</div>
-                {/* <div>{cart.shippingFees}</div> */}
+                <div>{cart.cart?.shippingFees}</div>
               </div>
               <div className="flex justify-between">
                 <div>مجموع</div>

@@ -27,11 +27,11 @@ const OrderDetailsPage = async ({
 
   if (!order) notFound()
 
-  console.log('Fetching order with ID:', productId)
-  console.log('Fetched order:', {
-    found: !!order,
-    id: order?.id,
-  })
+  // console.log('Fetching order with ID:', productId)
+  // console.log('Fetched order:', {
+  //   found: !!order,
+  //   id: order?.id,
+  // })
 
   // Determine if current user is admin
   const isAdmin = currentUser?.role === 'ADMIN' || false

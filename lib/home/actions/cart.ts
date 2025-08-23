@@ -3,7 +3,8 @@
 import { currentUser } from '@/lib/auth'
 import { Cart, CartItem } from '@/lib/generated/prisma'
 import prisma from '@/lib/prisma'
-import { calculateComprehensiveShippingCost } from '@/lib/shipping-price'
+import { calculateShippingCost } from '@/lib/shipping-price'
+
 import { CartProductType } from '@/lib/types/home'
 import { revalidatePath } from 'next/cache'
 
@@ -483,22 +484,22 @@ export async function updateCartWithShipping(
     // Calculate shipping fees based on your business logic
     // This is where you'd implement your shipping calculation
     // let totalShippingFee = 0
-    const totalShippingFee = calculateComprehensiveShippingCost({
-      originProvince: 'خوزستان',
-      destinationProvince: shippingAddress.province.name,
-      destinationCity: shippingAddress.city.name,
-      // actualWeightInGrams:cart.cartItems.map(c=>c.weight),
-      actualWeightInGrams: cart.cartItems.reduce(
-        (acc, item) => acc + (item.weight ?? 1000),
+    const totalShippingFee = calculateShippingCost({
+      origin: { province: 'خوزستان', city: 'دزفول' },
+      destination: {
+        province: shippingAddress.province.name,
+        city: shippingAddress.city.name,
+      },
+      weightGrams: cart.cartItems.reduce(
+        (acc, item) => acc + ((item.weight ?? 1000) * item.quantity || 2000),
         0
       ),
-      productValueInRials: cart.cartItems.reduce(
-        (acc, item) => acc + item.price,
-        0
-      ),
-      dimensions: { lengthCm: 50, widthCm: 50, heightCm: 50 },
-      includePickupService: true,
-      handlingFeeInRials: 500000,
+      valueRial:
+        cart.cartItems.reduce(
+          (acc, item) => acc + item.price * item.quantity,
+          0
+        ) * 10,
+      dimensions: { length: 50, width: 50, height: 50 },
     })
     // const updatedItems = cart.cartItems.map((item) => {
     //   // Calculate shipping for each item
@@ -513,8 +514,8 @@ export async function updateCartWithShipping(
     await prisma.cart.update({
       where: { id: cartId },
       data: {
-        total: cart.subTotal + totalShippingFee.finalCost,
-        shippingFees: totalShippingFee.finalCost,
+        total: cart.subTotal + totalShippingFee.total,
+        shippingFees: totalShippingFee.total,
         // cartItems: {
         //   updateMany: updatedItems.map((item) => ({
         //     where: { id: item.id },
@@ -528,7 +529,7 @@ export async function updateCartWithShipping(
       success: true,
       message: 'هزینه ارسال محاسبه شد.',
       totalShippingFee,
-      total: cart.subTotal + totalShippingFee.finalCost,
+      total: cart.subTotal + totalShippingFee.total / 10,
     }
   } catch (error) {
     console.error('Update shipping error:', error)
@@ -605,6 +606,7 @@ export interface DbCart {
   id: string
   userId: string
   subTotal: number
+  shippingFees: number
   total: number
   items: DbCartItem[]
   hasValidationIssues: boolean
@@ -767,6 +769,7 @@ export async function getValidatedCart(): Promise<CartValidationResult> {
       id: cart.id,
       userId: cart.userId,
       subTotal: cart.subTotal,
+      shippingFees: cart.shippingFees,
       total: cart.total,
       items: validatedItems,
       hasValidationIssues,

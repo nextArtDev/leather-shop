@@ -9,6 +9,8 @@ export async function getOrderById(orderId: string) {
         id: orderId,
       },
       include: {
+        paymentDetails: true,
+
         items: true,
         shippingAddress: {
           include: {

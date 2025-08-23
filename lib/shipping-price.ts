@@ -1,41 +1,17 @@
-// --- Data Structures based on Iran's Geography ---
+type CityInfo = {
+  province: string
+  city: string
+}
 
-// A simple list of provinces in Persian
-const provinces: string[] = [
-  'آذربایجان شرقی',
-  'آذربایجان غربی',
-  'اردبیل',
-  'اصفهان',
-  'البرز',
-  'ایلام',
-  'بوشهر',
-  'تهران',
-  'چهارمحال و بختیاری',
-  'خراسان جنوبی',
-  'خراسان رضوی',
-  'خراسان شمالی',
-  'خوزستان',
-  'زنجان',
-  'سمنان',
-  'سیستان و بلوچستان',
-  'فارس',
-  'قزوین',
-  'قم',
-  'کردستان',
-  'کرمان',
-  'کرمانشاه',
-  'کهگیلویه و بویراحمد',
-  'گلستان',
-  'گیلان',
-  'لرستان',
-  'مازندران',
-  'مرکزی',
-  'هرمزگان',
-  'همدان',
-  'یزد',
-]
+type ShippingInput = {
+  origin: CityInfo
+  destination: CityInfo
+  weightGrams: number
+  valueRial: number
+  dimensions?: { length: number; width: number; height: number } // cm
+  packaging?: number
+}
 
-// Adjacency list for provinces to determine shipping category
 const provinceAdjacency: Record<string, string[]> = {
   'آذربایجان شرقی': ['آذربایجان غربی', 'اردبیل', 'زنجان'],
   'آذربایجان غربی': ['آذربایجان شرقی', 'کردستان', 'زنجان'],
@@ -125,241 +101,97 @@ const provinceAdjacency: Record<string, string[]> = {
   یزد: ['سمنان', 'خراسان رضوی', 'خراسان جنوبی', 'کرمان', 'فارس', 'اصفهان'],
 }
 
-// List of metropolitan cities for surcharge calculation (excluding Tehran/Karaj which have a separate rule)
-const metropolitanCities: Record<
-  string,
-  { isCapital: boolean; type: 'tehran_alborz' | 'metro' }
-> = {
-  تهران: { isCapital: true, type: 'tehran_alborz' },
-  کرج: { isCapital: true, type: 'tehran_alborz' },
-  مشهد: { isCapital: true, type: 'metro' },
-  اصفهان: { isCapital: true, type: 'metro' },
-  تبریز: { isCapital: true, type: 'metro' },
-  شیراز: { isCapital: true, type: 'metro' },
-  اهواز: { isCapital: true, type: 'metro' },
-  قم: { isCapital: true, type: 'metro' },
-}
-type GeographicCategory =
-  | 'درون استانی'
-  | 'برون استانی همجوار'
-  | 'برون استانی غیر همجوار'
-
-interface PackageDimensions {
-  lengthCm: number
-  widthCm: number
-  heightCm: number
-}
-
-interface ShippingArgs {
-  originProvince: string
-  destinationProvince: string
-  destinationCity: string
-  actualWeightInGrams: number
-  productValueInRials: number
-  dimensions: PackageDimensions
-  includePickupService?: boolean // Optional: whether to add pickup fee
-  handlingFeeInRials?: number // Optional: your fixed handling fee
-}
-
-interface CostBreakdown {
-  chargeableWeightInGrams: number
-  baseRate: number
-  insuranceFee: number
-  metropolitanSurcharge: number
-  nonStandardDimensionSurcharge: number
-  pickupFee: number
-  handlingFee: number
-  finalCost: number
-  notes: string[]
-}
-
-// --- Main Calculation Function (Final Version) ---
-
-export function calculateComprehensiveShippingCost(
-  args: ShippingArgs
-): CostBreakdown {
+export function calculateShippingCost(input: ShippingInput): {
+  base: number
+  insurance: number
+  packaging: number
+  oversize: number
+  total: number
+} {
   const {
-    originProvince,
-    destinationProvince,
-    destinationCity,
-    actualWeightInGrams,
-    productValueInRials,
+    origin,
+    destination,
+    weightGrams,
+    valueRial,
     dimensions,
-    includePickupService = false,
-    handlingFeeInRials = 0,
-  } = args
-
-  const notes: string[] = []
-
-  // ;[cite_start] // 1. Determine Chargeable Weight (Actual vs. Volumetric) [cite: 136]
-  const volumetricWeightInGrams =
-    ((dimensions.lengthCm * dimensions.widthCm * dimensions.heightCm) / 6000) *
-    1000
-  const chargeableWeightInGrams = Math.max(
-    actualWeightInGrams,
-    volumetricWeightInGrams
-  )
-  if (volumetricWeightInGrams > actualWeightInGrams) {
-    notes.push(
-      `وزن حجمی (${Math.round(
-        volumetricWeightInGrams / 1000
-      )}kg) بیشتر از وزن واقعی بود و ملاک محاسبه قرار گرفت.`
-    )
-  }
-
-  // 2. Determine Geographic Category
-  let category: GeographicCategory
-  if (originProvince === destinationProvince) {
-    category = 'درون استانی'
-  } else if (provinceAdjacency[originProvince]?.includes(destinationProvince)) {
-    category = 'برون استانی همجوار'
-  } else {
-    category = 'برون استانی غیر همجوار'
-  }
-
-  // ;[cite_start] // 3. Calculate Base Rate for Pish-taz Service [cite: 127]
-  let baseRate = 0
-  const chargeableWeightInKg = Math.ceil(chargeableWeightInGrams / 1000)
-
-  if (chargeableWeightInGrams <= 500) {
-    const rates = {
-      'درون استانی': 215000,
-      'برون استانی همجوار': 265000,
-      'برون استانی غیر همجوار': 375000,
-    }
-    baseRate = rates[category]
-  } else if (chargeableWeightInGrams <= 1000) {
-    const rates = {
-      'درون استانی': 280000,
-      'برون استانی همجوار': 400000,
-      'برون استانی غیر همجوار': 457500,
-    }
-    baseRate = rates[category]
-  } else {
-    baseRate = {
-      'درون استانی': 280000,
-      'برون استانی همجوار': 400000,
-      'برون استانی غیر همجوار': 457500,
-    }[category]
-    const additionalKgRates = {
-      'درون استانی': 85000,
-      'برون استانی همجوار': 90000,
-      'برون استانی غیر همجوار': 105400,
-    }
-    const additionalKgs = chargeableWeightInKg - 1
-    baseRate += additionalKgs * additionalKgRates[category]
-  }
-
-  // 4. Calculate Surcharges based on the Base Rate
-  // 4a. [cite_start]Metropolitan Surcharge [cite: 159]
-  let metropolitanSurcharge = 0
-  const destCityInfo = metropolitanCities[destinationCity]
-  const destProvince =
-    destinationProvince === 'البرز' ? 'کرج' : destinationProvince // Handle Alborz
-
-  if (destCityInfo?.type === 'tehran_alborz' || destProvince === 'تهران') {
-    metropolitanSurcharge = baseRate * 0.2
-  } else if (destCityInfo?.type === 'metro') {
-    metropolitanSurcharge = baseRate * 0.15
-  }
-
-  // 4b. [cite_start]Non-Standard Dimension Surcharge [cite: 134]
-  let nonStandardDimensionSurcharge = 0
-  const standardLength = 35,
-    standardWidth = 25,
-    standardHeight = 18
-  if (
-    dimensions.lengthCm > standardLength ||
-    dimensions.widthCm > standardWidth ||
-    dimensions.heightCm > standardHeight
+    packaging = 100000,
+  } = input
+  //   console.log({
+  //     origin,
+  //     destination,
+  //     weightGrams,
+  //     valueRial,
+  //     dimensions,
+  //     packaging,
+  //   })
+  // تعیین نوع مسیر
+  let region: 'intra' | 'neighbor' | 'nonNeighbor'
+  if (origin.province === destination.province) {
+    region = 'intra'
+  } else if (
+    provinceAdjacency[origin.province]?.includes(destination.province)
   ) {
-    // A simple implementation: assume 100% surcharge for any dimension exceeding standard.
-    // For a more precise rule, the volume ratio needs to be calculated.
-    nonStandardDimensionSurcharge = baseRate * 1.0 // 100% surcharge
-    notes.push(`بسته شامل جریمه ابعاد غیر استاندارد (۱۰۰٪ هزینه پایه) شد.`)
+    region = 'neighbor'
+  } else {
+    region = 'nonNeighbor'
   }
 
-  // 5. Calculate other Fees
-  // 5a. [cite_start]Insurance Fee [cite: 140]
-  let insuranceFee = 0
-  if (productValueInRials > 0 && productValueInRials <= 300000000) {
-    insuranceFee = productValueInRials * 0.002
-  } else if (productValueInRials > 300000000) {
-    // Add logic for higher value items based on the tariff if needed
-    insuranceFee = productValueInRials * 0.0025 // Example for 300-500M bracket
+  const weightKg = weightGrams / 1000
+
+  // نرخ‌های پست پیشتاز (ریال)
+  const pishtazRates = {
+    intra: { halfKg: 215000, oneKg: 280000, extraKg: 105400 },
+    neighbor: { halfKg: 265000, oneKg: 400000, extraKg: 90000 },
+    nonNeighbor: { halfKg: 375000, oneKg: 457500, extraKg: 85000 },
   }
 
-  // 5b. [cite_start]Pickup Fee [cite: 134]
-  let pickupFee = 0
-  if (includePickupService) {
-    // Assuming origin is a metropolitan city for this example
-    pickupFee = 165000
+  let base = 0
+  if (weightKg <= 0.5) base = pishtazRates[region].halfKg
+  else if (weightKg <= 1) base = pishtazRates[region].oneKg
+  else
+    base =
+      pishtazRates[region].oneKg +
+      Math.ceil(weightKg - 1) * pishtazRates[region].extraKg
+
+  // بیمه اجباری (۰.۴٪ ارزش کالا، سقف ۵۰ میلیون ریال)
+  const maxCovered = 50_000_000
+  const insuredValue = Math.min(valueRial, maxCovered)
+  const insurance = Math.ceil((insuredValue * 0.004) / 1000) * 1000
+
+  // اضافه هزینه ابعاد غیر استاندارد (+۲۵٪ پایه)
+  let oversize = 0
+  if (dimensions) {
+    const { length, width, height } = dimensions
+    if (length > 35 || width > 25 || height > 18) {
+      oversize = Math.ceil(base * 0.25)
+    }
   }
 
-  // 6. Final Calculation
-  const finalCost =
-    baseRate +
-    insuranceFee +
-    metropolitanSurcharge +
-    nonStandardDimensionSurcharge +
-    pickupFee +
-    handlingFeeInRials
+  // هزینه بسته‌بندی ثابت فروشگاه
+  //   const packaging = 30000
+
+  const totalRial = base + insurance + oversize + packaging
+
+  const toTomanRounded = (rial: number) => Math.round(rial / 10000) * 1000
 
   return {
-    chargeableWeightInGrams: Math.round(chargeableWeightInGrams),
-    baseRate: Math.ceil(baseRate),
-    insuranceFee: Math.ceil(insuranceFee),
-    metropolitanSurcharge: Math.ceil(metropolitanSurcharge),
-    nonStandardDimensionSurcharge: Math.ceil(nonStandardDimensionSurcharge),
-    pickupFee: Math.ceil(pickupFee),
-    handlingFee: Math.ceil(handlingFeeInRials),
-    finalCost: Math.ceil(finalCost),
-    notes: notes,
+    base: toTomanRounded(base),
+    insurance: toTomanRounded(insurance),
+    packaging: toTomanRounded(packaging),
+    oversize: toTomanRounded(oversize),
+    total: toTomanRounded(totalRial),
   }
 }
 
-// --- Example Usage ---
+// مثال: تهران → دزفول
+// const result = calculateShippingCost({
+//   origin: { province: 'تهران', city: 'تهران' },
+//   destination: { province: 'اصفهان', city: 'اصفهان' },
+//   weightGrams: 100,
+//   valueRial: 2_000_000, // ۲ میلیون تومان = ۲۰,۰۰۰,۰۰۰ ریال
+//   dimensions: { length: 12, width: 8, height: 2 }, // استاندارد
+// })
 
-const myOrder = {
-  originProvince: 'تهران',
-  destinationProvince: 'فارس',
-  destinationCity: 'شیراز',
-  actualWeightInGrams: 1500, // 1.5 kg
-  productValueInRials: 30000000, // 3 million Toman
-  dimensions: {
-    lengthCm: 40, // Non-standard length
-    widthCm: 30, // Non-standard width
-    heightCm: 20, // Non-standard height
-  },
-  includePickupService: true, // We want the post to pick it up from us
-  handlingFeeInRials: 70000, // Our fixed handling fee is 7,000 Toman
-}
-
-const finalPriceDetails = calculateComprehensiveShippingCost(myOrder)
-
-console.log('--- جزئیات هزینه ارسال ---')
-console.log(`وزن محاسباتی: ${finalPriceDetails.chargeableWeightInGrams} گرم`)
-console.log(
-  `هزینه پایه پست (پیشتاز): ${finalPriceDetails.baseRate.toLocaleString()} ریال`
-)
-console.log(
-  `هزینه بیمه (۰.۲٪): ${finalPriceDetails.insuranceFee.toLocaleString()} ریال`
-)
-console.log(
-  `اضافه نرخ کلان‌شهر (شیراز): ${finalPriceDetails.metropolitanSurcharge.toLocaleString()} ریال`
-)
-console.log(
-  `جریمه ابعاد غیر استاندارد: ${finalPriceDetails.nonStandardDimensionSurcharge.toLocaleString()} ریال`
-)
-console.log(
-  `هزینه جمع‌آوری از محل: ${finalPriceDetails.pickupFee.toLocaleString()} ریال`
-)
-console.log(
-  `هزینه پردازش و بسته‌بندی شما: ${finalPriceDetails.handlingFee.toLocaleString()} ریال`
-)
-console.log('---------------------------------')
-console.log(
-  `هزینه نهایی برای مشتری: ${finalPriceDetails.finalCost.toLocaleString()} ریال`
-)
-console.log('\nیادداشت‌ها:')
-finalPriceDetails.notes.forEach((note) => console.log(`- ${note}`))
+// console.log(result)
+// خروجی نمونه:
+// { base: 375000, insurance: 200000, packaging: 30000, oversize: 0, total: 605000 }

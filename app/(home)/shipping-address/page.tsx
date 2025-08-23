@@ -12,6 +12,7 @@ import { getMyCart, getUserById } from '@/lib/home/queries/user'
 import CheckoutSteps from './components/checkout-steps'
 
 import prisma from '@/lib/prisma'
+import { updateCartWithShipping } from '@/lib/home/actions/cart'
 const page = async () => {
   //خوزستان ->18
   // const provinces = await getProvinces()
@@ -36,6 +37,17 @@ const page = async () => {
       user: true,
     },
   })
+  // if (
+  //   shippingAddress?.id &&
+  //   shippingAddress?.provinceId &&
+  //   shippingAddress.cityId
+  // ) {
+  //   const shippingFee = await updateCartWithShipping(
+  //     cart.id,
+  //     shippingAddress.id
+  //   )
+  //   console.log(shippingFee)
+  // }
   // const provinces = getProvinces()
   // console.log(user)
   return (

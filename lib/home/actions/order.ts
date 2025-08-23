@@ -84,7 +84,7 @@ export async function createOrder() {
         orderStatus: 'Pending',
         paymentStatus: 'Pending',
         subTotal: cart.cart.subTotal, // Will calculate below
-        shippingFees: 0, // Will calculate below
+        shippingFees: cart.cart.shippingFees, // Will calculate below
         total: cart.cart.total, // Will calculate below
       },
     })
@@ -122,7 +122,7 @@ export async function createOrder() {
       //   console.log({ res })
       return order.id
     })
-    console.log({ insertedOrderId })
+    // console.log({ insertedOrderId })
 
     if (!insertedOrderId) throw new Error('Order not created')
 

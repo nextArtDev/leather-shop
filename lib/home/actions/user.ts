@@ -5,6 +5,7 @@ import prisma from '@/lib/prisma'
 import { shippingAddressSchema } from '../schemas'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { updateCartWithShipping } from './cart'
 
 interface CreateShippingAddressFormState {
   success?: string
@@ -87,6 +88,11 @@ export async function createShippingAddress(
         user: {
           select: {
             name: true,
+            cart: {
+              select: {
+                id: true,
+              },
+            },
           },
         },
       },
@@ -103,6 +109,12 @@ export async function createShippingAddress(
         name: result.data.name,
       },
     })
+    const shippingFee = await updateCartWithShipping(
+      shippingAddress.user.cart?.id as string,
+      shippingAddress.id
+    )
+    console.log({ shippingFee })
+    // updateCartWithShipping(cart)
   } catch (err: unknown) {
     const message =
       err instanceof Error ? err.message : 'مشکلی در سرور پیش آمده.'
@@ -223,10 +235,20 @@ export async function editShippingAddress(
         user: {
           select: {
             name: true,
+            cart: {
+              select: {
+                id: true,
+              },
+            },
           },
         },
       },
     })
+    const shippingFee = await updateCartWithShipping(
+      shippingAddress.user.cart?.id as string,
+      shippingAddress.id
+    )
+    console.log({ shippingFee })
     const AddressToSaveForUser = `${shippingAddress?.province.name}-${shippingAddress?.city.name} | ${shippingAddress.address1} - ${shippingAddress.zip_code}`
 
     await prisma.user.update({
