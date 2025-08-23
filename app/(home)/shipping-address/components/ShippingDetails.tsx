@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useTransition } from 'react'
+import { useTransition } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -18,9 +17,6 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import provincesData from '@/constants/cities.json'
-
-// import { updateUserAddress } from '@/app/(home)/lib/actions/user.action'
 import { toast } from 'sonner'
 
 import { ArrowLeft, Loader } from 'lucide-react'
@@ -33,7 +29,6 @@ import {
   createShippingAddress,
   editShippingAddress,
 } from '@/lib/home/actions/user'
-import { updateCartWithShipping } from '@/lib/home/actions/cart'
 
 const ShippingDetails = ({
   provinces,
@@ -50,11 +45,6 @@ const ShippingDetails = ({
     }
   > | null
 }) => {
-  // console.log(initialData)
-  // const [provinceName, setProvinceName] = useState<string>(
-  //   initialData?.provinceId || ''
-  // )
-  // const [cityName, setCityName] = useState<string>(initialData?.cityId || '')
   const path = usePathname()
   const router = useRouter()
 
@@ -65,17 +55,9 @@ const ShippingDetails = ({
     defaultValues: {
       name: initialData?.name,
       address1: initialData?.address1 || '',
-      // address2: initialData?.address2 || '',
-      // countryId: initialData?.countryId,
-      // phone: initialData?.phone,
       cityId: Number(initialData?.cityId) || 0,
       provinceId: Number(initialData?.provinceId) || 0,
-      // state: initialData?.state,
       zip_code: initialData?.zip_code,
-      // default: typeof initialData?.default === 'boolean' ? initialData.default : false,
-      // default: initialData?.default ||false ||undefined,
-      //   lat: 0.0,
-      //   lng: 0.0,
     },
   })
 
@@ -101,30 +83,24 @@ const ShippingDetails = ({
       }
     })
   }
-  //   startTransition(async () => {
-  //     // const res = await updateUserAddress(data)
-  //     // if (!res.success) {
-  //     //   toast.error(res.message)
-  //     //   return
-  //     // }
-  //     // router.push('/place-order')
-  //   })
-  // }
-  // useEffect(() => {
-  //   form.watch('location')
-  // }, [form])
 
-  // console.log(phone)
   return (
     <section
       aria-labelledby="payment-and-shipping-heading"
-      className="space-y-6  py-16 lg:col-start-1 lg:row-start-1 lg:mx-auto lg:w-full lg:max-w-lg lg:pt-0 lg:pb-24"
+      className="space-y-6 px-2 py-16 lg:col-start-1 lg:row-start-1 lg:mx-auto lg:w-full lg:max-w-lg lg:pt-0 lg:pb-24"
     >
       <h2 id="payment-and-shipping-heading" className="sr-only">
         Payment and shipping details
       </h2>
 
-      <Input dir="ltr" disabled className="text-right max-w-sm" value={phone} />
+      <div className=" max-w-md items-center justify-center mx-auto">
+        <Input
+          dir="ltr"
+          disabled
+          className="text-right max-w-sm text-indigo-800  bg-indigo-400"
+          value={phone}
+        />
+      </div>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -141,7 +117,7 @@ const ShippingDetails = ({
               <FormItem>
                 <FormLabel>نام و نام‌خانوادگی گیرنده</FormLabel>
                 <FormControl>
-                  <Input placeholder="و  نام و نام‌خانوادگی" {...field} />
+                  <Input placeholder="نام و نام‌خانوادگی" {...field} />
                 </FormControl>
 
                 <FormMessage />
@@ -152,23 +128,7 @@ const ShippingDetails = ({
           <div className="flex flex-col space-y-6">
             <FormLabel>انتخاب استان و شهر</FormLabel>
 
-            <ProvinceCity
-              provinces={provinces}
-              // initialData={{
-              //   city: initialData?.city,
-              //   province: initialData?.province,
-              // }}
-              // initialProvince={
-              //   initialData?.provinceId
-              //     ? initialData?.provinceId.toString()
-              //     : ''
-              // }
-              // initialCity={
-              //   initialData?.cityId ? initialData?.cityId.toString() : ''
-              // }
-            />
-
-            {/* <FormMessage /> */}
+            <ProvinceCity provinces={provinces} />
           </div>
 
           <div className="!mt-3 flex flex-col gap-3">
@@ -179,32 +139,15 @@ const ShippingDetails = ({
               render={({ field }) => (
                 <FormItem className="flex-1">
                   <FormControl>
-                    <Input placeholder="خیابان، کوچه، محله..." {...field} />
+                    <Textarea placeholder="خیابان، کوچه، محله..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            {/* <FormField
-                disabled={isLoading}
-                control={form.control}
-                name="address2"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormControl>
-                      <Input
-                        placeholder="Apt, suite, unit, etc (optional）"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              /> */}
           </div>
 
           <FormField
-            // disabled={isLoading}
             control={form.control}
             name="zip_code"
             render={({ field }) => (

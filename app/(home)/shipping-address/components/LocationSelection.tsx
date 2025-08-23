@@ -45,36 +45,35 @@ const ProvinceCity: FC<ProvinceCityProps> = ({
   // })
 
   // Use queries with proper dependencies
-  const [{ data: cities, isPending: isPendingProvince }, { data: city }] =
-    useQueries({
-      queries: [
-        {
-          queryKey: ['cityByProvince', currentProvinceId],
-          queryFn: () => {
-            return currentProvinceId && currentProvinceId > 0
-              ? getCityByProvinceId(currentProvinceId)
-              : Promise.resolve([])
-          },
-          enabled: !!(currentProvinceId && currentProvinceId > 0),
-          staleTime: 5 * 60 * 1000,
+  const [{ data: cities, isPending: isPendingProvince }] = useQueries({
+    queries: [
+      {
+        queryKey: ['cityByProvince', currentProvinceId],
+        queryFn: () => {
+          return currentProvinceId && currentProvinceId > 0
+            ? getCityByProvinceId(currentProvinceId)
+            : Promise.resolve([])
         },
-        {
-          queryKey: ['cityById', currentCityId],
-          queryFn: () => {
-            return currentCityId && currentCityId > 0
-              ? getCityById(currentCityId)
-              : Promise.resolve(null)
-          },
-          enabled: !!(
-            currentCityId &&
-            currentCityId > 0 &&
-            currentProvinceId &&
-            currentProvinceId > 0
-          ),
-          staleTime: 5 * 60 * 1000,
+        enabled: !!(currentProvinceId && currentProvinceId > 0),
+        staleTime: 5 * 60 * 1000,
+      },
+      {
+        queryKey: ['cityById', currentCityId],
+        queryFn: () => {
+          return currentCityId && currentCityId > 0
+            ? getCityById(currentCityId)
+            : Promise.resolve(null)
         },
-      ],
-    })
+        enabled: !!(
+          currentCityId &&
+          currentCityId > 0 &&
+          currentProvinceId &&
+          currentProvinceId > 0
+        ),
+        staleTime: 5 * 60 * 1000,
+      },
+    ],
+  })
 
   // Handle province change
   const handleProvinceChange = (value: string) => {

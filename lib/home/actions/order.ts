@@ -1,6 +1,5 @@
 'use server'
 
-import { auth } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { isRedirectError } from 'next/dist/client/components/redirect-error'
 import { getValidatedCart } from './cart'
@@ -43,39 +42,6 @@ export async function createOrder() {
         redirectTo: '/shipping-address',
       }
     }
-    // if (!user.paymentMethod) {
-    //   return {
-    //     success: false,
-    //     message: 'No payment method',
-    //     redirectTo: '/payment-method',
-    //   }
-    // }
-
-    // Create order object
-    // const order = insertOrderSchema.parse({
-    //   userId: user.id,
-    //   shippingAddress: user.address1,
-    //   itemsPrice: cart.subTotal,
-    //   shippingPrice: cart.shippingFees,
-    //   //   taxPrice: cart.taxPrice,
-    //   totalPrice: cart.total,
-    // })
-
-    // <----- IMPORTANT ---->
-
-    //  let shippingFee = 0
-    //  const { shippingFeeMethod } = product
-    //  if (shippingFeeMethod === 'ITEM') {
-    //    shippingFee =
-    //      quantity === 1
-    //        ? details.shippingFee
-    //        : details.shippingFee + details.extraShippingFee * (quantity - 1)
-    //  } else if (shippingFeeMethod === 'WEIGHT') {
-    //    shippingFee = details.shippingFee * variant.weight * quantity
-    //  } else if (shippingFeeMethod === 'FIXED') {
-    //    shippingFee = details.shippingFee
-    //  }
-    // <----- IMPORTANT ---->
 
     const order = await prisma.order.create({
       data: {
@@ -89,13 +55,9 @@ export async function createOrder() {
       },
     })
 
-    // Create a transaction to create order and order items in database
     const insertedOrderId = await prisma.$transaction(async (tx) => {
-      // Create order
-      //   const insertedOrder = await tx.order.create({ data: order })
-      // Create order items from the cart items
       for (const item of cart?.cart?.items ?? []) {
-        const orders = await tx.orderItem.create({
+        await tx.orderItem.create({
           data: {
             productId: item.productId,
             sizeId: item.sizeId,

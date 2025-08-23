@@ -762,6 +762,7 @@ export async function getValidatedCart(): Promise<CartValidationResult> {
         maxAvailableQuantity,
       })
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       recalculatedSubTotal += validatedTotalPrice
     }
 

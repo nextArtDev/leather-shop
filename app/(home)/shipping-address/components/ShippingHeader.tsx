@@ -2,9 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
-type Props = {}
-
-const ShippingHeader = (props: Props) => {
+const ShippingHeader = () => {
   return (
     <div>
       <header className="relative mx-auto max-w-7xl bg-indigo-900 py-6 lg:grid lg:grid-cols-2 lg:gap-x-16 lg:bg-transparent lg:px-8 lg:pt-16 lg:pb-10">

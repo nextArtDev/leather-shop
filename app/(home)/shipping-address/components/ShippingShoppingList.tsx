@@ -1,9 +1,6 @@
-import AddToCardBtn from '@/components/product/product-detail/AddToCardBtn'
-import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
 import { CartItem } from '@/lib/generated/prisma'
-import { CartProductType } from '@/lib/types/home'
 import { cn } from '@/lib/utils'
-import { CheckIcon, ClockIcon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
@@ -31,34 +28,34 @@ const ShippingShoppingList = ({ cartItems }: Props) => {
           </div>
 
           <div className="relative mr-4 flex flex-1 flex-col justify-between sm:mr-6">
-            <div className="">
-              <div className="flex justify-between sm:grid sm:grid-cols-2">
-                <div className="pl-6">
-                  <Link
-                    href={`/product/${item.productSlug}`}
-                    className="font-medium line-clamp-1  hover:underline"
-                  >
-                    <h3 className="text-sm">{item.name}</h3>
-                  </Link>
-                  {/* <p className="mt-1 text-sm ">{product.color}</p> */}
-                  {item.size ? (
-                    <p className="mt-1 text-sm ">{item.size}</p>
-                  ) : null}
-                </div>
+            <div className="flex justify-between sm:grid sm:grid-cols-2">
+              <div className="pl-6">
+                <Link
+                  href={`/products/${item.productSlug}`}
+                  className="font-medium line-clamp-1  hover:underline"
+                >
+                  <h3 className="text-sm">
+                    {item.name} | {item.quantity ? item.quantity : null} عدد
+                  </h3>
+                </Link>
+                {/* <p className="mt-1 text-sm ">{product.color}</p> */}
+                {item.size ? (
+                  <p className="mt-1 text-sm ">{item.size}</p>
+                ) : null}
+                {item.price ? (
+                  <p className="mt-1 text-sm ">{item.price} تومان</p>
+                ) : null}
               </div>
-
+            </div>
+            <Separator />
+            <div className={cn('mt-4 flex items-center font-semibold gap-1 ')}>
+              <p className="font-semibold">مجموع:</p>
               <div
                 className={cn(
-                  'mt-4 flex items-center sm:absolute sm:top-0 sm:left-1/2 sm:mt-0 sm:block'
+                  'inline-grid w-full max-w-32 lg:mr-44  grid-cols-1'
                 )}
               >
-                <div
-                  className={cn(
-                    'inline-grid w-full max-w-32 lg:mr-44  grid-cols-1'
-                  )}
-                >
-                  {+item.price * item.quantity}
-                </div>
+                <p>{+item.price * item.quantity} تومان</p>
               </div>
             </div>
           </div>

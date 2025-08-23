@@ -109,11 +109,11 @@ export async function createShippingAddress(
         name: result.data.name,
       },
     })
-    const shippingFee = await updateCartWithShipping(
+    await updateCartWithShipping(
       shippingAddress.user.cart?.id as string,
       shippingAddress.id
     )
-    console.log({ shippingFee })
+    // console.log({ shippingFee })
     // updateCartWithShipping(cart)
   } catch (err: unknown) {
     const message =
@@ -244,11 +244,11 @@ export async function editShippingAddress(
         },
       },
     })
-    const shippingFee = await updateCartWithShipping(
+    await updateCartWithShipping(
       shippingAddress.user.cart?.id as string,
       shippingAddress.id
     )
-    console.log({ shippingFee })
+    // console.log({ shippingFee })
     const AddressToSaveForUser = `${shippingAddress?.province.name}-${shippingAddress?.city.name} | ${shippingAddress.address1} - ${shippingAddress.zip_code}`
 
     await prisma.user.update({

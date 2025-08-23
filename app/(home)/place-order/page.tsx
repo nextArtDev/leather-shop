@@ -1,8 +1,5 @@
-import { Metadata } from 'next'
-import { redirect } from 'next/navigation'
-import { Card, CardContent } from '@/components/ui/card'
-import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -11,44 +8,35 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Metadata } from 'next'
 import Image from 'next/image'
+import Link from 'next/link'
+import { redirect } from 'next/navigation'
 // import { formatCurrency } from '@/lib/utils'
 // import { getMyCart } from '../../lib/actions/cart.action'
 // import { getUserById } from '../../lib/actions/user.action'
 // import { ShippingAddress } from '../../types'
 // import CheckoutSteps from '../../components/checkout-steps'
-import PlaceOrderForm from './components/place-order-form'
-import {
-  getMyCart,
-  getUserById,
-  getUserShippingAddressById,
-} from '@/lib/home/queries/user'
-import { currentUser } from '@/lib/auth'
-import CheckoutSteps from '../shipping-address/components/checkout-steps'
-import { City, Province, ShippingAddress } from '@/lib/generated/prisma'
-import { getCartForCheckout, getValidatedCart } from '@/lib/home/actions/cart'
-import { toast } from 'sonner'
-import { Dialog } from '@/components/ui/dialog'
-import { DialogContent } from '@radix-ui/react-dialog'
 import {
   AlertDialog,
   AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
+import { currentUser } from '@/lib/auth'
+import { getValidatedCart } from '@/lib/home/actions/cart'
+import { getUserShippingAddressById } from '@/lib/home/queries/user'
+import CheckoutSteps from '../shipping-address/components/checkout-steps'
+import PlaceOrderForm from './components/place-order-form'
 
 export const metadata: Metadata = {
-  title: 'Place Order',
+  title: 'سفارش',
 }
 
 const PlaceOrderPage = async () => {
-  // if (cart.cart?.validationErrors)
-  //   return toast(cart.cart?.validationErrors.map((er) => er.issue).join(' '))
   const cUser = await currentUser()
   const userId = cUser?.id
 
@@ -106,18 +94,6 @@ const PlaceOrderPage = async () => {
               </div>
             </CardContent>
           </Card>
-
-          {/* <Card>
-            <CardContent className="p-4 gap-4">
-              <h2 className="text-xl pb-4">Payment Method</h2>
-              <p>{user.paymentMethod}</p>
-              <div className="mt-3">
-                <Link href="/payment-method">
-                  <Button variant="outline">Edit</Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card> */}
 
           <Card>
             <CardContent className="p-4 gap-4 ">

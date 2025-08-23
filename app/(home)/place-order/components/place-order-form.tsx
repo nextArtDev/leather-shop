@@ -2,50 +2,31 @@
 import { useRouter } from 'next/navigation'
 import { Check, Loader } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useFormStatus } from 'react-dom'
-// import { createOrder } from '@/app/(home)/lib/actions/order.action'
 
 import { useTransition } from 'react'
 import { useCartStore } from '@/hooks/useCartStore_'
 import { createOrder } from '@/lib/home/actions/order'
+import { toast } from 'sonner'
 
 const PlaceOrderForm = () => {
   const emptyCart = useCartStore((state) => state.emptyCart)
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
-
-  // const emptyCart = useCartStore((state) => state.emptyCart)
-  // const router = useRouter()
-
-  // const handleSubmit = async (event: React.FormEvent) => {
-  //   event.preventDefault()
-
-  //   const res = await createOrder()
-  //   // console.log({ res })
-  //   if (res.redirectTo) {
-  //     emptyCart() // useCartStore.getState().emptyCart()
-  //     router.push(res.redirectTo)
-  //   }
-  // }
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
 
     startTransition(async () => {
       try {
-        // Empty cart immediately to prevent UI issues
-
-        // Create order - this will redirect on success
         const res = await createOrder()
         emptyCart()
-        console.log({ res })
+        // console.log({ res })
 
         if (res?.redirectTo) {
           router.push(res.redirectTo)
         }
-      } catch (error) {
-        console.error('Order creation failed:', error)
-        // Restore cart if order creation fails
-        // You might want to restore cart items here
+      } catch (error: unknown) {
+        // console.error('Order creation failed:', error)
+        toast.error(error as string)
       }
     })
   }
