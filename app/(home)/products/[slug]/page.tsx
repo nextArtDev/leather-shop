@@ -17,8 +17,8 @@ const ProductDetailsPage = async ({
     // rating: string
   }>
 }) => {
-  const page = Number((await searchParams).page) || 1
-  const pageSize = 4
+  // const page = Number((await searchParams).page) || 1
+  // const pageSize = 4
 
   const slug = (await params).slug
   const searchParamsSizeId = (await searchParams).sizeId

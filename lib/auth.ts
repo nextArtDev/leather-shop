@@ -40,8 +40,8 @@ export const auth = betterAuth({
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       callbackOnVerification: async ({ phoneNumber, user }, request) => {
         // Implement callback after phone number verification
-        console.log({ phoneNumber })
-        console.log({ user })
+        // console.log({ phoneNumber })
+        // console.log({ user })
       },
     }),
     nextCookies(),

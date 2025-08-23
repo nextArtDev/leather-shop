@@ -33,7 +33,7 @@ export async function getOrderById(orderId: string) {
 
     return data
   } catch (error) {
-    console.log(error)
+    console.error(error)
     // unstable_noStore not available, continue without it
   }
 }

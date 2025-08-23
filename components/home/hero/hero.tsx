@@ -2,6 +2,7 @@ import React from 'react'
 import { Bounded } from '@/components/shared/Bounded'
 import Image from 'next/image'
 import heroImage from '../../../public/images/hero-image.jpg'
+// import heroImage from '../../../public/images/bg.jpg'
 import Link from 'next/link'
 
 import { FadeIn } from '@/components/shared/fade-in'

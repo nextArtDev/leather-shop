@@ -11,10 +11,10 @@ const myFont = localFont({
 //   src: '../public/fonts/Vazirmatn-VariableFont_wght.ttf',
 // })
 
-export const numericFont = localFont({
-  src: '../public/fonts/FarsiAdad.woff2',
-  variable: '--font-adad',
-})
+// const numericFont = localFont({
+//   src: '../public/fonts/FarsiAdad.woff2',
+//   variable: '--font-adad',
+// })
 
 export const metadata: Metadata = {
   title: 'Leather shop',

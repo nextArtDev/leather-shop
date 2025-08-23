@@ -2,8 +2,8 @@ import Image from 'next/image'
 import React from 'react'
 import img from '../../../public/images/hero-image.jpg'
 import Link from 'next/link'
-import brderImage from '../../../public/images/border.webp'
-import brderImage1 from '../../../public/images/border-rounded.webp'
+// import brderImage from '../../../public/images/border.webp'
+// import brderImage1 from '../../../public/images/border-rounded.webp'
 import CoverLayer from './CoverLayer'
 const HeroLeather = () => {
   return (

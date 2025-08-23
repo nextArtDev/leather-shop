@@ -54,7 +54,7 @@ export function ImageInput({
         !currentValue ||
         (Array.isArray(currentValue) && currentValue.length === 0)
       ) {
-        console.log(`Setting initial ${name} images:`, initialDataImages)
+        // console.log(`Setting initial ${name} images:`, initialDataImages)
         setValue(name as Path<YourMainFormSchemaType>, initialDataImages)
         setIsEditMode(true)
       } else if (currentValue === initialDataImages) {

@@ -115,7 +115,7 @@ async function createPaymentRequest(order: any, orderId: string) {
     Mobile: user.phoneNumber,
   })) as PaymentRequestResult
 
-  console.log('Payment request result:', payment)
+  // console.log('Payment request result:', payment)
   return payment
 }
 
@@ -160,6 +160,7 @@ async function verifySuccessfulPayment(
   order: any,
   Authority: string,
   orderId: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   path: string
 ) {
   const zarinpal = createZarinpalInstance()
@@ -170,11 +171,11 @@ async function verifySuccessfulPayment(
     storedPaymentResult?.authority &&
     storedPaymentResult.authority !== Authority
   ) {
-    console.log('Authority mismatch - possible cross-order contamination:', {
-      stored: storedPaymentResult.authority,
-      received: Authority,
-      orderId,
-    })
+    // console.log('Authority mismatch - possible cross-order contamination:', {
+    //   stored: storedPaymentResult.authority,
+    //   received: Authority,
+    //   orderId,
+    // })
     return {
       errors: {
         _form: [ERROR_MESSAGES.INVALID_PAYMENT_INFO],
@@ -200,7 +201,7 @@ async function verifySuccessfulPayment(
   }
 
   if (freshOrder.paymentStatus === 'Paid') {
-    console.log('Order was paid during verification process:', orderId)
+    // console.log('Order was paid during verification process:', orderId)
     return { success: true, alreadyPaid: true }
   }
 
@@ -209,10 +210,10 @@ async function verifySuccessfulPayment(
     Authority,
   })) as PaymentVerificationResult
 
-  console.log('Payment verification result:', verification)
+  // console.log('Payment verification result:', verification)
 
   if (verification.status === PAYMENT_STATUS.SUCCESS) {
-    console.log(`Payment verified! Ref ID: ${verification.refId}`)
+    // console.log(`Payment verified! Ref ID: ${verification.refId}`)
 
     // Use a transaction to ensure atomicity and prevent race conditions
     try {
@@ -233,13 +234,13 @@ async function verifySuccessfulPayment(
         error instanceof Error &&
         error.message === ERROR_MESSAGES.ORDER_ALREADY_PAID
       ) {
-        console.log('Order was already paid during update process')
+        // console.log('Order was already paid during update process')
         return { success: true, alreadyPaid: true }
       }
       throw error
     }
   } else {
-    console.log('Payment verification failed with status:', verification.status)
+    // console.log('Payment verification failed with status:', verification.status)
     await markPaymentAsFailed(orderId, order.userId)
 
     return {
@@ -254,7 +255,9 @@ async function verifySuccessfulPayment(
 export async function zarinpalPayment(
   path: string,
   orderId: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   formState: ZarinpalPaymentFormState,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   formData: FormData
 ): Promise<ZarinpalPaymentFormState> {
   try {
@@ -298,10 +301,10 @@ export async function zarinpalPayment(
       }
     }
 
-    console.log('Processing payment for order:', {
-      orderId,
-      totalPrice: order.total,
-    })
+    // console.log('Processing payment for order:', {
+    //   orderId,
+    //   totalPrice: order.total,
+    // })
 
     // Create payment request
     const payment = await createPaymentRequest(order, orderId)
@@ -355,7 +358,7 @@ export async function zarinpalPaymentApproval(
 
   // Check if we're already processing this exact payment
   if (processingCache.has(cacheKey)) {
-    console.log('Already processing payment verification for:', cacheKey)
+    // console.log('Already processing payment verification for:', cacheKey)
     try {
       return await processingCache.get(cacheKey)
     } catch (error) {
@@ -367,11 +370,11 @@ export async function zarinpalPaymentApproval(
   // Create the processing promise
   const processingPromise = (async () => {
     try {
-      console.log('Starting payment approval for:', {
-        orderId,
-        Authority,
-        Status,
-      })
+      // console.log('Starting payment approval for:', {
+      //   orderId,
+      //   Authority,
+      //   Status,
+      // })
 
       // Get current user
       const user = await getCurrentUser()
@@ -408,7 +411,7 @@ export async function zarinpalPaymentApproval(
         order.paymentDetails?.status === 'Paid' ||
         order.paymentStatus === 'Paid'
       ) {
-        console.log('Order already paid, skipping verification:', orderId)
+        // console.log('Order already paid, skipping verification:', orderId)
         return { success: true, alreadyPaid: true }
       }
 
@@ -463,7 +466,7 @@ export async function updateOrderToPaid({
   orderId: string
   paymentResult?: PaymentResult
 }) {
-  console.log('Updating order to paid:', { orderId, paymentResult })
+  // console.log('Updating order to paid:', { orderId, paymentResult })
 
   // Use a database transaction to prevent race conditions
   return await prisma.$transaction(async (tx) => {
@@ -483,7 +486,7 @@ export async function updateOrderToPaid({
 
     // CRITICAL: Check if order is already paid
     if (order.paymentStatus === 'Paid') {
-      console.log('Order already paid during transaction:', orderId)
+      // console.log('Order already paid during transaction:', orderId)
       throw new Error(ERROR_MESSAGES.ORDER_ALREADY_PAID)
     }
 
@@ -523,7 +526,7 @@ export async function updateOrderToPaid({
       },
     })
 
-    console.log('Order successfully updated to paid:', { orderId })
+    // console.log('Order successfully updated to paid:', { orderId })
     return updatedOrder
   })
 }
