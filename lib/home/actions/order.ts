@@ -1,14 +1,17 @@
 'use server'
 
-import { currentUser } from '@/lib/auth'
+import { auth } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { isRedirectError } from 'next/dist/client/components/redirect-error'
 import { getValidatedCart } from './cart'
 import { getUserById } from '../queries/user'
+import { updateOrderToPaid } from './payment1'
+import { revalidatePath } from 'next/cache'
+import { getCurrentUser } from '@/lib/auth-helpers'
 
 export async function createOrder() {
   try {
-    const session = await currentUser()
+    const session = await getCurrentUser()
     // if (!session) throw new Error('User is not authenticated')
 
     // const cart = await getMyCart()
@@ -130,6 +133,50 @@ export async function createOrder() {
     }
   } catch (error) {
     if (isRedirectError(error)) throw error
+    return { success: false, message: error }
+  }
+}
+
+export async function updateOrderToPaidCOD(orderId: string) {
+  try {
+    await updateOrderToPaid({ orderId })
+
+    revalidatePath(`/order/${orderId}`)
+
+    return { success: true, message: 'Order marked as paid' }
+  } catch (error) {
+    // return { success: false, message: formatError(error) }
+    return { success: false, message: error }
+  }
+}
+
+export async function deliverOrder(orderId: string) {
+  try {
+    const order = await prisma.order.findFirst({
+      where: {
+        id: orderId,
+      },
+    })
+
+    if (!order) throw new Error('Order not found')
+    if (order.paymentStatus !== 'Paid') throw new Error('Order is not paid')
+
+    await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        orderStatus: 'Delivered',
+        // isDelivered: true,
+        // deliveredAt: new Date(),
+      },
+    })
+
+    revalidatePath(`/order/${orderId}`)
+
+    return {
+      success: true,
+      message: 'سفارش به عنوان تحویل داده شده، ثبت شد.',
+    }
+  } catch (error) {
     return { success: false, message: error }
   }
 }

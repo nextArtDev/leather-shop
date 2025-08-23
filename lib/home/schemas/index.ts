@@ -48,25 +48,15 @@ export const shippingAddressSchema = z.object({
 
   // default: z.boolean().default(false),
 })
-// id String @id @default(uuid())
 
-//   title              String
-//   description        String
-//   isVerifiedPurchase Boolean @default(true)
+//Payment
 
-//   rating Float
-
-//   isFeatured Boolean @default(false)
-//   isPending  Boolean @default(true)
-//   images     Image[]
-
-//   quantity String
-//   likes    Int    @default(0)
-//   user     User   @relation("ReviewToUser", fields: [userId], references: [id])
-//   userId   String
-
-//   productId String
-//   product   Product @relation("ReviewToProduct", fields: [productId], references: [id])
-
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @default(now()) @updatedAt
+export const paymentResultSchema = z.object({
+  id: z.string(),
+  status: z.string(),
+  // url: z.string(),
+  authority: z.string(),
+  // status: z.string(),
+  fee: z.string(),
+})
+export type PaymentResult = z.infer<typeof paymentResultSchema>

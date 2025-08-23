@@ -383,3 +383,5 @@ export type CartProductType = {
   shippingFee: number
   extraShippingFee: number
 }
+
+// Payment

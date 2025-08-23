@@ -49,7 +49,8 @@
     "@tremor/react": "^3.18.7",
     "@types/gsap": "^3.0.0",
     "@types/jalaali-js": "^1.2.0",
-    "better-auth": "^1.3.6",
+    "@types/zarinpal-checkout": "^0.2.5",
+    "better-auth": "^1.3.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -82,6 +83,7 @@
     "tailwind-merge": "^3.3.1",
     "use-debounce": "^10.0.5",
     "vaul": "^1.1.2",
+    "zarinpal-checkout": "^0.3.0",
     "zod": "^4.0.17",
     "zustand": "^5.0.8"
   },
