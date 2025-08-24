@@ -36,6 +36,7 @@ async function AdminOrdersPage({
     user: item.user,
     total: item.total || undefined,
     items: item.items as OrderItem[],
+    shippingFees: item.shippingFees,
     createdAt: format(item.createdAt, 'dd MMMM yyyy'),
   }))
 

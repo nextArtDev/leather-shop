@@ -7,6 +7,10 @@ import { getUserById } from '../queries/user'
 import { updateOrderToPaid } from './payment1'
 import { revalidatePath } from 'next/cache'
 import { getCurrentUser } from '@/lib/auth-helpers'
+import { redirect } from 'next/navigation'
+import { UpdateOrderStatusFormSchema } from '../schemas'
+import { currentUser } from '@/lib/auth'
+import { OrderStatus } from '@/lib/types/home'
 
 export async function createOrder() {
   try {
@@ -141,4 +145,99 @@ export async function deliverOrder(orderId: string) {
   } catch (error) {
     return { success: false, message: error }
   }
+}
+
+interface UpdateOrderItemStatusFormState {
+  status?: string
+  errors: {
+    status?: string[]
+    _form?: string[]
+  }
+}
+
+export async function updateOrderItemStatus(
+  path: string,
+  orderId: string,
+  formState: UpdateOrderItemStatusFormState,
+  formData: FormData
+): Promise<UpdateOrderItemStatusFormState> {
+  const result = UpdateOrderStatusFormSchema.safeParse({
+    status: formData.get('status'),
+  })
+
+  if (!result.success) {
+    console.error(result.error.flatten().fieldErrors)
+    return {
+      errors: result.error.flatten().fieldErrors,
+    }
+  }
+  console.log({ result })
+  const session = await currentUser()
+
+  if (!session || !session.id || session.role !== 'ADMIN') {
+    return {
+      errors: {
+        _form: ['شما اجازه دسترسی ندارید!'],
+      },
+    }
+  }
+
+  if (!orderId) {
+    return {
+      errors: {
+        _form: ['سفارش در دسترس نیست!'],
+      },
+    }
+  }
+  try {
+    const order = await prisma.order.findUnique({
+      where: {
+        id: orderId,
+        // userId: session.id,
+      },
+    })
+    if (!order?.id) {
+      return {
+        errors: {
+          _form: ['سفارش در دسترس نیست!'],
+        },
+      }
+    }
+    console.log('result.data.status ', result.data.status)
+    // Verify seller ownership
+
+    const res = await prisma.order.update({
+      where: {
+        id: order.id,
+      },
+      data: {
+        orderStatus: result.data.status,
+      },
+    })
+
+    console.log({ res })
+    return {
+      status: res.orderStatus,
+      errors: {},
+    }
+    //  return updatedOrder.status
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      return {
+        errors: {
+          _form: [err.message],
+        },
+      }
+    } else {
+      return {
+        errors: {
+          _form: ['مشکلی پیش آمده، لطفا دوباره امتحان کنید!'],
+        },
+      }
+    }
+  }
+  //  finally {
+  //   revalidatePath(path)
+  //   redirect(path)
+  // }
 }

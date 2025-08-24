@@ -147,7 +147,7 @@ const StoreOrderSummary: FC<Props> = ({ order }) => {
               <div className="text-sm">
                 <p className="font-normal text-muted-foreground">
                   هزینه ارسال :{' '}
-                  <span className="ms-1">{product.shippingFee}</span>
+                  <span className="ms-1">{order.shippingFees}</span>
                 </p>
               </div>
             </div>

@@ -29,6 +29,7 @@ export type OrderTypeColumn = {
   orderStatus: OrderStatus
   user: { name: string | null; phoneNumber: string | null }
   items: OrderItem[]
+  shippingFees: number | null
   total: number | undefined
 
   // name: string | null

@@ -60,3 +60,7 @@ export const paymentResultSchema = z.object({
   fee: z.string(),
 })
 export type PaymentResult = z.infer<typeof paymentResultSchema>
+
+export const UpdateOrderStatusFormSchema = z.object({
+  status: z.string(),
+})

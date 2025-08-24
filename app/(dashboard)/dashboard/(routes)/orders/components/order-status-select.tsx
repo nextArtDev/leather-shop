@@ -8,9 +8,11 @@ import {
 
 import { OrderStatus } from '@/lib/types/home'
 
-import { FC, useState } from 'react'
+import { FC, useActionState, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import OrderStatusTag from './order-status'
+import { usePathname } from 'next/navigation'
+import { updateOrderItemStatus } from '@/lib/home/actions/order'
 
 interface Props {
   orderId: string
@@ -18,41 +20,90 @@ interface Props {
 }
 
 const OrderStatusSelect: FC<Props> = ({ orderId, status }) => {
+  const buttonRef = useRef<HTMLButtonElement>(null)
   const [newStatus, setNewStatus] = useState<OrderStatus>(status)
   const [isOpen, setIsOpen] = useState<boolean>(false)
+
+  const path = usePathname()
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [ActionState, deleteAction, pending] = useActionState(
+    updateOrderItemStatus.bind(null, path, orderId as string),
+    {
+      status: '',
+      errors: {},
+    }
+  )
+  useEffect(() => {
+    // console.log({ ActionState })
+    if (ActionState.status) {
+      console.log(ActionState.status)
+      setNewStatus(ActionState.status as OrderStatus)
+    }
+  }, [ActionState])
 
   // Options
   const options = Object.values(OrderStatus).filter((s) => s !== newStatus)
 
   // Handle click
-  const handleClick = async (selectedStatus: OrderStatus) => {
-    // try {
-    //   const response = await updateOrderGroupStatus1(orderId, selectedStatus)
-    //   if (response) {
-    //     setNewStatus(response as OrderStatus)
-    //     setIsOpen(false)
-    //   }
-    // } catch (error: unknown) {
-    //   toast.error(error.toString())
-    // }
-  }
+  // const handleClick = async (selectedStatus: OrderStatus) => {
+  //   console.log({ selectedStatus })
+  //   // try {
+  //   //   const response = await updateOrderGroupStatus1(orderId, selectedStatus)
+  //   //   if (response) {
+  //   //     setNewStatus(response as OrderStatus)
+  //   //     setIsOpen(false)
+  //   //   }
+  //   // } catch (error: unknown) {
+  //   //   toast.error(error.toString())
+  //   // }
+  // }
   return (
     <div className="relative">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="w-fit bg-transparent">
+          <Button
+            type="submit"
+            variant="outline"
+            className="w-fit bg-transparent"
+          >
             <OrderStatusTag status={newStatus} />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-fit" align="center">
           {options.map((option) => (
-            <DropdownMenuItem
+            <form
               key={option}
-              onClick={() => handleClick(option)}
-              className="w-full h-full flex items-center justify-center"
+              action={deleteAction}
+              // onSubmit={(e) => {
+              //   e.preventDefault()
+              //   // buttonRef.current?.click()
+              //   // console.log(e.currentTarget)
+              //   // handleClick(option)
+              // }}
             >
-              <OrderStatusTag status={option} />
-            </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  buttonRef.current?.click()
+                  // handleClick(option)
+                }}
+                className="w-full h-full flex items-center justify-center"
+              >
+                <OrderStatusTag status={option} />
+                <input
+                  type="text"
+                  name="status"
+                  value={option}
+                  onChange={() => setNewStatus(option)}
+                  className="hidden"
+                />
+                <button
+                  ref={buttonRef}
+                  type="submit"
+                  className="hidden"
+                ></button>
+              </DropdownMenuItem>
+            </form>
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
