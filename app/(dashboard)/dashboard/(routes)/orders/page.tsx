@@ -5,7 +5,12 @@ import { columns, OrderTypeColumn } from './components/columns'
 import { Heading } from '../comments/components/Heading'
 import { Separator } from '@/components/ui/separator'
 import { OrderStatus, PaymentStatus } from '@/lib/types/home'
-import { OrderItem } from '@/lib/generated/prisma'
+import {
+  City,
+  OrderItem,
+  Province,
+  ShippingAddress,
+} from '@/lib/generated/prisma'
 
 async function AdminOrdersPage({
   searchParams,
@@ -17,13 +22,18 @@ async function AdminOrdersPage({
   const pageSize = params.pageSize ? +params.pageSize : 50
 
   const orders = await getAllOrders({ page, pageSize })
-
+  // console.log(orders.order?.map((t) => t.shippingAddressId))
   const formattedComments: OrderTypeColumn[] = orders.order?.map((item) => ({
     id: item.id,
-    // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-    name: item.user?.name!,
+    name: item.user.name ?? '',
     paymentStatus: item.paymentStatus as PaymentStatus,
     orderStatus: item.orderStatus as OrderStatus,
+    shippingAddress: item.shippingAddress as ShippingAddress & {
+      province: Province | null
+    } & {
+      city: City | null
+    },
+    user: item.user,
     total: item.total || undefined,
     items: item.items as OrderItem[],
     createdAt: format(item.createdAt, 'dd MMMM yyyy'),
@@ -33,14 +43,14 @@ async function AdminOrdersPage({
     <div className="flex-col">
       <div className="flex-1 space-y-4 p-8 pt-6">
         <Heading
-          title={`کامنت‌ها (${formattedComments?.length})`}
-          description="کامنتها را مدیریت کنید."
+          title={`سفارشات (${formattedComments?.length})`}
+          description="سفارشات را مدیریت کنید."
         />
 
         <Separator />
         {!!orders?.order.length && !!formattedComments && (
           <DataTable
-            searchKey="comment"
+            searchKey="name"
             columns={columns}
             data={formattedComments}
             pageNumber={page ? +page : 1}

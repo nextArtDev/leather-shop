@@ -78,16 +78,6 @@ const data = {
       ],
     },
     {
-      title: 'سفارشها',
-      url: '/dashboard/orders',
-      items: [
-        {
-          title: 'سفارشها',
-          url: '/dashboard/orders',
-        },
-      ],
-    },
-    {
       title: 'کامنت‌ها',
       url: '/dashboard/comments',
       items: [

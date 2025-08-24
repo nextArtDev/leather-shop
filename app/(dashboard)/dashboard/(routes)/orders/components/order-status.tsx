@@ -72,18 +72,16 @@ const OrderStatusTag: FC<OrderStatusTagProps> = ({ status }) => {
   const styles = statusStyles[status]
   const { bgColor, textColor, label } = styles
   return (
-    <div>
-      <span
-        className={cn(
-          'py-1 px-2 inline-flex items-center gap-x-1 text-xs font-medium rounded-md',
-          bgColor,
-          textColor
-        )}
-      >
-        <Truck className="shrink-0 size-3" />
-        {label}
-      </span>
-    </div>
+    <span
+      className={cn(
+        'w-full h-full text-center py-1  inline-flex items-center justify-center gap-x-1 text-xs md:sm font-medium  cursor-pointer',
+        bgColor,
+        textColor
+      )}
+    >
+      <Truck className="shrink-0 size-3" />
+      {label}
+    </span>
   )
 }
 

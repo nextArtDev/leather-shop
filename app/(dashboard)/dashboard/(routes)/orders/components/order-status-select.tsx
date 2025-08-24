@@ -1,3 +1,11 @@
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+
 import { OrderStatus } from '@/lib/types/home'
 
 import { FC, useState } from 'react'
@@ -30,15 +38,33 @@ const OrderStatusSelect: FC<Props> = ({ orderId, status }) => {
   }
   return (
     <div className="relative">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" className="w-fit bg-transparent">
+            <OrderStatusTag status={newStatus} />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-fit" align="center">
+          {options.map((option) => (
+            <DropdownMenuItem
+              key={option}
+              onClick={() => handleClick(option)}
+              className="w-full h-full flex items-center justify-center"
+            >
+              <OrderStatusTag status={option} />
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
       {/* Current status */}
-      <div
+      {/* <div
         className="cursor-pointer"
         onClick={() => setIsOpen((prev) => !prev)}
       >
         <OrderStatusTag status={newStatus} />
-      </div>
+      </div> */}
       {/* Dropdown */}
-      {isOpen && (
+      {/* {isOpen && (
         <div className="absolute !z-50 bg-white dark:bg-black border border-gray-200 dark:border-gray-700 rounded-md shadow-md mt-2 w-[140px]">
           {options.map((option) => (
             <button
@@ -50,7 +76,7 @@ const OrderStatusSelect: FC<Props> = ({ orderId, status }) => {
             </button>
           ))}
         </div>
-      )}
+      )} */}
     </div>
   )
 }

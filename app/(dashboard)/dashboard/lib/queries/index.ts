@@ -334,7 +334,7 @@ export type OrderType = {
   order: (Order & {
     items: OrderItem[] // Added missing 'items'
     paymentDetails: PaymentDetails | null
-    user: { phoneNumber: string | null; name: string | null }
+    user: { phoneNumber: string | null; name: string }
     shippingAddress: ShippingAddress & {
       city: City | null
       province: Province | null
@@ -345,7 +345,7 @@ export type OrderType = {
 export type DetailedOrder = Order & {
   items: OrderItem[]
   paymentDetails: PaymentDetails | null
-  user: { phoneNumber: string | null; name: string | null }
+  user: { phoneNumber: string | null; name: string }
   shippingAddress: ShippingAddress & {
     city: City | null
     province: Province | null

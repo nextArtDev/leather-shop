@@ -5,19 +5,17 @@ import Image from 'next/image'
 import OrderStatusSelect from './order-status-select'
 
 import ProductStatusSelect from './product-status-select'
-import { DetailedOrder } from '../../../lib/queries'
 import { OrderStatus, PaymentStatus } from '@/lib/types/home'
 import PaymentStatusTag from './payment-status'
 import { ProductStatus } from '@/lib/generated/prisma'
+import { OrderTypeColumn } from './columns'
 
 interface Props {
-  order: DetailedOrder
+  order: OrderTypeColumn
 }
 
 const StoreOrderSummary: FC<Props> = ({ order }) => {
-  // const paymentDetails = order.paymentDetails
-  const paymentStatus = order.paymentStatus as PaymentStatus
-  const shippingAddress = order.shippingAddress
+  // console.log(order)
 
   // const { coupon, couponId, subTotal, total, shippingFees } = order
 
@@ -26,15 +24,15 @@ const StoreOrderSummary: FC<Props> = ({ order }) => {
   //   discountedAmount = ((subTotal + shippingFees) * coupon.discount) / 100
   // }
   return (
-    <div className="py-2 relative">
+    <div className="py-2 relative flex flex-col text-start">
       <div className="w-full px-1">
         <div className="space-y-3">
-          <h2 className="font-bold text-3xl leading-10 overflow-ellipsis line-clamp-1">
+          <h2 className=" sr-only font-bold text-3xl leading-10 overflow-ellipsis line-clamp-1 ">
             جزئیات سفارش
           </h2>
           <h6 className="font-semibold text-2xl leading-9">#{order.id}</h6>
           <div className="flex items-center gap-x-2">
-            <PaymentStatusTag status={paymentStatus} />
+            <PaymentStatusTag status={order.paymentStatus as PaymentStatus} />
             <OrderStatusSelect
               orderId={order.id}
               status={order.orderStatus as OrderStatus}
@@ -82,19 +80,20 @@ const StoreOrderSummary: FC<Props> = ({ order }) => {
           </div> */}
           {/* Address */}
           <div>
-            <p className="font-normal text-base leading-7 text-gray-500 mb-3 transition-all duration-500 ">
-              Address
+            <p className="font-normal text-base leading-7   mb-3 transition-all duration-500 ">
+              آدرس
             </p>
             <h6 className="font-semibold text-lg leading-9">
-              {shippingAddress.province?.name}, {shippingAddress.city?.name}
+              {order.shippingAddress?.province?.name},{' '}
+              {order.shippingAddress.city?.name}
               ,&nbsp;
-              {shippingAddress.address1} <br />
+              {order.shippingAddress.address1} <br />
               {order.shippingAddress.zip_code}
             </h6>
           </div>
           {/* Customer */}
           <div>
-            <p className="font-normal text-base leading-7 text-gray-500 mb-3 transition-all duration-500 ">
+            <p className="font-normal text-base leading-7  mb-3 transition-all duration-500 ">
               خریدار
             </p>
             <h6 className="font-semibold text-lg leading-9">
@@ -125,28 +124,28 @@ const StoreOrderSummary: FC<Props> = ({ order }) => {
                 {product.name}
               </h5>
               <div className="text-sm">
-                <p className="font-normal text-muted">
+                <p className="font-normal text-muted-foreground">
                   Sku : <span className="ms-1">{product.sku}</span>
                 </p>
               </div>
               <div className="text-sm">
-                <p className="font-normal text-muted">
+                <p className="font-normal text-muted-foreground">
                   سایز : <span className="ms-1">{product.size}</span>
                 </p>
               </div>
               <div className="text-sm">
-                <p className="font-normal text-muted">
+                <p className="font-normal text-muted-foreground">
                   تعداد : <span className="ms-1">{product.quantity}</span>
                 </p>
               </div>
               <div className="text-sm">
-                <p className="font-normal text-muted">
+                <p className="font-normal text-muted-foreground">
                   قیمت :&nbsp;
                   <span className="ms-1"> {product.price}</span>
                 </p>
               </div>
               <div className="text-sm">
-                <p className="font-normal text-muted">
+                <p className="font-normal text-muted-foreground">
                   هزینه ارسال :{' '}
                   <span className="ms-1">{product.shippingFee}</span>
                 </p>

@@ -1,3 +1,10 @@
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { ProductStatus } from '@/lib/generated/prisma'
 import { FC, useState } from 'react'
 import { toast } from 'sonner'
@@ -32,27 +39,24 @@ const ProductStatusSelect: FC<Props> = ({ orderItemId, status }) => {
   }
   return (
     <div className="relative">
-      {/* Current status */}
-      <div
-        className="cursor-pointer"
-        onClick={() => setIsOpen((prev) => !prev)}
-      >
-        <ProductStatusTag status={newStatus} />
-      </div>
-      {/* Dropdown */}
-      {isOpen && (
-        <div className="absolute z-50 bg-white dark:bg-black border border-gray-200 dark:border-gray-700 rounded-md shadow-md mt-2 w-[170px]">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" className="w-fit bg-transparent">
+            <ProductStatusTag status={newStatus} />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-fit" align="center">
           {options.map((option) => (
-            <button
+            <DropdownMenuItem
               key={option}
-              className="w-full flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md"
               onClick={() => handleClick(option)}
+              className="w-full h-full flex items-center justify-center"
             >
               <ProductStatusTag status={option} />
-            </button>
+            </DropdownMenuItem>
           ))}
-        </div>
-      )}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   )
 }
