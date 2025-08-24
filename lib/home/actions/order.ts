@@ -11,6 +11,7 @@ import { getCurrentUser } from '@/lib/auth-helpers'
 import { UpdateOrderStatusFormSchema } from '../schemas'
 import { currentUser } from '@/lib/auth'
 import { OrderStatus } from '@/lib/types/home'
+import { redirect } from 'next/navigation'
 
 export async function createOrder() {
   try {
@@ -238,9 +239,8 @@ export async function updateOrderItemStatus(
         },
       }
     }
+  } finally {
+    revalidatePath(path)
+    redirect(path)
   }
-  //  finally {
-  //   revalidatePath(path)
-  //   redirect(path)
-  // }
 }

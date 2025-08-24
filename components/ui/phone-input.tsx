@@ -64,7 +64,7 @@ const InputComponent = React.forwardRef<
   React.ComponentProps<'input'>
 >(({ className, ...props }, ref) => (
   <Input
-    className={cn('rounded-e-lg rounded-s-none', className)}
+    className={cn('rounded-r-lg rounded-l-none', className)}
     {...props}
     ref={ref}
   />
@@ -104,7 +104,7 @@ const CountrySelect = ({
         <Button
           type="button"
           variant="outline"
-          className="flex gap-1 rounded-e-none rounded-s-lg border-r-0 px-3 focus:z-10"
+          className="flex gap-1 rounded-r-none rounded-l-lg  px-3 focus:z-10"
           disabled={disabled}
         >
           <FlagComponent
@@ -136,11 +136,11 @@ const CountrySelect = ({
                 }
               }, 0)
             }}
-            placeholder="Search country..."
+            placeholder="جست‌وجوی کشور"
           />
           <CommandList>
             <ScrollArea ref={scrollAreaRef} className="h-72">
-              <CommandEmpty>No country found.</CommandEmpty>
+              <CommandEmpty>یافت نشد!</CommandEmpty>
               <CommandGroup>
                 {countryList.map(({ value, label }) =>
                   value ? (

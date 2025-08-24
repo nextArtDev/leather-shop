@@ -25,6 +25,7 @@ import {
   LucideIcon,
 } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
+import { useRouter } from 'next/navigation'
 
 // Schemas
 const phoneSchema = z.object({
@@ -68,20 +69,20 @@ interface FormStep {
 
 interface MultiStepFormAuthProps {
   className?: string
-  onSuccess?: () => void
+  // onSuccess?: () => void
 }
 
 export default function MultiStepFormAuth({
   className,
-  onSuccess,
-}: MultiStepFormAuthProps) {
+}: // onSuccess,
+MultiStepFormAuthProps) {
   const [isPending, startTransition] = useTransition()
   const [step, setStep] = useState<0 | 1>(0)
   const [phoneNumber, setPhoneNumber] = useState<string>('')
   const [otpValue, setOtpValue] = useState<string>('')
   const [otpKey, setOtpKey] = useState<number>(0)
   const [isSuccess, setIsSuccess] = useState<boolean>(false)
-
+  const router = useRouter()
   // Define steps
   const steps: FormStep[] = [
     {
@@ -133,7 +134,7 @@ export default function MultiStepFormAuth({
         const result = await authClient.phoneNumber.sendOtp({
           phoneNumber: data.phone,
         })
-
+        console.log({ result })
         if (result.error) {
           toast.error(result.error.message || 'خطا در ارسال کد')
         } else {
@@ -166,7 +167,17 @@ export default function MultiStepFormAuth({
         })
 
         if (result.error) {
-          toast.error(result.error.message || 'کد وارد شده اشتباه است')
+          // OTP not found
+          toast.error(
+            result.error.message === 'Invalid OTP'
+              ? 'کد وارد شده اشتباه است!'
+              : result.error.message === 'OTP not found'
+              ? 'کد تایید منقضی شده است.'
+              : result.error.message === 'Too many attempts'
+              ? 'تعداد وارد کردن کد بیش از حد مجاز است!'
+              : 'لطفا دوباره تلاش کنید.'
+          )
+          // toast.error(result.error.message || 'کد وارد شده اشتباه است')
           // Reset OTP on error
           setOtpValue('')
           setOtpKey((prev) => prev + 1)
@@ -174,7 +185,8 @@ export default function MultiStepFormAuth({
         } else {
           setIsSuccess(true)
           toast.success('تایید موفقیت‌آمیز بود')
-          onSuccess?.()
+          // onSuccess?.()
+          router.push('/')
         }
       } catch (error) {
         console.error('OTP verification error:', error)
@@ -243,15 +255,15 @@ export default function MultiStepFormAuth({
   }
 
   // Reset form
-  const resetForm = (): void => {
-    setStep(0)
-    setPhoneNumber('')
-    setOtpValue('')
-    setOtpKey(0)
-    setIsSuccess(false)
-    phoneForm.reset({ phone: '' })
-    otpForm.reset({ code: '' })
-  }
+  // const resetForm = (): void => {
+  //   setStep(0)
+  //   setPhoneNumber('')
+  //   setOtpValue('')
+  //   setOtpKey(0)
+  //   setIsSuccess(false)
+  //   phoneForm.reset({ phone: '' })
+  //   otpForm.reset({ code: '' })
+  // }
 
   // Animation variants
   const variants = {
@@ -273,32 +285,19 @@ export default function MultiStepFormAuth({
     >
       {!isSuccess ? (
         <>
-          {/* Progress bar */}
-          <div dir="rtl" className="mb-8">
-            <div className="mb-2 flex justify-between">
-              <span className="text-xs font-medium text-muted-foreground">
-                {step + 1}/{steps.length}
-              </span>
-              <span className="text-sm font-medium text-muted-foreground">
-                {Math.round(progress)}%
-              </span>
-            </div>
-            <Progress value={progress} className="h-2" />
-          </div>
-
           {/* Step indicators */}
-          <div className="mb-8 flex justify-between">
+          <div className=" flex justify-between">
             {steps.map((s, i) => {
               const Icon = s.icon
               return (
                 <div key={s.id} className="flex flex-col items-center">
                   <div
                     className={cn(
-                      'flex h-10 w-10 items-center justify-center rounded-full border-2 text-xs font-bold transition-colors',
+                      'flex h-10 w-10 border-indigo-600 items-center justify-center rounded-full border-2 text-xs font-bold transition-colors',
                       i < step
-                        ? 'border-primary bg-primary text-primary-foreground'
+                        ? 'border-indigo-600 bg-indigo-600 text-muted-foreground'
                         : i === step
-                        ? 'border-primary bg-primary text-primary-foreground'
+                        ? 'border-indigo-600 bg-indigo-600 text-primary-foreground'
                         : 'border-muted bg-muted text-muted-foreground'
                     )}
                   >
@@ -314,6 +313,18 @@ export default function MultiStepFormAuth({
                 </div>
               )
             })}
+          </div>
+          {/* Progress bar */}
+          <div dir="rtl" className="mb-8">
+            <Progress value={progress} className="h-2  " />
+            <div className="my-2 flex justify-between">
+              <span className="text-xs font-medium text-indigo-600 ">
+                {step + 1}/{steps.length}
+              </span>
+              {/* <span className="text-sm font-medium text-muted-foreground">
+                {Math.round(progress)}%
+              </span> */}
+            </div>
           </div>
 
           {/* Form */}
@@ -332,7 +343,7 @@ export default function MultiStepFormAuth({
                   {currentStep.description}
                 </p>
                 {step === 1 && phoneNumber && (
-                  <p className="mt-2 text-sm text-blue-600">
+                  <p className="mt-2 text-sm text-indigo-600">
                     کد تایید به شماره {phoneNumber} ارسال شد
                   </p>
                 )}
@@ -344,6 +355,7 @@ export default function MultiStepFormAuth({
                     <Label htmlFor="phone">شماره موبایل</Label>
                     <div dir="ltr">
                       <PhoneInput
+                        dir="ltr"
                         placeholder="09123456789"
                         defaultCountry="IR"
                         disabled={isPending}
@@ -371,6 +383,7 @@ export default function MultiStepFormAuth({
                         disabled={isPending}
                         autoComplete="one-time-code"
                         inputMode="numeric"
+                        onComplete={handleOtpChange}
                       >
                         <InputOTPGroup>
                           {Array.from({ length: 6 }, (_, index) => (
@@ -389,13 +402,14 @@ export default function MultiStepFormAuth({
 
                 {/* Resend OTP button */}
                 {step === 1 && (
-                  <div className="text-center">
+                  <div className="text-center flex flex-col gap-1">
+                    <p>مدت اعتبار کد 3 دقیقه می‌باشد.</p>
                     <Button
                       type="button"
                       variant="link"
                       onClick={handleResendOtp}
                       disabled={isPending}
-                      className="text-sm"
+                      className="text-sm text-muted-foreground"
                     >
                       ارسال مجدد کد تایید
                     </Button>
@@ -449,16 +463,13 @@ export default function MultiStepFormAuth({
           transition={{ duration: 0.5 }}
           className="py-10 text-center"
         >
-          <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+          <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full  ">
             <CheckCircle2 className="h-8 w-8 text-green-600" />
           </div>
           <h2 className="mb-2 text-2xl font-bold">تایید موفقیت‌آمیز!</h2>
           <p className="mb-6 text-muted-foreground">
             شماره موبایل شما با موفقیت تایید شد.
           </p>
-          <Button onClick={resetForm} variant="outline">
-            ورود مجدد
-          </Button>
         </motion.div>
       )}
     </div>
