@@ -7,7 +7,7 @@ import { getUserById } from '../queries/user'
 import { updateOrderToPaid } from './payment1'
 import { revalidatePath } from 'next/cache'
 import { getCurrentUser } from '@/lib/auth-helpers'
-import { redirect } from 'next/navigation'
+
 import { UpdateOrderStatusFormSchema } from '../schemas'
 import { currentUser } from '@/lib/auth'
 import { OrderStatus } from '@/lib/types/home'
@@ -171,7 +171,7 @@ export async function updateOrderItemStatus(
       errors: result.error.flatten().fieldErrors,
     }
   }
-  console.log({ result })
+  // console.log({ result })
   const session = await currentUser()
 
   if (!session || !session.id || session.role !== 'ADMIN') {
@@ -203,21 +203,24 @@ export async function updateOrderItemStatus(
         },
       }
     }
-    console.log('result.data.status ', result.data.status)
+    // console.log('result.data.status ', result.data.status)
     // Verify seller ownership
 
-    const res = await prisma.order.update({
+    const updatedOrder = await prisma.order.update({
       where: {
         id: order.id,
       },
       data: {
-        orderStatus: result.data.status,
+        orderStatus: result.data.status as OrderStatus,
       },
     })
 
-    console.log({ res })
+    revalidatePath(path)
+
+    // console.log('Order updated successfully:', updatedOrder)
+
     return {
-      status: res.orderStatus,
+      status: updatedOrder.orderStatus as OrderStatus,
       errors: {},
     }
     //  return updatedOrder.status

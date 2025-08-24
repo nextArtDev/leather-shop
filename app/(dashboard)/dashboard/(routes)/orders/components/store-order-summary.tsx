@@ -3,11 +3,9 @@ import { FC } from 'react'
 import Image from 'next/image'
 
 import OrderStatusSelect from './order-status-select'
-
-import ProductStatusSelect from './product-status-select'
 import { OrderStatus, PaymentStatus } from '@/lib/types/home'
 import PaymentStatusTag from './payment-status'
-import { ProductStatus } from '@/lib/generated/prisma'
+// import { ProductStatus } from '@/lib/generated/prisma'
 import { OrderTypeColumn } from './columns'
 
 interface Props {
@@ -153,10 +151,10 @@ const StoreOrderSummary: FC<Props> = ({ order }) => {
             </div>
             {/* Product status - total  */}
             <div className="flex flex-col items-center justify-center">
-              <ProductStatusSelect
+              {/* <ProductStatusSelect
                 orderItemId={product.id}
                 status={product.status as ProductStatus}
-              />
+              /> */}
               <div className="grid place-items-center">
                 <h5 className="font-semibold text-3xl leading-10 mt-3">
                   {product.totalPrice}

@@ -1,3 +1,4 @@
+import { OrderStatus } from '@/lib/types/home'
 import { z } from 'zod'
 
 export const ReviewFormSchema = z.object({
@@ -62,5 +63,5 @@ export const paymentResultSchema = z.object({
 export type PaymentResult = z.infer<typeof paymentResultSchema>
 
 export const UpdateOrderStatusFormSchema = z.object({
-  status: z.string(),
+  status: z.enum(OrderStatus),
 })

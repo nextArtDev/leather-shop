@@ -8,8 +8,7 @@ import {
 
 import { OrderStatus } from '@/lib/types/home'
 
-import { FC, useActionState, useEffect, useRef, useState } from 'react'
-import { toast } from 'sonner'
+import { FC, useActionState } from 'react'
 import OrderStatusTag from './order-status'
 import { usePathname } from 'next/navigation'
 import { updateOrderItemStatus } from '@/lib/home/actions/order'
@@ -20,114 +19,55 @@ interface Props {
 }
 
 const OrderStatusSelect: FC<Props> = ({ orderId, status }) => {
-  const buttonRef = useRef<HTMLButtonElement>(null)
-  const [newStatus, setNewStatus] = useState<OrderStatus>(status)
-  const [isOpen, setIsOpen] = useState<boolean>(false)
-
   const path = usePathname()
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [ActionState, deleteAction, pending] = useActionState(
-    updateOrderItemStatus.bind(null, path, orderId as string),
+  const [actionState, updateAction, pending] = useActionState(
+    updateOrderItemStatus.bind(null, path, orderId),
     {
-      status: '',
+      status: status,
       errors: {},
     }
   )
-  useEffect(() => {
-    // console.log({ ActionState })
-    if (ActionState.status) {
-      console.log(ActionState.status)
-      setNewStatus(ActionState.status as OrderStatus)
-    }
-  }, [ActionState])
 
-  // Options
-  const options = Object.values(OrderStatus).filter((s) => s !== newStatus)
+  // Get current status from action state or fallback to prop
+  const currentStatus = (actionState.status as OrderStatus) || status
 
-  // Handle click
-  // const handleClick = async (selectedStatus: OrderStatus) => {
-  //   console.log({ selectedStatus })
-  //   // try {
-  //   //   const response = await updateOrderGroupStatus1(orderId, selectedStatus)
-  //   //   if (response) {
-  //   //     setNewStatus(response as OrderStatus)
-  //   //     setIsOpen(false)
-  //   //   }
-  //   // } catch (error: unknown) {
-  //   //   toast.error(error.toString())
-  //   // }
-  // }
+  // Options - exclude current status
+  const options = Object.values(OrderStatus).filter((s) => s !== currentStatus)
+
+  // Handle status selection
+  const handleStatusChange = (selectedStatus: OrderStatus) => {
+    const formData = new FormData()
+    formData.append('status', selectedStatus)
+    updateAction(formData)
+  }
+
   return (
     <div className="relative">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            type="submit"
+            type="button"
             variant="outline"
             className="w-fit bg-transparent"
+            disabled={pending}
           >
-            <OrderStatusTag status={newStatus} />
+            <OrderStatusTag status={currentStatus} />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-fit" align="center">
           {options.map((option) => (
-            <form
+            <DropdownMenuItem
               key={option}
-              action={deleteAction}
-              // onSubmit={(e) => {
-              //   e.preventDefault()
-              //   // buttonRef.current?.click()
-              //   // console.log(e.currentTarget)
-              //   // handleClick(option)
-              // }}
+              onClick={() => handleStatusChange(option)}
+              className="w-full h-full flex items-center justify-center cursor-pointer"
+              disabled={pending}
             >
-              <DropdownMenuItem
-                onClick={() => {
-                  buttonRef.current?.click()
-                  // handleClick(option)
-                }}
-                className="w-full h-full flex items-center justify-center"
-              >
-                <OrderStatusTag status={option} />
-                <input
-                  type="text"
-                  name="status"
-                  value={option}
-                  onChange={() => setNewStatus(option)}
-                  className="hidden"
-                />
-                <button
-                  ref={buttonRef}
-                  type="submit"
-                  className="hidden"
-                ></button>
-              </DropdownMenuItem>
-            </form>
+              <OrderStatusTag status={option} />
+            </DropdownMenuItem>
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
-      {/* Current status */}
-      {/* <div
-        className="cursor-pointer"
-        onClick={() => setIsOpen((prev) => !prev)}
-      >
-        <OrderStatusTag status={newStatus} />
-      </div> */}
-      {/* Dropdown */}
-      {/* {isOpen && (
-        <div className="absolute !z-50 bg-white dark:bg-black border border-gray-200 dark:border-gray-700 rounded-md shadow-md mt-2 w-[140px]">
-          {options.map((option) => (
-            <button
-              key={option}
-              className="w-full flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md"
-              onClick={() => handleClick(option)}
-            >
-              <OrderStatusTag status={option} />
-            </button>
-          ))}
-        </div>
-      )} */}
     </div>
   )
 }
