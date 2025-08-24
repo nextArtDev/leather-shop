@@ -1,9 +1,16 @@
+import { getCurrentUser } from '@/lib/auth-helpers'
 import {
   Category,
+  City,
   Color,
   Image,
+  Order,
+  OrderItem,
+  PaymentDetails,
   Product,
+  Province,
   Question,
+  ShippingAddress,
   Size,
   Spec,
   SubCategory,
@@ -254,5 +261,93 @@ export const getAllReviews = async (params: getAllReviewsProps) => {
     return { review: allCompleteReviews.flat() || [], isNext }
   } catch (error) {
     console.error(error)
+  }
+}
+
+interface getAllReviewsProps {
+  page?: number
+  pageSize?: number
+}
+
+export const getAllOrders = async (
+  params: getAllReviewsProps
+): Promise<OrderType> => {
+  const { page = 1, pageSize = 30 } = params
+  const skipAmount = (page - 1) * pageSize
+  try {
+    const user = await getCurrentUser()
+
+    if (!user) throw new Error('Unauthenticated.')
+
+    if (user.role !== 'ADMIN')
+      throw new Error(
+        'Unauthorized Access: Seller Privileges Required for Entry.'
+      )
+
+    // Retrieve order groups for the specified store and user
+    const allOrders = await prisma.order.findMany({
+      where: {},
+      include: {
+        items: true,
+        // coupon: true,
+
+        paymentDetails: true,
+        user: {
+          select: {
+            phoneNumber: true,
+            name: true,
+          },
+        },
+
+        shippingAddress: {
+          include: {
+            city: true,
+            province: true,
+          },
+        },
+      },
+      orderBy: {
+        updatedAt: 'desc',
+      },
+      skip: skipAmount,
+      take: pageSize,
+    })
+    const totalOrders = await prisma.order.count()
+
+    const isNext = totalOrders > skipAmount + allOrders.length
+    return { order: allOrders || [], isNext }
+  } catch (error) {
+    throw error
+  }
+}
+
+// export type OrderType = (Order & {
+//   items: OrderItem[] // Added missing 'items'
+//   paymentDetails: PaymentDetails | null
+//   user: { phoneNumber: string | null }
+//   shippingAddress: ShippingAddress & {
+//     city: City | null
+//     province: Province | null
+//   }
+// })[]
+export type OrderType = {
+  order: (Order & {
+    items: OrderItem[] // Added missing 'items'
+    paymentDetails: PaymentDetails | null
+    user: { phoneNumber: string | null; name: string | null }
+    shippingAddress: ShippingAddress & {
+      city: City | null
+      province: Province | null
+    }
+  })[] // The result is an array of orders
+  isNext: boolean // Added 'isNext'
+}
+export type DetailedOrder = Order & {
+  items: OrderItem[]
+  paymentDetails: PaymentDetails | null
+  user: { phoneNumber: string | null; name: string | null }
+  shippingAddress: ShippingAddress & {
+    city: City | null
+    province: Province | null
   }
 }

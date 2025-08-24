@@ -11,7 +11,7 @@ import {
 import { BadgeDollarSign, Barcode, CreditCard, Users } from 'lucide-react'
 import { Metadata } from 'next'
 
-import Charts from './components/charts'
+// import Charts from './components/charts'
 import { currentUser } from '@/lib/auth'
 
 export const metadata: Metadata = {
@@ -83,13 +83,13 @@ const AdminOverviewPage = async () => {
             <CardTitle>خلاصه</CardTitle>
           </CardHeader>
           <CardContent>
-            <Charts
+            {/* <Charts
               data={
                 {
                   // salesData: summary.salesData,
                 }
               }
-            />
+            /> */}
           </CardContent>
         </Card>
         <Card className="col-span-3">

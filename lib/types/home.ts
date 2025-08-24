@@ -385,3 +385,26 @@ export type CartProductType = {
 }
 
 // Payment
+export enum OrderStatus {
+  Pending = 'Pending',
+  Confirmed = 'Confirmed',
+  Processing = 'Processing',
+  Shipped = 'Shipped',
+  OutforDelivery = 'OutforDelivery',
+  Delivered = 'Delivered',
+  Cancelled = 'Cancelled',
+  Failed = 'Failed',
+  Refunded = 'Refunded',
+  Returned = 'Returned',
+  OnHold = 'OnHold',
+}
+
+export enum PaymentStatus {
+  Pending = 'Pending',
+  Paid = 'Paid',
+  Failed = 'Failed',
+  Declined = 'Declined',
+  Cancelled = 'Cancelled',
+  Refunded = 'Refunded',
+  Chargeback = 'Chargeback',
+}
