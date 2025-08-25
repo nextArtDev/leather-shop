@@ -1,7 +1,5 @@
 'use client'
 
-import { useModal } from '@/providers/modal-provider'
-import { Edit, MoreHorizontal, Trash } from 'lucide-react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,42 +20,35 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Category, Image, SubCategory } from '@/lib/generated/prisma'
+import { Edit, MoreHorizontal, Trash } from 'lucide-react'
 
-import { useActionState } from 'react'
 import { usePathname } from 'next/navigation'
-import CustomModal from '../../../components/custom-modal'
+import { useActionState } from 'react'
 // import { toast } from 'sonner'
-import SubCategoryDetails from './sub-category-details'
 import { deleteSubCategory } from '../../../lib/actions/sub-category'
 
 import Link from 'next/link'
 
 interface CellActionsProps {
-  rowData: SubCategory & { images: Image[] }
-  categories: Partial<Category>[]
+  subCategoryId: string
 }
 
-export const CellActions: React.FC<CellActionsProps> = ({
-  rowData,
-  categories,
-}) => {
-  const { setOpen, setClose } = useModal()
+export const CellActions: React.FC<CellActionsProps> = ({ subCategoryId }) => {
   const path = usePathname()
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, deleteAction, pending] = useActionState(
-    deleteSubCategory.bind(null, path, rowData.id as string),
+    deleteSubCategory.bind(null, path, subCategoryId as string),
     {
       errors: {},
     }
   )
-  // Return null if rowData or rowData.id don't exist
-  if (!rowData || !rowData.id) return null
+  // Return null if rowData or subCategoryId don't exist
+  if (!subCategoryId) return null
 
   return (
     <AlertDialog>
-      <DropdownMenu>
+      <DropdownMenu dir="rtl">
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="h-8 w-8 p-0">
             <span className="sr-only">Open menu</span>
@@ -66,33 +57,10 @@ export const CellActions: React.FC<CellActionsProps> = ({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
           <DropdownMenuLabel>عملیات</DropdownMenuLabel>
-          <DropdownMenuItem
-            className="flex gap-2"
-            onClick={() => {
-              try {
-                setOpen(
-                  <CustomModal>
-                    <SubCategoryDetails
-                      initialData={rowData}
-                      categories={categories}
-                    />
-                  </CustomModal>
-                  // async () => {
-                  //   const data = await getSubCategoryById(rowData.id)
-                  //   // console.log({ data })
-                  //   return {
-                  //     rowData: data,
-                  //   }
-                  // }
-                )
-              } catch (error) {
-                console.error('Error:', error)
-              }
-            }}
-          >
+          <DropdownMenuItem className="flex gap-2">
             <Link
               className="flex items-center gap-2"
-              href={`/dashboard/sub-categories/${rowData.id}`}
+              href={`/dashboard/sub-categories/${subCategoryId}`}
             >
               <Edit size={15} />
               ویرایش زیردسته
@@ -108,10 +76,10 @@ export const CellActions: React.FC<CellActionsProps> = ({
       </DropdownMenu>
       <AlertDialogContent className="max-w-lg">
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-left">
+          <AlertDialogTitle className="text-right">
             از حذف زیردسته‌بندی مطمئن هستید؟
           </AlertDialogTitle>
-          <AlertDialogDescription className="text-left">
+          <AlertDialogDescription className="text-right">
             این عملیات برگشت‌پذیر نیست و تمام زیردسته‌بندی و محصولاتش حذف خواهند
             شد!
           </AlertDialogDescription>
@@ -121,10 +89,6 @@ export const CellActions: React.FC<CellActionsProps> = ({
           <AlertDialogAction
             disabled={pending}
             className="bg-destructive hover:bg-destructive mb-2 text-white"
-            onClick={() => {
-              setClose()
-              // toast('Deleted sub category')
-            }}
           >
             <form action={deleteAction}>
               <input className="hidden" />

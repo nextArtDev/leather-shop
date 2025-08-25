@@ -5,21 +5,27 @@ import { BadgeCheck, BadgeMinus } from 'lucide-react'
 import { ColumnDef } from '@tanstack/react-table'
 
 import { CellActions } from './cell-actions'
-import { Category, Image, SubCategory } from '@/lib/generated/prisma'
+import { Category, Image } from '@/lib/generated/prisma'
 
-export const columns: ColumnDef<
-  SubCategory & { category: Category } & { images: Image[] } & {
-    categories: Partial<Category>[]
-  }
->[] = [
+export type SubCategoryColumn = {
+  id: string
+  name: string
+  url: string
+  featured: boolean
+  images: Image[]
+  category: Category
+  createdAt: string
+}
+
+export const columns: ColumnDef<SubCategoryColumn>[] = [
   {
-    accessorKey: 'image',
+    accessorKey: 'images',
     header: 'تصویر',
     cell: ({ row }) => {
       return (
         <div className="relative w-20 aspect-square min-w-20 rounded-2xl overflow-hidden">
           <NextImage
-            src={row.original?.images[0]?.url}
+            src={row.original?.images?.[0].url}
             alt={row.original.name}
             fill
             className="rounded-2xl object-cover shadow-2xl"
@@ -72,8 +78,7 @@ export const columns: ColumnDef<
     id: 'actions',
     cell: ({ row }) => {
       const rowData = row.original
-      const categories = row.original.categories
-      return <CellActions rowData={rowData} categories={categories} />
+      return <CellActions subCategoryId={rowData.id} />
     },
   },
 ]

@@ -1,54 +1,92 @@
 import { Plus } from 'lucide-react'
-import DataTable from '../../components/data-table'
 import { getAllSubCategories } from '../../lib/queries'
-import SubCategoryDetails from './components/sub-category-details'
 
-import prisma from '@/lib/prisma'
-import { columns } from './components/columns'
+import { columns, SubCategoryColumn } from './components/columns'
 import { Suspense } from 'react'
+import { DataTableSkeleton } from '../../components/shared/DataTableSkeleton'
+import { Separator } from '@/components/ui/separator'
+import Link from 'next/link'
+import { Heading } from '../../components/shared/Heading'
+import { cn } from '@/lib/utils'
+import { buttonVariants } from '@/components/ui/button'
+import { format } from 'date-fns-jalali'
+import { DataTable } from '../../components/shared/DataTable'
+
+function SubCategoryDataTable({
+  formattedSubCategory,
+  page,
+  pageSize,
+  isNext,
+}: {
+  formattedSubCategory: SubCategoryColumn[]
+  page: number
+  pageSize: number
+  isNext: boolean
+}) {
+  return (
+    <DataTable
+      searchKey="name"
+      columns={columns}
+      data={formattedSubCategory}
+      pageNumber={page}
+      pageSize={pageSize}
+      isNext={isNext}
+    />
+  )
+}
+
 export default async function AdminSubCategoriesPage({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
-  const asyncPage = (await searchParams).page
-  const page = asyncPage ? +asyncPage : 1
+  const params = await searchParams
+  const page = params.page ? +params.page : 1
+  const pageSize = params.pageSize ? +params.pageSize : 50
 
-  const subCategoriesResponse = await getAllSubCategories({ page })
-  const categories = await prisma.category.findMany({
-    where: {},
-    select: {
-      name: true,
-      id: true,
-    },
-  })
+  const subCategoriesResponse = await getAllSubCategories({ page, pageSize })
 
-  if (!subCategoriesResponse.subCategories) return null
-  // const columns = getColumns(categories)
-  const dataWithCategories = subCategoriesResponse.subCategories.map(
-    (subCategory) => ({
-      ...subCategory,
-      categories,
-    })
-  )
+  const formattedSubCategory: SubCategoryColumn[] =
+    subCategoriesResponse.subCategories?.map((item) => ({
+      id: item.id,
+      name: item.name,
+      url: item.url,
+      featured: item.featured,
+      images: item.images,
+      category: item.category,
+      // categories: categories,
+
+      createdAt: format(item.createdAt, 'dd MMMM yyyy'),
+    }))
+
   return (
-    <section className="px-1">
-      <Suspense>
-        <DataTable
-          actionButtonText={
-            <>
-              <Plus size={15} />
-              ایجاد زیردسته‌بندی
-            </>
-          }
-          modalChildren={<SubCategoryDetails categories={categories} />}
-          newTabLink="/dashboard/sub-categories/new"
-          filterValue="name"
-          data={dataWithCategories}
-          searchPlaceholder="جست و جوی زیردسته‌ها با نام "
-          columns={columns}
+    <div className="flex-col">
+      <div className="flex-1 flex items-center justify-between space-y-4 p-8 pt-6">
+        <Heading
+          title={`زیردسته‌بندی (${formattedSubCategory?.length})`}
+          description="زیردسته‌بندی را مدیریت کنید."
         />
-      </Suspense>
-    </section>
+        <Link
+          href={`/dashboard/sub-categories/new`}
+          className={cn(buttonVariants())}
+        >
+          <Plus className="ml-2 h-4 w-4" /> اضافه کردن
+        </Link>
+      </div>
+      <div className="flex-1 space-y-4 p-8 pt-6">
+        <Separator />
+        <Suspense fallback={<DataTableSkeleton />}>
+          {!!subCategoriesResponse.subCategories?.length &&
+            !!formattedSubCategory && (
+              <SubCategoryDataTable
+                formattedSubCategory={formattedSubCategory}
+                page={page}
+                pageSize={pageSize}
+                isNext={subCategoriesResponse?.isNext}
+              />
+            )}
+        </Suspense>
+      </div>
+    </div>
   )
 }

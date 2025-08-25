@@ -1,6 +1,3 @@
-import { useModal } from '@/providers/modal-provider'
-
-import { Edit, MoreHorizontal, Trash } from 'lucide-react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,36 +18,30 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Edit, MoreHorizontal, Trash } from 'lucide-react'
 
-import { useActionState } from 'react'
 import { usePathname } from 'next/navigation'
-import CustomModal from '../../../components/custom-modal'
-import CategoryDetails from './category-details'
-import { Category, Image } from '@/lib/generated/prisma'
-// import { toast } from 'sonner'
+import { useActionState } from 'react'
+
 import Link from 'next/link'
-import { getCategoryById } from '../../../lib/queries'
 import { deleteCategory } from '../../../lib/actions/category'
 
 interface CellActionsProps {
-  rowData: Category & { images: Image[] }
+  categoryId: string
 }
 
-// CellActions component definition
-export const CellActions: React.FC<CellActionsProps> = ({ rowData }) => {
-  // Hooks
-  const { setOpen, setClose } = useModal()
+export const CellActions: React.FC<CellActionsProps> = ({ categoryId }) => {
   const path = usePathname()
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, deleteAction, pending] = useActionState(
-    deleteCategory.bind(null, path, rowData.id as string),
+    deleteCategory.bind(null, path, categoryId as string),
     {
       errors: {},
     }
   )
-  // Return null if rowData or rowData.id don't exist
-  if (!rowData || !rowData.id) return null
+
+  if (!categoryId) return null
 
   return (
     <AlertDialog>
@@ -65,28 +56,9 @@ export const CellActions: React.FC<CellActionsProps> = ({ rowData }) => {
           <DropdownMenuLabel>عملیات</DropdownMenuLabel>
           <Link
             className="flex items-center gap-2"
-            href={`/dashboard/categories/${rowData.id}`}
+            href={`/dashboard/categories/${categoryId}`}
           >
-            <DropdownMenuItem
-              className="flex gap-2"
-              onClick={() => {
-                try {
-                  setOpen(
-                    <CustomModal>
-                      <CategoryDetails initialData={rowData} />
-                    </CustomModal>,
-                    async () => {
-                      const data = await getCategoryById(rowData.id)
-                      return {
-                        rowData: data,
-                      }
-                    }
-                  )
-                } catch (error) {
-                  console.error('Error:', error)
-                }
-              }}
-            >
+            <DropdownMenuItem className="flex gap-2">
               <Edit size={15} />
               ویرایش دسته‌بندی
             </DropdownMenuItem>
@@ -114,10 +86,6 @@ export const CellActions: React.FC<CellActionsProps> = ({ rowData }) => {
           <AlertDialogAction
             disabled={pending}
             className="bg-destructive hover:bg-destructive mb-2 text-white"
-            onClick={() => {
-              setClose()
-              // toast('دسته‌بندی حذف شد!')
-            }}
           >
             <form action={deleteAction}>
               <input className="hidden" />

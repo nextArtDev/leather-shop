@@ -48,7 +48,7 @@ import { Loader2 } from 'lucide-react'
 
 interface SubCategoryDetailsProps {
   initialData?: SubCategory & { images: Partial<Image>[] }
-  categories: Partial<Category>[]
+  categories: Category[]
 }
 
 const SubCategoryDetails: FC<SubCategoryDetailsProps> = ({

@@ -1,26 +1,20 @@
 'use client'
 
-// React, Next.js imports
-
 import NextImage from 'next/image'
-
-// Hooks and utilities
-
-// Lucide icons
 import { BadgeCheck, BadgeMinus } from 'lucide-react'
-
-// Queries
-// import { deleteCategory, getCategory } from '@/queries/category'
-
-// Tanstack React Table
 import { ColumnDef } from '@tanstack/react-table'
-
-// Prisma models
-
 import { CellActions } from './cell-actions'
-import { Category, Image } from '@/lib/generated/prisma'
+import { Image } from '@/lib/generated/prisma'
 
-export const columns: ColumnDef<Category & { images: Image[] }>[] = [
+export type CategoryColumn = {
+  id: string
+  name: string
+  url: string
+  featured: boolean
+  images: Image[]
+  createdAt: string
+}
+export const columns: ColumnDef<CategoryColumn>[] = [
   {
     accessorKey: 'image',
     header: 'عکس',
@@ -76,7 +70,7 @@ export const columns: ColumnDef<Category & { images: Image[] }>[] = [
     cell: ({ row }) => {
       const rowData = row.original
 
-      return <CellActions rowData={rowData} />
+      return <CellActions categoryId={rowData.id} />
     },
   },
 ]

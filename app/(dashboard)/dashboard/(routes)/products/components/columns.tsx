@@ -1,6 +1,4 @@
 'use client'
-import { useActionState } from 'react'
-import NextImage from 'next/image'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,123 +20,152 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useModal } from '@/providers/modal-provider'
-import { Edit, FilePenLine, MoreHorizontal, Trash } from 'lucide-react'
-import { ColumnDef } from '@tanstack/react-table'
-import Link from 'next/link'
 import {
   Category,
   Color,
   Image,
   OfferTag,
-  Product,
   Size,
   SubCategory,
 } from '@/lib/generated/prisma'
+import { useModal } from '@/providers/modal-provider'
+import { ColumnDef } from '@tanstack/react-table'
+import {
+  BookCheck,
+  BookX,
+  Edit,
+  FilePenLine,
+  MoreHorizontal,
+  Trash,
+} from 'lucide-react'
+import NextImage from 'next/image'
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useActionState } from 'react'
 import { deleteProduct } from '../../../lib/actions/products'
 
-export const columns: ColumnDef<
-  Product & {
-    images: Image[]
-    variantImages: Image[]
-    colors: Color[] | null
-    sizes: Size[] | null
-    category: Category
-    subCategory: SubCategory
-    offerTag: OfferTag | null
-  }
->[] = [
-  {
-    accessorKey: 'name',
-    header: 'نام',
-    cell: ({ row }) => {
-      return <span>{row.original.name}</span>
-    },
-  },
-  {
-    accessorKey: 'image',
-    header: 'تصویر',
-    cell: ({ row }) => {
-      return (
-        <div className=" flex flex-col justify-center items-center gap-y-3">
-          <Link href={`/dashboard/products/${row.original.id}`}>
-            <div className="group relative flex  justify-center items-center cursor-pointer">
-              <NextImage
-                src={row.original.images.map((img) => img.url)[0]}
-                alt={`${row.original.name} image`}
-                width={96}
-                height={96}
-                className="max-w-32 h-24 rounded-md object-cover shadow-sm"
-              />
-              <div className=" w-[230px]  text-background absolute inset-0   z-0 rounded-sm bg-primary/25 transition-all duration-150 hidden group-hover:flex items-center justify-center">
-                <FilePenLine className=" text-background" />
-                ویرایش
-              </div>
+export type ProductColumn = {
+  id: string
+  name: string
+  slug: string
+  subCategory: SubCategory
+  offerTag?: OfferTag | null
+  featured: boolean
+  images: Image[]
+  colors: Color[]
+  sizes: Size[]
+  category: Category
+  createdAt: string
+}
 
-              <div className="flex flex-col gap-y-2 group">
-                <div className="relative **:flex flex-col mt-2 gap-2 cursor-pointer p-2">
-                  <div className=" flex flex-wrap max-w-sm gap-2 rounded-md">
-                    {row.original?.colors?.map((color: Color) => (
-                      <span
-                        key={color.name}
-                        className="w-4 h-4 rounded-full shadow-2xl"
-                        style={{ backgroundColor: color.name }}
-                      />
-                    ))}
-                  </div>
-                  <div>
-                    {/* Sizes */}
-                    <div className="flex flex-col  gap-2 max-w-72 mt-1">
-                      {row.original.sizes?.map((size: Size) => (
+export const columns: ColumnDef<ProductColumn>[] =
+  // Product & {
+  //   images: Image[]
+  //   variantImages: Image[]
+  //   colors: Color[] | null
+  //   sizes: Size[] | null
+  //   category: Category
+  //   subCategory: SubCategory
+  //   offerTag: OfferTag | null
+  // }
+  [
+    {
+      accessorKey: 'name',
+      header: 'نام',
+      cell: ({ row }) => {
+        return <span>{row.original.name}</span>
+      },
+    },
+    {
+      accessorKey: 'image',
+      header: 'تصویر',
+      cell: ({ row }) => {
+        return (
+          <div className=" flex flex-col justify-center items-center gap-y-3">
+            <Link href={`/dashboard/products/${row.original.id}`}>
+              <div className="group relative flex  justify-center items-center cursor-pointer">
+                <NextImage
+                  src={row.original.images.map((img) => img.url)[0]}
+                  alt={`${row.original.name} image`}
+                  width={96}
+                  height={96}
+                  className="max-w-32 h-24 rounded-md object-cover shadow-sm"
+                />
+                <div className=" w-[230px]  text-background absolute inset-0   z-0 rounded-sm bg-primary/25 transition-all duration-150 hidden group-hover:flex items-center justify-center">
+                  <FilePenLine className=" text-background" />
+                  ویرایش
+                </div>
+
+                <div className="flex flex-col gap-y-2 group">
+                  <div className="relative **:flex flex-col mt-2 gap-2 cursor-pointer p-2">
+                    <div className=" flex flex-wrap max-w-sm gap-2 rounded-md">
+                      {row.original?.colors?.map((color: Color) => (
                         <span
-                          key={size.size}
-                          className="w-fit p-1 rounded-md text-[11px] font-medium border-2 bg-white/10"
-                        >
-                          {size.size} - ({size.quantity} عدد) - {size.price}
-                        </span>
+                          key={color.name}
+                          className="w-4 h-4 rounded-full shadow-2xl"
+                          style={{ backgroundColor: color.name }}
+                        />
                       ))}
+                    </div>
+                    <div>
+                      {/* Sizes */}
+                      <div className="flex flex-col  gap-2 max-w-72 mt-1">
+                        {row.original.sizes?.map((size: Size) => (
+                          <span
+                            key={size.size}
+                            className="w-fit p-1 rounded-md text-[11px] font-medium border-2 bg-white/10"
+                          >
+                            {size.size} - ({size.quantity} عدد) - {size.price}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </Link>
-        </div>
-      )
+            </Link>
+          </div>
+        )
+      },
     },
-  },
-  {
-    accessorKey: 'category',
-    header: 'دسته‌بندی',
-    cell: ({ row }) => {
-      return <span>{row.original.category.name}</span>
+    {
+      accessorKey: 'category',
+      header: 'دسته‌بندی',
+      cell: ({ row }) => {
+        return <span>{row.original.category.name}</span>
+      },
     },
-  },
-  {
-    accessorKey: 'subCategory',
-    header: 'زیردسته‌بندی',
-    cell: ({ row }) => {
-      return <span>{row.original.subCategory.name}</span>
+    {
+      accessorKey: 'subCategory',
+      header: 'زیردسته‌بندی',
+      cell: ({ row }) => {
+        return <span>{row.original.subCategory.name}</span>
+      },
     },
-  },
-  {
-    accessorKey: 'offerTag',
-    header: 'تخفیف',
-    cell: ({ row }) => {
-      const offerTag = row.original.offerTag
-      return <span>{offerTag ? offerTag.name : '-'}</span>
+    {
+      accessorKey: 'featured',
+      header: 'ویژه',
+      cell: ({ row }) => {
+        return (
+          <span>
+            {row.original.featured ? (
+              <BookCheck className="text-green-400" />
+            ) : (
+              <BookX className="text-red-500" />
+            )}
+          </span>
+        )
+      },
     },
-  },
-  {
-    id: 'actions',
-    cell: ({ row }) => {
-      const rowData = row.original
+    {
+      id: 'actions',
+      cell: ({ row }) => {
+        const rowData = row.original
 
-      return <CellActions productId={rowData.id} />
+        return <CellActions productId={rowData.id} />
+      },
     },
-  },
-]
+  ]
 
 // Define props interface for CellActions component
 interface CellActionsProps {

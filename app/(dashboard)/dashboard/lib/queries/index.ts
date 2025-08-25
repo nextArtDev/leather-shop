@@ -135,29 +135,45 @@ export const getCategoryList = cache(async (): Promise<Category[] | []> => {
   return categoryList
 })
 
-export const getAllProductsList = cache(async () => {
-  try {
-    // Retrieve all products associated with the store
-    const products = await prisma.product.findMany({
-      where: {},
-      include: {
-        category: true,
-        subCategory: true,
-        offerTag: true,
-        images: { orderBy: { created_at: 'desc' } },
-        variantImages: true,
-        questions: true,
-        specs: true,
-        colors: true,
-        sizes: true,
-      },
-    })
-    // console.log({ products })
-    return products
-  } catch (error) {
-    console.error(error)
+export const getAllProductsList = cache(
+  async ({
+    page = 1,
+    pageSize = 100,
+  }: {
+    page?: number
+    pageSize?: number
+  }) => {
+    try {
+      const skipAmount = (page - 1) * pageSize
+
+      // Retrieve all products associated with the store
+      const products = await prisma.product.findMany({
+        where: {},
+        include: {
+          category: true,
+          subCategory: true,
+          offerTag: true,
+          images: { orderBy: { created_at: 'desc' } },
+          variantImages: true,
+          questions: true,
+          specs: true,
+          colors: true,
+          sizes: true,
+        },
+        skip: skipAmount,
+        take: pageSize,
+      })
+      const count = await prisma.product.count()
+
+      const isNext = count > skipAmount + products.length
+
+      // console.log({ products })
+      return { products, isNext }
+    } catch (error) {
+      console.error(error)
+    }
   }
-})
+)
 
 export const getAllOfferTags = cache(async () => {
   const offerTgas = await prisma.offerTag.findMany({

@@ -1,43 +1,105 @@
 import { Plus } from 'lucide-react'
-import { columns } from './components/columns'
-import DataTable from '../../components/data-table'
-import CategoryDetails from './components/category-details'
+import { CategoryColumn, columns } from './components/columns'
 import { getAllCategories } from '../../lib/queries'
 import { Suspense } from 'react'
+import { format } from 'date-fns-jalali'
+import { Heading } from '../../components/shared/Heading'
+import Link from 'next/link'
+import { cn } from '@/lib/utils'
+import { buttonVariants } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
+import { DataTableSkeleton } from '../../components/shared/DataTableSkeleton'
+import { DataTable } from '../../components/shared/DataTable'
+
+function CategoryDataTable({
+  formattedCategory,
+  page,
+  pageSize,
+  isNext,
+}: {
+  formattedCategory: CategoryColumn[]
+  page: number
+  pageSize: number
+  isNext: boolean
+}) {
+  return (
+    <DataTable
+      searchKey="name"
+      columns={columns}
+      data={formattedCategory}
+      pageNumber={page}
+      pageSize={pageSize}
+      isNext={isNext}
+    />
+  )
+}
 
 export default async function CategoriesPage({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
-  const asyncPage = (await searchParams).page
-  const page = asyncPage ? +asyncPage : 1
+  const params = await searchParams
+  const page = params.page ? +params.page : 1
+  const pageSize = params.pageSize ? +params.pageSize : 50
 
-  // Fetching stores data from the database
-  const categoriesResponse = await getAllCategories({ page })
-  // console.log(categoriesResponse.categories)
+  const categoriesResponse = await getAllCategories({ page, pageSize })
 
-  // Checking if no categories are found
-  if (!categoriesResponse.categories) return null // If no categories found, return null
+  const formattedCategory: CategoryColumn[] =
+    categoriesResponse.categories?.map((item) => ({
+      id: item.id,
+      name: item.name,
+      url: item.url,
+      featured: item.featured,
+      images: item.images,
+      // categories: categories,
+
+      createdAt: format(item.createdAt, 'dd MMMM yyyy'),
+    }))
 
   return (
-    <Suspense>
-      <div className="px-1">
-        <DataTable
-          actionButtonText={
-            <>
-              <Plus size={15} />
-              ایجاد دسته‌بندی
-            </>
-          }
-          modalChildren={<CategoryDetails />}
-          newTabLink="/dashboard/categories/new"
-          filterValue="name"
-          data={categoriesResponse.categories}
-          searchPlaceholder="جست‌وجو..."
-          columns={columns}
+    <div className="flex-col">
+      <div className="flex-1 flex items-center justify-between space-y-4 p-8 pt-6">
+        <Heading
+          title={`زیردسته‌بندی (${formattedCategory?.length})`}
+          description="زیردسته‌بندی را مدیریت کنید."
         />
+        <Link
+          href={`/dashboard/categories/new`}
+          className={cn(buttonVariants())}
+        >
+          <Plus className="ml-2 h-4 w-4" /> اضافه کردن
+        </Link>
       </div>
-    </Suspense>
+      <div className="flex-1 space-y-4 p-8 pt-6">
+        <Separator />
+        <Suspense fallback={<DataTableSkeleton />}>
+          {!!categoriesResponse.categories?.length && !!formattedCategory && (
+            <CategoryDataTable
+              formattedCategory={formattedCategory}
+              page={page}
+              pageSize={pageSize}
+              isNext={categoriesResponse?.isNext}
+            />
+          )}
+        </Suspense>
+      </div>
+    </div>
+    // <div className="px-1">
+    //   <DataTable
+    //     actionButtonText={
+    //       <>
+    //         <Plus size={15} />
+    //         ایجاد دسته‌بندی
+    //       </>
+    //     }
+    //     modalChildren={<CategoryDetails />}
+    //     newTabLink="/dashboard/categories/new"
+    //     filterValue="name"
+    //     data={categoriesResponse.categories}
+    //     searchPlaceholder="جست‌وجو..."
+    //     columns={columns}
+    //   />
+    // </div>
   )
 }
