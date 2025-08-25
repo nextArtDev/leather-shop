@@ -54,7 +54,7 @@ export default function UserSession() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className="w-fit rounded-none bg-background/20 backdrop-blur-2xl text-white "
+        className="w-fit rounded-none bg-background/20 backdrop-blur-lg   "
         align="end"
       >
         <DropdownMenuLabel dir="rtl" className="cursor-pointer">

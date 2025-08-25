@@ -10,16 +10,11 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { Facebook, Instagram, Linkedin, Send, Twitter } from 'lucide-react'
-import { useTheme } from 'next-themes'
+
 import Link from 'next/link'
 import * as React from 'react'
 
 export default function Footer() {
-  const { theme, setTheme } = useTheme()
-  // const [theme, setTheme] = React.useState<'light' | 'dark' | 'system'>(
-
-  //   'system'
-  // )
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isChatOpen, setIsChatOpen] = React.useState(false)
 
@@ -169,9 +164,9 @@ export default function Footer() {
             </div>
             <div className="w-fit p-1">
               <ThemeSwitcher
-                defaultValue="light"
-                onChange={setTheme}
-                value={theme as 'light' | 'dark' | 'system'}
+              // defaultValue="light"
+              // onChange={setTheme}
+              // value={theme as 'light' | 'dark' | 'system'}
               />
             </div>
             {/* <div className="flex items-center space-x-2">
