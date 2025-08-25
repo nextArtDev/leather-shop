@@ -152,7 +152,7 @@ const AddToCardBtn: FC<AddToCardBtnProps> = ({
               {'اتمام موجودی!'}
             </span>
           ) : (
-            <span className="px-2 py-3 block text-center text-rose-300 text-xs">
+            <span className="px-2 py-3 block text-center text-indigo-400 text-xs">
               {stock - existItem.quantity} عدد در انبار
             </span>
           )}
@@ -165,7 +165,7 @@ const AddToCardBtn: FC<AddToCardBtnProps> = ({
   return (
     <Button
       disabled={!price || !isProductValid || remainingStock <= 0}
-      variant={price ? 'default' : 'secondary'}
+      variant={price ? 'indigo' : 'secondary'}
       onClick={handleAddToCart}
       className={cn(
         'w-full rounded-sm py-6 font-bold flex justify-between items-center'
@@ -175,7 +175,7 @@ const AddToCardBtn: FC<AddToCardBtnProps> = ({
       {price && (
         <div className="flex items-center gap-1">
           {!!discount && (
-            <p className="text-red-500">
+            <p className="text-red-300">
               {price - price * (discount / 100)} تومان
             </p>
           )}

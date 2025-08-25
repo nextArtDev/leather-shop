@@ -8,6 +8,7 @@ import {
 } from '../../lib/queries'
 import { columns } from './components/columns'
 import ProductDetails from './components/product-details'
+import { Suspense } from 'react'
 
 export default async function ProductsPage() {
   const products = await getAllProductsList()
@@ -18,22 +19,24 @@ export default async function ProductsPage() {
 
   return (
     <div className="w-full px-1">
-      <DataTable
-        actionButtonText={
-          <>
-            <Plus size={15} />
-            ایجاد محصول
-          </>
-        }
-        modalChildren={
-          <ProductDetails categories={categories} offerTags={offerTags} />
-        }
-        newTabLink={`/dashboard/products/new`}
-        filterValue="name"
-        data={products}
-        columns={columns}
-        searchPlaceholder="جست‌وجوی نام محصول..."
-      />
+      <Suspense>
+        <DataTable
+          actionButtonText={
+            <>
+              <Plus size={15} />
+              ایجاد محصول
+            </>
+          }
+          modalChildren={
+            <ProductDetails categories={categories} offerTags={offerTags} />
+          }
+          newTabLink={`/dashboard/products/new`}
+          filterValue="name"
+          data={products}
+          columns={columns}
+          searchPlaceholder="جست‌وجوی نام محصول..."
+        />
+      </Suspense>
     </div>
   )
 }

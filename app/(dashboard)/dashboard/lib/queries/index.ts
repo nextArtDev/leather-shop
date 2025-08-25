@@ -3,6 +3,7 @@ import {
   Category,
   City,
   Color,
+  Coupon,
   Image,
   Order,
   OrderItem,
@@ -210,24 +211,6 @@ export const getProductById = cache(
   }
 )
 
-export const getAllCoupons = async () => {
-  try {
-    // const user = await currentUser()
-    // if (!user) throw new Error('Unauthenticated.')
-
-    // if (user.role !== 'ADMIN')
-    //   throw new Error(
-    //     'Unauthorized Access: Seller Privileges Required for Entry.'
-    //   )
-
-    const coupons = await prisma.coupon.findMany()
-    // console.log({ coupons })
-    return coupons
-  } catch (error) {
-    console.log(error)
-  }
-}
-
 interface getAllReviewsProps {
   page?: number
   pageSize?: number
@@ -349,5 +332,44 @@ export type DetailedOrder = Order & {
   shippingAddress: ShippingAddress & {
     city: City | null
     province: Province | null
+  }
+}
+
+interface getAllReviewsProps {
+  page?: number
+  pageSize?: number
+}
+
+export const getAllCoupons = async (
+  params: getAllReviewsProps
+): Promise<{ coupon: Coupon[] } & { isNext: boolean }> => {
+  const { page = 1, pageSize = 50 } = params
+  const skipAmount = (page - 1) * pageSize
+  try {
+    const user = await getCurrentUser()
+
+    if (!user) throw new Error('Unauthenticated.')
+
+    if (user.role !== 'ADMIN')
+      throw new Error(
+        'Unauthorized Access: Seller Privileges Required for Entry.'
+      )
+
+    // Retrieve order groups for the specified store and user
+    const allCoupons = await prisma.coupon.findMany({
+      where: {},
+
+      orderBy: {
+        updatedAt: 'desc',
+      },
+      skip: skipAmount,
+      take: pageSize,
+    })
+    const totalCoupons = await prisma.coupon.count()
+
+    const isNext = totalCoupons > skipAmount + allCoupons.length
+    return { coupon: allCoupons || [], isNext }
+  } catch (error) {
+    throw error
   }
 }

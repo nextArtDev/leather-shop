@@ -1,8 +1,8 @@
 import { format } from 'date-fns-jalali'
 import { getAllOrders } from '../../lib/queries'
-import { DataTable } from '../comments/components/DataTable'
+import { DataTable } from '../../components/shared/DataTable'
 import { columns, OrderTypeColumn } from './components/columns'
-import { Heading } from '../comments/components/Heading'
+
 import { Separator } from '@/components/ui/separator'
 import { OrderStatus, PaymentStatus } from '@/lib/types/home'
 import {
@@ -11,6 +11,32 @@ import {
   Province,
   ShippingAddress,
 } from '@/lib/generated/prisma'
+import { Suspense } from 'react'
+import { DataTableSkeleton } from '../../components/shared/DataTableSkeleton'
+import { Heading } from '../../components/shared/Heading'
+
+function OrdersDataTable({
+  formattedOrders,
+  page,
+  pageSize,
+  isNext,
+}: {
+  formattedOrders: OrderTypeColumn[]
+  page: number
+  pageSize: number
+  isNext: boolean
+}) {
+  return (
+    <DataTable
+      searchKey="name"
+      columns={columns}
+      data={formattedOrders}
+      pageNumber={page}
+      pageSize={pageSize}
+      isNext={isNext}
+    />
+  )
+}
 
 async function AdminOrdersPage({
   searchParams,
@@ -23,7 +49,7 @@ async function AdminOrdersPage({
 
   const orders = await getAllOrders({ page, pageSize })
   // console.log(orders.order?.map((t) => t.shippingAddressId))
-  const formattedComments: OrderTypeColumn[] = orders.order?.map((item) => ({
+  const formattedOrders: OrderTypeColumn[] = orders.order?.map((item) => ({
     id: item.id,
     name: item.user.name ?? '',
     paymentStatus: item.paymentStatus as PaymentStatus,
@@ -44,21 +70,21 @@ async function AdminOrdersPage({
     <div className="flex-col">
       <div className="flex-1 space-y-4 p-8 pt-6">
         <Heading
-          title={`سفارشات (${formattedComments?.length})`}
+          title={`سفارشات (${formattedOrders?.length})`}
           description="سفارشات را مدیریت کنید."
         />
 
         <Separator />
-        {!!orders?.order.length && !!formattedComments && (
-          <DataTable
-            searchKey="name"
-            columns={columns}
-            data={formattedComments}
-            pageNumber={page ? +page : 1}
-            pageSize={pageSize}
-            isNext={orders.isNext}
-          />
-        )}
+        <Suspense fallback={<DataTableSkeleton />}>
+          {!!orders?.order.length && !!formattedOrders && (
+            <OrdersDataTable
+              formattedOrders={formattedOrders}
+              page={page}
+              pageSize={pageSize}
+              isNext={orders.isNext}
+            />
+          )}
+        </Suspense>
         <Separator />
       </div>
     </div>

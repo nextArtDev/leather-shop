@@ -2,8 +2,6 @@
 
 import { ThemeSwitcher } from '@/components/shared/theme-switcher'
 import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import {
   Tooltip,
@@ -11,15 +9,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import {
-  Facebook,
-  Instagram,
-  Linkedin,
-  Moon,
-  Send,
-  Sun,
-  Twitter,
-} from 'lucide-react'
+import { Facebook, Instagram, Linkedin, Send, Twitter } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import * as React from 'react'

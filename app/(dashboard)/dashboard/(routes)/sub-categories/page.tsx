@@ -5,6 +5,7 @@ import SubCategoryDetails from './components/sub-category-details'
 
 import prisma from '@/lib/prisma'
 import { columns } from './components/columns'
+import { Suspense } from 'react'
 export default async function AdminSubCategoriesPage({
   searchParams,
 }: {
@@ -32,20 +33,22 @@ export default async function AdminSubCategoriesPage({
   )
   return (
     <section className="px-1">
-      <DataTable
-        actionButtonText={
-          <>
-            <Plus size={15} />
-            ایجاد زیردسته‌بندی
-          </>
-        }
-        modalChildren={<SubCategoryDetails categories={categories} />}
-        newTabLink="/dashboard/sub-categories/new"
-        filterValue="name"
-        data={dataWithCategories}
-        searchPlaceholder="جست و جوی زیردسته‌ها با نام "
-        columns={columns}
-      />
+      <Suspense>
+        <DataTable
+          actionButtonText={
+            <>
+              <Plus size={15} />
+              ایجاد زیردسته‌بندی
+            </>
+          }
+          modalChildren={<SubCategoryDetails categories={categories} />}
+          newTabLink="/dashboard/sub-categories/new"
+          filterValue="name"
+          data={dataWithCategories}
+          searchPlaceholder="جست و جوی زیردسته‌ها با نام "
+          columns={columns}
+        />
+      </Suspense>
     </section>
   )
 }

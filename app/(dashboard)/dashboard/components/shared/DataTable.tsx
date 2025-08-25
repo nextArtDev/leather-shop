@@ -22,7 +22,6 @@ import {
 } from '@/components/ui/table'
 import { Input } from '@/components/ui/input'
 
-import Pagination from './Pagination'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
   Select,
@@ -33,6 +32,7 @@ import {
 } from '@/components/ui/select'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
+import Pagination from './Pagination'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]

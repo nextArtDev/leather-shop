@@ -28,12 +28,19 @@ import { useModal } from '@/providers/modal-provider'
 import { MoreHorizontal, Trash } from 'lucide-react'
 import { ColumnDef } from '@tanstack/react-table'
 import { format } from 'date-fns-jalali'
-import { Coupon } from '@/lib/generated/prisma'
 import { getTimeUntil } from '../../../lib/utils'
 import { usePathname } from 'next/navigation'
 import { deleteCoupon } from '../../../lib/actions/coupons'
 
-export const columns: ColumnDef<Coupon>[] = [
+export type CouponColumn = {
+  id: string
+  code: string
+  startDate: string
+  endDate: string
+  discount: number
+  createdAt: string
+}
+export const columns: ColumnDef<CouponColumn>[] = [
   {
     accessorKey: 'code',
     header: 'کد',
@@ -74,7 +81,7 @@ export const columns: ColumnDef<Coupon>[] = [
     header: 'تخفیف',
     cell: ({ row }) => {
       return (
-        <span className="text-red-500 font-bold">{row.original.discount}</span>
+        <span className="text-red-500 font-bold">{row.original.discount}%</span>
       )
     },
   },
@@ -109,7 +116,7 @@ const CellActions: React.FC<CellActionsProps> = ({ couponId }) => {
   if (!couponId) return null
   return (
     <AlertDialog>
-      <DropdownMenu>
+      <DropdownMenu dir="rtl">
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="h-8 w-8 p-0">
             <span className="sr-only">Open menu</span>
@@ -121,18 +128,18 @@ const CellActions: React.FC<CellActionsProps> = ({ couponId }) => {
           <DropdownMenuSeparator />
 
           <AlertDialogTrigger asChild>
-            <DropdownMenuItem className="flex gap-2">
+            <DropdownMenuItem className="flex gap-2 cursor-pointer">
               <Trash size={15} /> حذف کوپن
             </DropdownMenuItem>
           </AlertDialogTrigger>
         </DropdownMenuContent>
       </DropdownMenu>
-      <AlertDialogContent className="max-w-lg">
+      <AlertDialogContent dir="rtl" className="max-w-lg">
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-left">
+          <AlertDialogTitle className="text-right">
             از حذف کوپن مطمئن هستید؟
           </AlertDialogTitle>
-          <AlertDialogDescription className="text-left">
+          <AlertDialogDescription className="text-right">
             این عملیات برگشت‌پذیر نیست و تمام کوپن و محصولاتش حذف خواهند شد!
           </AlertDialogDescription>
         </AlertDialogHeader>

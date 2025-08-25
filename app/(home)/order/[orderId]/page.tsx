@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import OrderDetailsTable from './components/order-details-table1'
 import { getOrderById } from '@/lib/home/queries/order'
 import { getCurrentUser } from '@/lib/auth-helpers'
+import { Suspense } from 'react'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -26,21 +27,23 @@ const OrderDetailsPage = async ({
 
   return (
     <section>
-      <OrderDetailsTable
-        order={{
-          ...order,
-          shippingAddress: {
-            ...order.shippingAddress,
-            province: order.shippingAddress.province,
-            city: order.shippingAddress.city,
-          },
-          user: {
-            name: order.user.name,
-            phoneNumber: order.user.phoneNumber ?? '', // fallback to empty string if null
-          },
-        }}
-        isAdmin={isAdmin}
-      />
+      <Suspense>
+        <OrderDetailsTable
+          order={{
+            ...order,
+            shippingAddress: {
+              ...order.shippingAddress,
+              province: order.shippingAddress.province,
+              city: order.shippingAddress.city,
+            },
+            user: {
+              name: order.user.name,
+              phoneNumber: order.user.phoneNumber ?? '', // fallback to empty string if null
+            },
+          }}
+          isAdmin={isAdmin}
+        />
+      </Suspense>
     </section>
   )
 }

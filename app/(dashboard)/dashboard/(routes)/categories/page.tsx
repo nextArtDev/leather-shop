@@ -3,6 +3,7 @@ import { columns } from './components/columns'
 import DataTable from '../../components/data-table'
 import CategoryDetails from './components/category-details'
 import { getAllCategories } from '../../lib/queries'
+import { Suspense } from 'react'
 
 export default async function CategoriesPage({
   searchParams,
@@ -20,21 +21,23 @@ export default async function CategoriesPage({
   if (!categoriesResponse.categories) return null // If no categories found, return null
 
   return (
-    <div className="px-1">
-      <DataTable
-        actionButtonText={
-          <>
-            <Plus size={15} />
-            ایجاد دسته‌بندی
-          </>
-        }
-        modalChildren={<CategoryDetails />}
-        newTabLink="/dashboard/categories/new"
-        filterValue="name"
-        data={categoriesResponse.categories}
-        searchPlaceholder="جست‌وجو..."
-        columns={columns}
-      />
-    </div>
+    <Suspense>
+      <div className="px-1">
+        <DataTable
+          actionButtonText={
+            <>
+              <Plus size={15} />
+              ایجاد دسته‌بندی
+            </>
+          }
+          modalChildren={<CategoryDetails />}
+          newTabLink="/dashboard/categories/new"
+          filterValue="name"
+          data={categoriesResponse.categories}
+          searchPlaceholder="جست‌وجو..."
+          columns={columns}
+        />
+      </div>
+    </Suspense>
   )
 }

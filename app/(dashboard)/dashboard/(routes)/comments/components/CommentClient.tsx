@@ -4,7 +4,7 @@ import { Separator } from '@/components/ui/separator'
 
 import { Columns, CommentColumn } from './columns'
 import { Heading } from './Heading'
-import { DataTable } from './DataTable'
+import { DataTable } from '../../../components/shared/DataTable'
 
 // import { ApiList } from '@/components/dashboard/ApiList'
 
