@@ -1,14 +1,8 @@
 // components/main-nav.tsx
+
 'use client'
 
-import {
-  Menu,
-  Package2,
-  Search,
-  // ShoppingBag,
-  //   X,
-  User,
-} from 'lucide-react'
+import { Menu, Package2, Search, User } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import * as React from 'react'
@@ -34,12 +28,31 @@ import {
 } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
 import TextRotate from '../shared/text-rotate'
-// import useFromStore from '@/hooks/useFromStore'
-// import { useCartStore } from '@/hooks/useCartStore'
-// import CartSheet from './CartSheet'
 import DrawerCart from './DrawerCart'
 
+// Hook to ensure consistent client-side rendering
+function useIsomorphicLayoutEffect(
+  effect: React.EffectCallback,
+  deps?: React.DependencyList
+) {
+  const useEffectToUse =
+    typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect
+  useEffectToUse(effect, deps)
+}
+
+// Hook to prevent hydration mismatches
+function useHydrationSafe() {
+  const [isHydrated, setIsHydrated] = React.useState(false)
+
+  useIsomorphicLayoutEffect(() => {
+    setIsHydrated(true)
+  }, [])
+
+  return isHydrated
+}
+
 // --- TypeScript Definitions for Navigation Data ---
+
 interface FeaturedItem {
   name: string
   href: string
@@ -63,6 +76,7 @@ interface NavigationData {
 }
 
 // --- Component Data ---
+
 const navigation: NavigationData = {
   categories: [
     {
@@ -146,6 +160,38 @@ const Logo = () => (
   </Link>
 )
 
+// Fixed ListItem component - removed nested Link issue
+const ListItem = React.forwardRef<
+  HTMLAnchorElement,
+  React.ComponentPropsWithoutRef<typeof Link> & {
+    title: string
+    children: React.ReactNode
+  }
+>(({ className, title, children, href, ...props }, ref) => {
+  return (
+    <NavigationMenuLink asChild>
+      <Link
+        ref={ref}
+        href={href}
+        className={cn(
+          'group block select-none space-y-2 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
+          className
+        )}
+        {...props}
+      >
+        {children}
+        <div className="text-sm font-medium leading-none text-foreground">
+          {title}
+        </div>
+        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+          Shop Now
+        </p>
+      </Link>
+    </NavigationMenuLink>
+  )
+})
+ListItem.displayName = 'ListItem'
+
 const DesktopNav = () => (
   <NavigationMenu className="hidden lg:block">
     <NavigationMenuList>
@@ -173,11 +219,11 @@ const DesktopNav = () => (
       ))}
       {navigation.pages.map((page) => (
         <NavigationMenuItem key={page.name}>
-          <Link href={page.href} passHref>
-            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+          <NavigationMenuLink asChild>
+            <Link href={page.href} className={navigationMenuTriggerStyle()}>
               {page.name}
-            </NavigationMenuLink>
-          </Link>
+            </Link>
+          </NavigationMenuLink>
         </NavigationMenuItem>
       ))}
     </NavigationMenuList>
@@ -196,9 +242,9 @@ const MobileNav = () => (
       <div className="flex items-center justify-between pr-2">
         <Logo />
         <SheetClose asChild>
-          {/* <Button variant="ghost" size="icon" className="rounded-full"> */}
-          {/* <X className="h-5 w-5" /> */}
-          {/* </Button> */}
+          <Button variant="ghost" size="icon" className="rounded-full sr-only">
+            Close
+          </Button>
         </SheetClose>
       </div>
       <Separator className="my-4" />
@@ -235,129 +281,134 @@ const MobileNav = () => (
       <Separator className="my-4" />
       <div className="space-y-2 px-4">
         <Button asChild variant="default" className="w-full">
-          <Link href="#">Create an account</Link>
+          <Link href="/register">Create an account</Link>
         </Button>
         <Button asChild variant="secondary" className="w-full">
-          <Link href="#">Sign in</Link>
+          <Link href="/login">Sign in</Link>
         </Button>
       </div>
     </SheetContent>
   </Sheet>
 )
 
+const SearchBar = ({
+  isOpen,
+  onToggle,
+}: {
+  isOpen: boolean
+  onToggle: () => void
+}) => (
+  <>
+    <Button
+      variant="ghost"
+      size="icon"
+      aria-label="Search"
+      aria-expanded={isOpen}
+      onClick={onToggle}
+    >
+      <Search className="h-6 w-6" />
+    </Button>
+    <Collapsible
+      open={isOpen}
+      onOpenChange={onToggle}
+      className="absolute top-full left-0 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b z-10"
+    >
+      <CollapsibleContent>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="relative flex h-16 items-center">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search for products..."
+                className="w-full pl-10 h-12"
+                autoFocus
+              />
+            </div>
+          </div>
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
+  </>
+)
+
+const TopBanner = () => {
+  const isHydrated = useHydrationSafe()
+
+  return (
+    <div className="bg-primary text-primary-foreground">
+      {isHydrated ? (
+        <TextRotate
+          texts={[
+            'All duties and taxes included. within the US',
+            'Buy now. Pay later with Klarna. ',
+          ]}
+          mainClassName="flex items-center justify-center px-2 sm:px-2 md:px-3 overflow-hidden py-0.5 sm:py-1 md:py-1 justify-center rounded-lg"
+          staggerFrom={'last'}
+          initial={{ y: '100%' }}
+          animate={{ y: 0 }}
+          exit={{ y: '-120%' }}
+          staggerDuration={0.025}
+          splitBy="line"
+          splitLevelClassName="overflow-hidden line-clamp-2 text-center py-auto pb-0.5 sm:pb-1 md:pb-1"
+          transition={{ type: 'spring', damping: 30, stiffness: 400 }}
+          rotationInterval={5000}
+        />
+      ) : (
+        <div className="flex items-center justify-center px-2 sm:px-2 md:px-3 py-0.5 sm:py-1 md:py-1">
+          All duties and taxes included. within the US
+        </div>
+      )}
+    </div>
+  )
+}
+
 // --- Main Exported Component ---
 
 export default function MainNav() {
   const [isSearchOpen, setIsSearchOpen] = React.useState(false)
-  // const [isSheetOpen, setIsSheetOpen] = React.useState(false)
-  // const cartItems = useFromStore(useCartStore, (state) => state.cart)
+
+  const toggleSearch = React.useCallback(() => {
+    setIsSearchOpen((prev) => !prev)
+  }, [])
 
   return (
     <div className="bg-background">
       <header className="relative">
-        <nav aria-label="Top">
+        <nav aria-label="Main navigation">
           {/* Top navigation */}
-          <div className="bg-primary text-primary-foreground">
-            {/* <div className="mx-auto flex h-10 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-              <form>
-                <Select defaultValue="CAD">
-                  <SelectTrigger className="border-0 bg-transparent text-primary-foreground focus:ring-0 focus:ring-offset-0 h-auto p-0">
-                    <SelectValue placeholder="Currency" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {currencies.map((currency) => (
-                      <SelectItem key={currency} value={currency}>
-                        {currency}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </form>
-
-              <div className="hidden lg:flex items-center space-x-6">
-                <Button
-                  variant="link"
-                  asChild
-                  className="text-primary-foreground"
-                >
-                  <Link href="#">Sign in</Link>
-                </Button>
-                <Button
-                  variant="link"
-                  asChild
-                  className="text-primary-foreground"
-                >
-                  <Link href="#">Create an account</Link>
-                </Button>
-              </div>
-            </div> */}
-            <TextRotate
-              texts={[
-                'All duties and taxes included. within the US',
-
-                'Buy now. Pay later with Klarna. ',
-              ]}
-              mainClassName="flex items-center justify-center px-2 sm:px-2 md:px-3   overflow-hidden py-0.5 sm:py-1 md:py-1 justify-center rounded-lg"
-              staggerFrom={'last'}
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '-120%' }}
-              staggerDuration={0.025}
-              splitBy="line"
-              splitLevelClassName="overflow-hidden line-clamp-2  text-center py-auto pb-0.5 sm:pb-1 md:pb-1"
-              transition={{ type: 'spring', damping: 30, stiffness: 400 }}
-              rotationInterval={5000}
-            />
-          </div>
+          <TopBanner />
 
           {/* Secondary navigation */}
-          <div className=" ">
+          <div className="">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="flex h-16 items-center justify-between">
                 <div className="flex flex-1 items-center lg:hidden">
                   <MobileNav />
                 </div>
 
-                <div className="hidden lg:items-center h-full lg:flex  ">
+                <div className="hidden lg:items-center h-full lg:flex">
                   <DesktopNav />
                 </div>
-                <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-center ">
+
+                <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-center">
                   <Logo />
                 </div>
+
                 <div className="lg:hidden">
                   <Logo />
                 </div>
 
                 <div className="flex flex-1 items-center justify-end">
                   <div className="flex items-center space-x-4">
+                    <SearchBar isOpen={isSearchOpen} onToggle={toggleSearch} />
                     <Button
                       variant="ghost"
                       size="icon"
-                      aria-label="Search"
-                      aria-expanded={isSearchOpen}
-                      onClick={() => setIsSearchOpen((prev) => !prev)}
+                      aria-label="User account"
                     >
-                      <Search className="h-6 w-6" />
-                    </Button>
-                    <Button variant="ghost" size="icon" aria-label="Help">
                       <User className="h-6 w-6" />
                     </Button>
-
-                    {/* <Link href={'/cart'}>
-                        <ShoppingBag
-                          className="h-4 w-4"
-                          onClick={() => setIsSheetOpen(!isSheetOpen)}
-                        />
-                        <span className="ml-1 w-fit h-fit p-1 text-sm font-medium text-red-500 rounded-full absolute left-1.5 -top-1.5 ">
-                          {cartItems?.length ?? null}
-                        </span>
-                      </Link>
-                      <article className="sm:hidden">
-                        <CartSheet
-                          isOpen={isSheetOpen}
-                          onClose={() => setIsSheetOpen(!isSheetOpen)}
-                        />
-                      </article> */}
                     <DrawerCart />
                   </div>
                 </div>
@@ -365,58 +416,7 @@ export default function MainNav() {
             </div>
           </div>
         </nav>
-        {/* This is the new collapsible search panel */}
-        <Collapsible
-          open={isSearchOpen}
-          onOpenChange={setIsSearchOpen}
-          className="absolute top-full left-0 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b z-10"
-        >
-          <CollapsibleContent>
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <div className="relative flex h-16 items-center">
-                <div className="relative w-full">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                  <Input
-                    type="search"
-                    placeholder="Search for products..."
-                    className="w-full pl-10 h-12"
-                  />
-                </div>
-              </div>
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
       </header>
     </div>
   )
 }
-
-// Custom ListItem component for NavigationMenu, now using Next.js Link
-const ListItem = React.forwardRef<
-  React.ElementRef<typeof Link>,
-  React.ComponentPropsWithoutRef<typeof Link>
->(({ className, title, children, ...props }, ref) => {
-  return (
-    <div>
-      <NavigationMenuLink asChild>
-        <Link
-          ref={ref}
-          className={cn(
-            'group block select-none space-y-2 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
-            className
-          )}
-          {...props}
-        >
-          {children}
-          <div className="text-sm font-medium leading-none text-foreground">
-            {title}
-          </div>
-          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-            Shop Now
-          </p>
-        </Link>
-      </NavigationMenuLink>
-    </div>
-  )
-})
-ListItem.displayName = 'ListItem'

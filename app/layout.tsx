@@ -31,7 +31,7 @@ export default function RootLayout({
       <QueryProviders>
         <body className={`  ${myFont.className}  adad  antialiased`}>
           {children}
-          <Toaster />
+          <Toaster richColors />
         </body>
       </QueryProviders>
     </html>

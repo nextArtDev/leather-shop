@@ -69,7 +69,6 @@ interface FormStep {
 
 interface MultiStepFormAuthProps {
   className?: string
-  // onSuccess?: () => void
 }
 
 export default function MultiStepFormAuth({
