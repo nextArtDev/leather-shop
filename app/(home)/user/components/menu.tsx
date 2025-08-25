@@ -48,7 +48,7 @@ const Menu = () => {
             <EllipsisVertical />
           </SheetTrigger>
           <SheetContent className="flex flex-col items-start">
-            <SheetTitle>Menu</SheetTitle>
+            <SheetTitle>منو</SheetTitle>
             <ThemeSwitcher />
             <Link
               href="/cart"

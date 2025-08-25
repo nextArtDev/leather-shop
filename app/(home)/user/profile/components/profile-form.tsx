@@ -99,7 +99,7 @@ const ProfileForm = ({ initialData }: Props) => {
         <Button
           type="submit"
           size="lg"
-          className="button col-span-2 w-full"
+          className="button col-span-2 w-full my-12"
           disabled={form.formState.isSubmitting}
         >
           {form.formState.isSubmitting ? 'درحال تایید' : 'ویرایش'}

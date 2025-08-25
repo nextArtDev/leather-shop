@@ -64,7 +64,7 @@ export default function UserSession() {
           <>
             <DropdownMenuGroup dir="rtl">
               <DropdownMenuItem className="cursor-pointer">
-                <Link href={'/user'}>پروفایل</Link>
+                <Link href={'/user/profile'}>پروفایل</Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
 
