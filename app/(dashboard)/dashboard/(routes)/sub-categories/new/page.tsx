@@ -8,10 +8,6 @@ import prisma from '@/lib/prisma'
 export default async function AdminNewSubCategoryPage() {
   const categories = await prisma.category.findMany({
     where: {},
-    select: {
-      name: true,
-      id: true,
-    },
   })
   if (!categories) return notFound()
   return (

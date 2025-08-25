@@ -2,7 +2,7 @@ import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   output: 'standalone',
-  missingSuspenseWithCSRBailout: false,
+  // missingSuspenseWithCSRBailout: false,
   experimental: {
     serverActions: {
       bodySizeLimit: '5mb',

@@ -3,11 +3,45 @@ import { notFound } from 'next/navigation'
 import OrderDetailsTable from './components/order-details-table1'
 import { getOrderById } from '@/lib/home/queries/order'
 import { getCurrentUser } from '@/lib/auth-helpers'
+import { Order, OrderItem, ShippingAddress } from '@/lib/generated/prisma'
+import { Suspense } from 'react'
+import { OrderDetailsSkeleton } from './components/Skeletons'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 export const metadata: Metadata = {
   title: 'جزئیات سفارش',
+}
+
+function OrderDetailsTableWrapper({
+  order,
+  isAdmin,
+}: {
+  order: Order & { items: OrderItem[] } & {
+    shippingAddress: ShippingAddress & { province: { name: string } } & {
+      city: { name: string }
+    }
+  } & { user: { name: string; phoneNumber: string | null } }
+
+  isAdmin: boolean
+}) {
+  return (
+    <OrderDetailsTable
+      order={{
+        ...order,
+        shippingAddress: {
+          ...order.shippingAddress,
+          province: order.shippingAddress.province,
+          city: order.shippingAddress.city,
+        },
+        user: {
+          name: order.user.name,
+          phoneNumber: order.user.phoneNumber ?? '',
+        },
+      }}
+      isAdmin={isAdmin}
+    />
+  )
 }
 
 const OrderDetailsPage = async ({
@@ -26,21 +60,9 @@ const OrderDetailsPage = async ({
 
   return (
     <section>
-      <OrderDetailsTable
-        order={{
-          ...order,
-          shippingAddress: {
-            ...order.shippingAddress,
-            province: order.shippingAddress.province,
-            city: order.shippingAddress.city,
-          },
-          user: {
-            name: order.user.name,
-            phoneNumber: order.user.phoneNumber ?? '', // fallback to empty string if null
-          },
-        }}
-        isAdmin={isAdmin}
-      />
+      <Suspense fallback={<OrderDetailsSkeleton />}>
+        <OrderDetailsTableWrapper order={order} isAdmin={isAdmin} />
+      </Suspense>
     </section>
   )
 }

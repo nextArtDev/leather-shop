@@ -21,11 +21,11 @@ const data = {
   navMain: [
     {
       title: 'وضعیت کلی',
-      url: '/dashboard/overview',
+      url: '/dashboard',
       items: [
         {
           title: 'وضعیت کلی',
-          url: '/dashboard/overview',
+          url: '/dashboard',
         },
         // {
         //   title: 'Project Structure',
