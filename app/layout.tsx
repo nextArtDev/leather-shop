@@ -3,6 +3,7 @@ import localFont from 'next/font/local'
 import './globals.css'
 import { Toaster } from 'sonner'
 import QueryProviders from '@/providers/query-provider'
+import { ThemeProvider } from '@/providers/theme-providers'
 
 const myFont = localFont({
   src: '../public/fonts/Parastoo-VariableFont_wght.ttf',
@@ -27,10 +28,17 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="fa-IR" dir="rtl">
+    <html lang="fa-IR" dir="rtl" suppressHydrationWarning>
       <QueryProviders>
         <body className={`  ${myFont.className}  adad  antialiased`}>
-          {children}
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
           <Toaster richColors />
         </body>
       </QueryProviders>

@@ -1,5 +1,6 @@
 'use client'
 
+import { ThemeSwitcher } from '@/components/shared/theme-switcher'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
@@ -19,21 +20,18 @@ import {
   Sun,
   Twitter,
 } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import * as React from 'react'
 
 export default function Footer() {
-  const [isDarkMode, setIsDarkMode] = React.useState(false)
+  const { theme, setTheme } = useTheme()
+  // const [theme, setTheme] = React.useState<'light' | 'dark' | 'system'>(
+
+  //   'system'
+  // )
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isChatOpen, setIsChatOpen] = React.useState(false)
-
-  React.useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-  }, [isDarkMode])
 
   return (
     <footer className="relative border-t bg-background text-foreground transition-colors duration-300">
@@ -179,7 +177,14 @@ export default function Footer() {
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="w-fit p-1">
+              <ThemeSwitcher
+                defaultValue="light"
+                onChange={setTheme}
+                value={theme as 'light' | 'dark' | 'system'}
+              />
+            </div>
+            {/* <div className="flex items-center space-x-2">
               <Sun className="h-4 w-4" />
               <Switch
                 id="dark-mode"
@@ -190,7 +195,7 @@ export default function Footer() {
               <Label htmlFor="dark-mode" className="sr-only">
                 Toggle dark mode
               </Label>
-            </div>
+            </div> */}
           </div>
         </div>
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t pt-8 text-center md:flex-row">
