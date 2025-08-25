@@ -1,5 +1,7 @@
 import { getCurrentUser } from '@/lib/auth-helpers'
 import { Metadata } from 'next'
+import ProfileForm from './components/profile-form'
+import { redirect } from 'next/navigation'
 
 export const metadata: Metadata = {
   title: 'پروفایل',
@@ -7,11 +9,15 @@ export const metadata: Metadata = {
 
 const Profile = async () => {
   const session = await getCurrentUser()
-  console.log({ session })
+  if (!session?.name || !session.phoneNumber) redirect('/sign-in')
+  const initialData = {
+    name: session.name,
+    phoneNumber: session.phoneNumber,
+  }
   return (
     <div className="max-w-md mx-auto space-y-4">
-      <h2 className="h2-bold">Profile</h2>
-      {/* <ProfileForm /> */}
+      <h2 className="font-bold text-xl">پروفایل</h2>
+      <ProfileForm initialData={initialData} />
     </div>
   )
 }

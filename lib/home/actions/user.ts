@@ -6,6 +6,8 @@ import { shippingAddressSchema } from '../schemas'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { updateCartWithShipping } from './cart'
+import { getCurrentUser } from '@/lib/auth-helpers'
+import { formatError } from '@/lib/utils'
 
 interface CreateShippingAddressFormState {
   success?: string
@@ -269,4 +271,35 @@ export async function editShippingAddress(
   }
   revalidatePath(path)
   redirect(`/place-order`)
+}
+
+export async function updateProfile(user: { name: string; phone?: string }) {
+  try {
+    const session = await getCurrentUser()
+    if (!session) throw new Error('کاربر پیدا نشد!')
+    const currentUser = await prisma.user.findFirst({
+      where: {
+        id: session?.id,
+        // phone: user?.phone,
+      },
+    })
+
+    if (!currentUser) throw new Error('User not found')
+
+    await prisma.user.update({
+      where: {
+        id: currentUser.id,
+      },
+      data: {
+        name: user.name,
+      },
+    })
+
+    return {
+      success: true,
+      message: 'اطلاعات با موفقیت آپدیت شد!',
+    }
+  } catch (error) {
+    return { success: false, message: formatError(error) }
+  }
 }

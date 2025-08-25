@@ -65,3 +65,8 @@ export type PaymentResult = z.infer<typeof paymentResultSchema>
 export const UpdateOrderStatusFormSchema = z.object({
   status: z.enum(OrderStatus),
 })
+
+export const updateProfileSchema = z.object({
+  name: z.string(),
+  phoneNumber: z.string().optional(),
+})
