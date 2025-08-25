@@ -95,7 +95,7 @@ export const CellActions: React.FC<CellActionsProps> = ({ categoryId }) => {
                 type="submit"
                 className="hover:bg-transparent active:bg-transparent w-full outline-none"
               >
-                حدف
+                حذف
               </Button>
             </form>
           </AlertDialogAction>

@@ -1,8 +1,6 @@
-// components/main-nav.tsx
-
 'use client'
 
-import { Menu, Package2, Search, User } from 'lucide-react'
+import { Menu, Package2, Search } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import * as React from 'react'
@@ -29,6 +27,7 @@ import {
 import { cn } from '@/lib/utils'
 import TextRotate from '../shared/text-rotate'
 import DrawerCart from './DrawerCart'
+import UserSession from './UserSession'
 
 // Hook to ensure consistent client-side rendering
 function useIsomorphicLayoutEffect(
@@ -402,13 +401,14 @@ export default function MainNav() {
                 <div className="flex flex-1 items-center justify-end">
                   <div className="flex items-center space-x-4">
                     <SearchBar isOpen={isSearchOpen} onToggle={toggleSearch} />
-                    <Button
+                    {/* <Button
                       variant="ghost"
                       size="icon"
                       aria-label="User account"
                     >
                       <User className="h-6 w-6" />
-                    </Button>
+                    </Button> */}
+                    <UserSession />
                     <DrawerCart />
                   </div>
                 </div>
