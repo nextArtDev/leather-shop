@@ -1,3 +1,4 @@
+import { Prisma } from '@/lib/generated/prisma'
 import prisma from '@/lib/prisma'
 import {
   CategoryWithStats,
@@ -206,7 +207,7 @@ export async function searchProducts({
   const skip = (page - 1) * limit
 
   // Build where clause
-  const where: any = {}
+  const where: Prisma.ProductWhereInput = {}
 
   if (search) {
     where.OR = [
@@ -259,7 +260,7 @@ export async function searchProducts({
   }
 
   // Build orderBy
-  let orderBy: any = { createdAt: 'desc' }
+  let orderBy: Prisma.ProductOrderByWithAggregationInput = { createdAt: 'desc' }
   switch (sortBy) {
     case 'newest':
       orderBy = { createdAt: 'desc' }
@@ -280,7 +281,7 @@ export async function searchProducts({
     prisma.product.findMany({
       where,
       select: {
-        id: true,
+        // id: true,
         name: true,
         slug: true,
         brand: true,
@@ -523,54 +524,64 @@ export async function getFiltersData(
   if (categoryId) where.categoryId = categoryId
   if (subCategoryId) where.subCategoryId = subCategoryId
 
-  const [priceRange, colors, sizes, brands] = await Promise.all([
-    // Get price range
-    prisma.size.aggregate({
-      where: {
-        product: where,
-      },
-      _min: { price: true },
-      _max: { price: true },
-    }),
-    // Get available colors
-    prisma.color.findMany({
-      where: {
-        product: where,
-      },
-      select: {
-        name: true,
-      },
-      distinct: ['name'],
-    }),
-    // Get available sizes
-    prisma.size.findMany({
-      where: {
-        product: where,
-        quantity: { gt: 0 },
-      },
-      select: {
-        size: true,
-      },
-      distinct: ['size'],
-    }),
-    // Get brands
-    prisma.product.findMany({
-      where,
-      select: {
-        brand: true,
-      },
-      distinct: ['brand'],
-    }),
-  ])
+  try {
+    const [priceRange, colors, sizes, brands] = await Promise.all([
+      // Get price range
+      prisma.size.aggregate({
+        where: {
+          product: where,
+        },
+        _min: { price: true },
+        _max: { price: true },
+      }),
+      // Get available colors
+      prisma.color.findMany({
+        where: {
+          product: where,
+        },
+        select: {
+          name: true,
+        },
+        distinct: ['name'],
+      }),
+      // Get available sizes
+      prisma.size.findMany({
+        where: {
+          product: where,
+          quantity: { gt: 0 },
+        },
+        select: {
+          size: true,
+        },
+        distinct: ['size'],
+      }),
+      // Get brands
+      prisma.product.findMany({
+        where,
+        select: {
+          brand: true,
+        },
+        distinct: ['brand'],
+      }),
+    ])
 
-  return {
-    priceRange: {
-      min: priceRange._min.price || 0,
-      max: priceRange._max.price || 1000,
-    },
-    colors: colors.map((c) => c.name),
-    sizes: sizes.map((s) => s.size),
-    brands: brands.map((b) => b.brand),
+    return {
+      priceRange: {
+        min: priceRange._min.price || 0,
+        max: priceRange._max.price || 1000000,
+      },
+      colors: colors.map((c) => c.name),
+      sizes: sizes.map((s) => s.size),
+      brands: brands.map((b) => b.brand),
+    }
+  } catch (error) {
+    console.error('Error fetching filters data:', error)
+    return {
+      priceRange: { min: 0, max: 1000000 },
+      colors: [],
+      sizes: [],
+      brands: [],
+    }
   }
 }
 
@@ -678,3 +689,20 @@ export async function getFiltersData(
 //     totalPages: Math.ceil(dataCount / limit),
 //   }
 // }
+export async function getAllCategories({}) {
+  const categories = await prisma.category.findMany({
+    select: {
+      id: true,
+      name: true,
+      url: true,
+      featured: true,
+    },
+    orderBy: {
+      featured: 'desc',
+    },
+  })
+
+  return {
+    categories,
+  }
+}

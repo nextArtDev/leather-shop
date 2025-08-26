@@ -115,7 +115,7 @@ export type CategoriesWithStatsResult = CategoryWithStats[]
 
 // 5. Search Products Types
 export type SearchProduct = {
-  id: string
+  // id: string
   name: string
   slug: string
   brand: string
@@ -248,13 +248,6 @@ export type PriceRange = {
   max: number
 }
 
-export type FiltersData = {
-  priceRange: PriceRange
-  colors: string[]
-  sizes: string[]
-  brands: string[]
-}
-
 // Additional utility types for components
 
 // For product cards/listings
@@ -285,6 +278,45 @@ export type SearchFiltersProps = {
   currentFilters: SearchFilters
 }
 
+// export interface SearchFilters {
+//   search?: string
+//   categoryId?: string
+//   subCategoryId?: string
+//   minPrice?: number
+//   maxPrice?: number
+//   sortBy?: 'newest' | 'oldest' | 'price_asc' | 'price_desc' | 'rating' | 'sales'
+//   page?: number
+//   colors?: string[]
+//   sizes?: string[]
+// }
+
+export interface SortOption {
+  name: string
+  value: SearchFilters['sortBy']
+}
+
+// Updated category type to match your actual data
+export interface CategoryData {
+  id: string
+  name: string
+  url: string
+  featured: boolean
+}
+
+// Type for filters data
+export interface FiltersData {
+  priceRange: {
+    min: number
+    max: number
+  }
+  colors: string[]
+  sizes: string[]
+  brands: string[]
+}
+export interface SortOption {
+  name: string
+  value: SearchFilters['sortBy']
+}
 export type SearchFilters = {
   search?: string
   categoryId?: string
@@ -294,6 +326,7 @@ export type SearchFilters = {
   colors?: string[]
   sizes?: string[]
   sortBy?: 'newest' | 'oldest' | 'price_asc' | 'price_desc' | 'rating' | 'sales'
+  page?: number
 }
 
 // For pagination component

@@ -49,16 +49,15 @@ type Props = {
 
 const ProductCard = ({ product }: Props) => {
   console.log('itemitem', { product })
+  const imageUrls = [
+    ...product?.variantImages.map((img) => img.url),
+    ...product?.images.map((img) => img.url),
+  ]
   return (
     <div>
       <div className=" border-none rounded-none grid grid-rows-7   place-content-center bg-transparent ">
         <article className=" row-span-5 w-full h-full bg-[#eceae8]  ">
-          <ProductCardCarousel
-            urls={[
-              ...product?.images.map((img) => img.url),
-              ...product?.variantImages.map((img) => img.url),
-            ]}
-          />
+          <ProductCardCarousel urls={imageUrls} />
         </article>
         <article className="row-span-2  h-full w-full flex flex-col gap-1 justify-evenly  items-start px-2 text-pretty text-xs md:text-sm lg:text-base">
           <p className="font-semibold">{product.category.name}</p>

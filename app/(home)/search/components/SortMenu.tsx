@@ -1,3 +1,5 @@
+'use client'
+
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -7,61 +9,48 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
 import { ChevronDown } from 'lucide-react'
-import React, { useState } from 'react'
-
-interface SortOption {
-  name: string
-  value: string
-}
+import { SortOption, SearchFilters } from '@/lib/types/home'
 
 interface SortMenuProps {
   options: SortOption[]
-  selectedOption: SortOption
-  onSelectionChange: (option: SortOption) => void
+  selectedSort: SearchFilters['sortBy']
+  onSortChange: (sort: SearchFilters['sortBy']) => void
 }
 
-const SortMenu: React.FC<SortMenuProps> = ({
+export default function SortMenu({
   options,
-  selectedOption,
-  onSelectionChange,
-}) => {
-  const [isOpen, setIsOpen] = useState(false)
+  selectedSort,
+  onSortChange,
+}: SortMenuProps) {
+  const selectedOption =
+    options.find((opt) => opt.value === selectedSort) || options[0]
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          onClick={() => setIsOpen(!isOpen)}
-          className="text-sm font-medium   hover:text-muted-foreground"
+          className="text-sm font-medium hover:text-muted-foreground"
         >
           مرتب کردن با: {selectedOption.name}
           <ChevronDown className="mr-2 h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      {isOpen && (
-        <DropdownMenuContent>
-          {options.map((option) => (
-            <DropdownMenuItem
-              dir="rtl"
-              key={option.value}
-              onSelect={() => {
-                onSelectionChange(option)
-                setIsOpen(false)
-              }}
-              className={cn(
-                option.value === selectedOption.value
-                  ? 'font-semibold  '
-                  : 'text-muted-foreground'
-              )}
-            >
-              {option.name}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      )}
+      <DropdownMenuContent>
+        {options.map((option) => (
+          <DropdownMenuItem
+            key={option.value}
+            onSelect={() => onSortChange(option.value)}
+            className={cn(
+              option.value === selectedSort
+                ? 'font-semibold'
+                : 'text-muted-foreground'
+            )}
+          >
+            {option.name}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
     </DropdownMenu>
   )
 }
-
-export default SortMenu
