@@ -74,7 +74,7 @@ const OrderStatusTag: FC<OrderStatusTagProps> = ({ status }) => {
   return (
     <span
       className={cn(
-        'w-full h-full text-center  inline-flex items-center justify-center gap-x-1 text-xs md:sm font-medium  cursor-pointer',
+        'py-1 px-2 inline-flex items-center gap-x-1 text-xs font-medium rounded-md ',
         bgColor,
         textColor
       )}

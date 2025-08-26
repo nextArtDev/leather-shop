@@ -37,6 +37,7 @@ const StoreOrderSummary: FC<Props> = ({ order }) => {
               orderId={order.id}
               status={order.orderStatus as OrderStatus}
             /> */}
+
             <OrderStatusTag status={order.orderStatus as OrderStatus} />
           </div>
         </div>
@@ -160,7 +161,7 @@ const StoreOrderSummary: FC<Props> = ({ order }) => {
               /> */}
               <div className="grid place-items-center">
                 <h5 className="font-semibold text-3xl leading-10 mt-3">
-                  {product.totalPrice}
+                  {product.totalPrice} تومان
                 </h5>
               </div>
             </div>

@@ -22,6 +22,7 @@ import CustomModal from '@/app/(dashboard)/dashboard/components/custom-modal'
 import PaymentStatusTag from '@/app/(dashboard)/dashboard/(routes)/orders/components/payment-status'
 import StoreOrderSummary from './store-order-summary'
 import OrderStatusTag from '@/app/(dashboard)/dashboard/(routes)/orders/components/order-status'
+import { formatId } from '@/lib/utils'
 
 export type OrderTypeColumn = {
   id: string
@@ -43,27 +44,32 @@ export type OrderTypeColumn = {
 
 export const columns: ColumnDef<OrderTypeColumn>[] = [
   {
-    accessorKey: 'products',
-    header: 'محصولات',
-    cell: ({ row }) => {
-      const images = row.original.items.map((product) => product.image)
-      return (
-        <div className="flex flex-wrap gap-1">
-          {images.map((img, i) => (
-            <Image
-              key={`${img}-${i}`}
-              src={img}
-              alt=""
-              width={100}
-              height={100}
-              className="w-7 h-7 object-cover rounded-full"
-              style={{ transform: `translateX(-${i * 15}px)` }}
-            />
-          ))}
-        </div>
-      )
-    },
+    accessorKey: 'id',
+    header: 'id',
+    cell: ({ row }) => <span>{formatId(row.original.id)}</span>,
   },
+  // {
+  //   accessorKey: 'products',
+  //   header: 'محصولات',
+  //   cell: ({ row }) => {
+  //     const images = row.original.items.map((product) => product.image)
+  //     return (
+  //       <div className="flex flex-wrap gap-1">
+  //         {images.map((img, i) => (
+  //           <Image
+  //             key={`${img}-${i}`}
+  //             src={img}
+  //             alt=""
+  //             width={100}
+  //             height={100}
+  //             className="w-7 h-7 object-cover rounded-full"
+  //             style={{ transform: `translateX(-${i * 15}px)` }}
+  //           />
+  //         ))}
+  //       </div>
+  //     )
+  //   },
+  // },
   {
     accessorKey: 'paymentStatus',
     header: 'پرداخت',
@@ -78,10 +84,10 @@ export const columns: ColumnDef<OrderTypeColumn>[] = [
   },
   {
     accessorKey: 'status',
-    header: 'وضعیت',
+    header: 'وضعیت ارسال',
     cell: ({ row }) => {
       return (
-        <div>
+        <div className="">
           {/* <OrderStatusSelect
             orderId={row.original.id}
             status={row.original.orderStatus as OrderStatus}
@@ -91,6 +97,7 @@ export const columns: ColumnDef<OrderTypeColumn>[] = [
             status={row.original.orderStatus as OrderStatus}
             // isTable
           />
+
           {/* {row.original.orderStatus} */}
         </div>
       )

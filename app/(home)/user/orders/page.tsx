@@ -15,7 +15,7 @@ import { Suspense } from 'react'
 import { Heading } from '@/app/(dashboard)/dashboard/components/shared/Heading'
 import { DataTableSkeleton } from '@/app/(dashboard)/dashboard/components/shared/DataTableSkeleton'
 import { DataTable } from '@/app/(dashboard)/dashboard/components/shared/DataTable'
-import { columns, OrderTypeColumn } from './columns'
+import { columns, OrderTypeColumn } from './components/columns'
 import { getCurrentUser } from '@/lib/auth-helpers'
 import { getMyOrders } from '@/lib/home/queries/order'
 import { redirect } from 'next/navigation'
@@ -74,7 +74,7 @@ async function AdminOrdersPage({
   }))
 
   return (
-    <div className="flex-col w-full max-w-2xl">
+    <div className="flex-col w-full  max-w-5xl mx-auto">
       <div className="flex-1 space-y-4 p-8 pt-6">
         <Heading
           title={`سفارشات شما (${formattedOrders?.length})`}
