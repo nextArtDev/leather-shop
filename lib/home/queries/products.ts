@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// 1. MAIN PAGE QUERIES - Fetch only what you display
-
 import prisma from '@/lib/prisma'
 import {
   CategoryWithStats,
@@ -213,10 +210,14 @@ export async function searchProducts({
 
   if (search) {
     where.OR = [
-      { name: { contains: search, mode: 'insensitive' } },
-      { description: { contains: search, mode: 'insensitive' } },
-      { brand: { contains: search, mode: 'insensitive' } },
-      { keywords: { contains: search, mode: 'insensitive' } },
+      // { name: { contains: search, mode: 'insensitive' } },
+      { name: { contains: search } },
+      // { description: { contains: search, mode: 'insensitive' } },
+      { description: { contains: search } },
+      // { brand: { contains: search, mode: 'insensitive' } },
+      { brand: { contains: search } },
+      // { keywords: { contains: search, mode: 'insensitive' } },
+      { keywords: { contains: search } },
     ]
   }
 
@@ -289,7 +290,12 @@ export async function searchProducts({
         isSale: true,
         saleEndDate: true,
         images: {
-          take: 2, // Show primary + hover image
+          // take: 2, // Show primary + hover image
+          select: {
+            url: true,
+          },
+        },
+        variantImages: {
           select: {
             url: true,
           },
@@ -567,3 +573,108 @@ export async function getFiltersData(
     brands: brands.map((b) => b.brand),
   }
 }
+
+// export async function getAllProducts({
+//   query,
+//   limit = 10,
+//   page,
+//   category,
+//   price,
+//   rating,
+//   sort,
+// }: {
+//   query: string
+//   limit?: number
+//   page: number
+//   category?: string
+//   price?: string
+//   rating?: string
+//   sort?: string
+// }) {
+//   // Query filter
+//   const queryFilter: Prisma.ProductWhereInput =
+//     query && query !== 'all'
+//       ? {
+//           name: {
+//             contains: query,
+//             // mode: 'insensitive',
+//           } as Prisma.StringFilter,
+//         }
+//       : {}
+
+//   // Category filter
+//   const categoryFilter: Prisma.CategoryWhereInput =
+//     category && category !== 'all'
+//       ? {
+//           category: {
+//             contains: query,
+//             // mode: 'insensitive',
+//           } ,
+//         }
+//       : {}
+
+//   // Price filter
+//   const priceFilter: Prisma.SizeWhereInput =
+//     price && price !== 'all'
+//       ? {
+//           price: {
+//             gte: Number(price.split('-')[0]),
+//             lte: Number(price.split('-')[1]),
+//           },
+//         }
+//       : {}
+
+//   // Rating filter
+//   const ratingFilter =
+//     rating && rating !== 'all'
+//       ? {
+//           rating: {
+//             gte: Number(rating),
+//           },
+//         }
+//       : {}
+
+//   const data = await prisma.product.findMany({
+//     where: {
+//       ...queryFilter,
+//       ...ratingFilter,
+//     },
+//     include: {
+//       images: {
+//         select: { url: true },
+//       },
+//       category: {
+//         where: {
+//           ...categoryFilter,
+//         },
+//       },
+//       sizes: {
+//         where: {
+//           ...priceFilter,
+//         },
+//          orderBy:
+//       sort === 'lowest'
+//         ? { price: 'asc' }
+//         :  { price: 'desc' }
+//       },
+
+//     },
+//     orderBy:
+//       // sort === 'lowest'
+//       //   ? { price: 'asc' }
+//       //   : sort === 'highest'
+//       //   ? { price: 'desc' }:
+//          sort === 'rating'
+//         ? { rating: 'desc' }
+//         : { createdAt: 'desc' },
+//     skip: (page - 1) * limit,
+//     take: limit,
+//   })
+
+//   const dataCount = await prisma.product.count()
+
+//   return {
+//     data,
+//     totalPages: Math.ceil(dataCount / limit),
+//   }
+// }
