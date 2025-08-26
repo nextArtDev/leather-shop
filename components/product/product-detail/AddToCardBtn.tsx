@@ -67,7 +67,7 @@ const AddToCardBtn: FC<AddToCardBtnProps> = ({
       slug,
       name,
       image,
-      stock,
+      stock: stockQuantity,
       weight: weight ?? 1,
       sizeId: sizeId,
       size: size!,
@@ -84,6 +84,7 @@ const AddToCardBtn: FC<AddToCardBtnProps> = ({
     size,
     price,
     discount,
+    stockQuantity,
   ])
 
   useEffect(() => {
@@ -97,7 +98,9 @@ const AddToCardBtn: FC<AddToCardBtnProps> = ({
   )
 
   // Calculate remaining stock available for this item
-  const remainingStock = existItem ? stock - existItem.quantity : stock
+  const remainingStock = existItem
+    ? stockQuantity - existItem.quantity
+    : stockQuantity
 
   const handleAddQtyToCart = async () => {
     if (existItem && existItem.quantity < stock) {
@@ -116,7 +119,15 @@ const AddToCardBtn: FC<AddToCardBtnProps> = ({
     }
   }
 
-  console.log(cartItems)
+  if (stockQuantity <= 0) {
+    return (
+      <div className="w-full p-4 bg-red-50 border border-red-200 rounded-sm text-center">
+        <p className="text-red-600 font-medium">این سایز موجود نیست</p>
+      </div>
+    )
+  }
+
+  // console.log(cartItems)
   if (existItem) {
     return (
       <div className="flex flex-col w-full h-full items-center justify-center">
@@ -141,19 +152,19 @@ const AddToCardBtn: FC<AddToCardBtnProps> = ({
             variant="outline"
             className="rounded-md cursor-pointer w-7 h-7 sm:w-9 sm:h-9"
             onClick={handleAddQtyToCart}
-            disabled={existItem.quantity >= stock}
+            disabled={existItem.quantity >= stockQuantity}
           >
             <Plus className="w-2 h-2 sm:w-4 sm:h-4" />
           </Button>
         </article>
         <article className="flex  w-full h-full items-center justify-center">
-          {existItem.quantity >= stock ? (
+          {existItem.quantity >= stockQuantity ? (
             <span className="px-2 py-3 block text-center text-rose-300 text-xs">
               {'اتمام موجودی!'}
             </span>
           ) : (
             <span className="px-2 py-3 block text-center text-indigo-400 text-xs">
-              {stock - existItem.quantity} عدد در انبار
+              {stockQuantity - existItem.quantity} عدد در انبار
             </span>
           )}
         </article>
@@ -161,7 +172,6 @@ const AddToCardBtn: FC<AddToCardBtnProps> = ({
     )
   }
 
-  // If item doesn't exist in cart, show add to cart button
   return (
     <Button
       disabled={!price || !isProductValid || remainingStock <= 0}

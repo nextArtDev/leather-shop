@@ -185,22 +185,38 @@ const ProductPage: FC<ProductPageProp> = ({
                     'rounded-sm  cursor-pointer',
                     buttonVariants({
                       variant: size.id === sizeId ? 'default' : 'outline',
-                    })
+                    }),
+                    size.quantity <= 0 &&
+                      'opacity-50 cursor-not-allowed pointer-events-none'
                   )}
                 >
                   {size.size}
+                  {size.quantity <= 0 && (
+                    <span className="ml-1 text-xs text-red-500">ناموجود</span>
+                  )}
                 </Link>
               </li>
             ))}
           </ul>
         </article>
         <span className="text-green-600 flex gap-1 text-sm items-center">
-          <span className="w-2 h-2 animate-pulse rounded-full bg-green-600"></span>
-          {sizes.map((s: ProductSize) => s.quantity)[0] > 1
-            ? 'موجود'
-            : 'اتمام موجودی'}
+          <span
+            className={cn(
+              'w-2 h-2 animate-pulse rounded-full',
+              currentSize && currentSize.quantity > 0
+                ? 'bg-green-600'
+                : 'bg-red-600'
+            )}
+          ></span>
+          {currentSize && currentSize.quantity > 0 ? 'موجود' : 'اتمام موجودی'}
+          {/* Show remaining quantity */}
+          {currentSize && currentSize.quantity > 0 && (
+            <span className="text-xs text-gray-500">
+              ({currentSize.quantity} عدد باقی مانده)
+            </span>
+          )}
         </span>
-        {!!sizes.length && currentSize && (
+        {!!sizes.length && currentSize && currentSize.quantity > 0 && (
           <AddToCardBtn
             sizeId={sizeId}
             weight={weight}
@@ -216,6 +232,15 @@ const ProductPage: FC<ProductPageProp> = ({
             // stock={stock}
             image={images.map((image) => image.url)[0]}
           />
+        )}
+
+        {currentSize && currentSize.quantity <= 0 && (
+          <div className="bg-red-50 border border-red-200 rounded-md p-4 text-center">
+            <p className="text-red-600 font-medium">این سایز موجود نیست</p>
+            <p className="text-sm text-red-500 mt-1">
+              لطفاً سایز دیگری انتخاب کنید
+            </p>
+          </div>
         )}
         <Link
           className={cn(

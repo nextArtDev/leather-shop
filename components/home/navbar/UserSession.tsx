@@ -58,14 +58,20 @@ export default function UserSession() {
         align="end"
       >
         <DropdownMenuLabel dir="rtl" className="cursor-pointer">
-          {session ? session.user?.name : 'ورود/عضویت'}
+          {session ? (
+            session.user?.name
+          ) : (
+            <Link href={'/sign-in'}> {'ورود/عضویت'}</Link>
+          )}
         </DropdownMenuLabel>
         {session?.user.phoneNumber && (
           <>
             <DropdownMenuGroup dir="rtl">
-              <DropdownMenuItem className="cursor-pointer">
-                <Link href={'/user/profile'}>پروفایل</Link>
-              </DropdownMenuItem>
+              <Link href={'/user/profile'}>
+                <DropdownMenuItem className="cursor-pointer">
+                  پروفایل
+                </DropdownMenuItem>
+              </Link>
             </DropdownMenuGroup>
 
             <DropdownMenuSeparator />

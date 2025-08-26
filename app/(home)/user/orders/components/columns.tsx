@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import { ColumnDef } from '@tanstack/react-table'
 
 import { Expand } from 'lucide-react'

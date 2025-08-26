@@ -15,14 +15,16 @@ export default function UserLayout({
       <div className="w-full h-full flex flex-col">
         <div className="w-full h-full border-b  mx-auto">
           <div className="w-full  flex justify-around items-center h-16 px-4">
-            <Link href="/" className="w-22">
-              <Image
-                src={'/images/logo.svg'}
-                height={48}
-                width={48}
-                alt={'SEP'}
-              />
-            </Link>
+            <article>
+              <Link href="/" className="w-22">
+                <Image
+                  src={'/images/logo.svg'}
+                  height={48}
+                  width={48}
+                  alt={'SEP'}
+                />
+              </Link>
+            </article>
             <MainNav className="mx-2" />
             <div className="  items-center flex space-x-4">
               <Menu />
