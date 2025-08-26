@@ -3,6 +3,7 @@ import Link from 'next/link'
 
 import MainNav from './components/main-nav'
 import Menu from './components/menu'
+import ModalProvider from '@/providers/modal-provider'
 
 export default function UserLayout({
   children,
@@ -23,14 +24,14 @@ export default function UserLayout({
               />
             </Link>
             <MainNav className="mx-6" />
-            <div className="ml-auto items-center flex space-x-4">
+            <div className="  items-center flex space-x-4">
               <Menu />
             </div>
           </div>
         </div>
 
         <div className="flex-1 space-y-4 p-8 pt-6 container mx-auto">
-          {children}
+          <ModalProvider>{children}</ModalProvider>
         </div>
       </div>
     </>
