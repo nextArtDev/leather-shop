@@ -37,8 +37,8 @@ const AdminOverviewPage = async () => {
   const summary = await getOrderSummary()
 
   return (
-    <div className="space-y-2 mx-2">
-      <h1 className="h2-bold">دشبورد</h1>
+    <div className="space-y-2 mx-2 py-4">
+      {/* <h1 className="h2-bold">دشبورد</h1> */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

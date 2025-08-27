@@ -217,3 +217,28 @@ export function formatError(error: any) {
       : JSON.stringify(error.message)
   }
 }
+
+export async function generateSearchMetadata(searchParams: {
+  q?: string
+  categoryId?: string
+  minPrice?: string
+  maxPrice?: string
+}) {
+  const { q, categoryId, minPrice, maxPrice } = searchParams
+
+  const titleParts = []
+
+  if (q) titleParts.push(`جستجو: ${q}`)
+  if (categoryId) titleParts.push(`دسته‌بندی`)
+  if (minPrice || maxPrice) titleParts.push(`فیلتر قیمت`)
+
+  const title =
+    titleParts.length > 0
+      ? titleParts.join(' | ') + ' - فروشگاه'
+      : 'جستجو و فیلتر محصولات - فروشگاه'
+
+  return {
+    title,
+    description: 'جستجو، فیلتر و مرتب‌سازی محصولات با بهترین قیمت و کیفیت',
+  }
+}

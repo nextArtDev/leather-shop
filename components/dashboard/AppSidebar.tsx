@@ -97,21 +97,6 @@ const data = {
         },
       ],
     },
-    {
-      title: 'کاربران',
-      url: '/dashboard/users',
-      items: [
-        {
-          title: 'ورود',
-          url: '/sign-in',
-        },
-
-        {
-          title: 'Turbopack',
-          url: '#',
-        },
-      ],
-    },
   ],
 }
 

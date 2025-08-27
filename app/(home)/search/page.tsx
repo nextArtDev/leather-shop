@@ -1,30 +1,6 @@
 import { getAllCategories, searchProducts } from '@/lib/home/queries/products'
 import { getFiltersData } from '@/lib/home/queries/products' // Add this function
 
-export async function generateSearchMetadata(searchParams: {
-  q?: string
-  categoryId?: string
-  minPrice?: string
-  maxPrice?: string
-}) {
-  const { q, categoryId, minPrice, maxPrice } = searchParams
-
-  const titleParts = []
-
-  if (q) titleParts.push(`جستجو: ${q}`)
-  if (categoryId) titleParts.push(`دسته‌بندی`)
-  if (minPrice || maxPrice) titleParts.push(`فیلتر قیمت`)
-
-  const title =
-    titleParts.length > 0
-      ? titleParts.join(' | ') + ' - فروشگاه'
-      : 'جستجو و فیلتر محصولات - فروشگاه'
-
-  return {
-    title,
-    description: 'جستجو، فیلتر و مرتب‌سازی محصولات با بهترین قیمت و کیفیت',
-  }
-}
 import { Suspense } from 'react'
 import { Metadata } from 'next'
 import { Card, CardContent } from '@/components/ui/card'
@@ -32,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 import { parseSearchParams } from './components/utils'
 import SearchPageClient from './components/SearchPageClient'
+import { generateSearchMetadata } from '@/lib/utils'
 
 interface SearchPageProps {
   searchParams: Promise<{
