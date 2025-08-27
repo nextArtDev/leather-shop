@@ -11,6 +11,7 @@ import { DataTableSkeleton } from '../../components/shared/DataTableSkeleton'
 import { Heading } from '../../components/shared/Heading'
 import { getAllProductsList } from '../../lib/queries'
 import { columns, ProductColumn } from './components/columns'
+import { currentUser } from '@/lib/auth'
 
 function ProductDataTable({
   formattedProduct,
@@ -40,14 +41,17 @@ export default async function ProductsPage({
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
+  const user = await currentUser()
+
+  if (!user || user?.role !== 'ADMIN') return notFound()
   const params = await searchParams
   const page = params.page ? +params.page : 1
   const pageSize = params.pageSize ? +params.pageSize : 50
 
   const products = await getAllProductsList({ page, pageSize })
-  if (!products) return notFound()
-
-  const formattedProduct: ProductColumn[] = products.products?.map((item) => ({
+  // if (!products) return notFound()
+  if (!products) return <h1 className="text-2xl">هیچ محصولی اضافه نشده!</h1>
+  const formattedProduct: ProductColumn[] = products?.products?.map((item) => ({
     id: item.id,
     name: item.name,
     slug: item.slug,

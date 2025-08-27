@@ -8,6 +8,8 @@ import { Heading } from './components/Heading'
 import { getAllReviews } from '../../lib/queries'
 import { Suspense } from 'react'
 import { DataTableSkeleton } from '../../components/shared/DataTableSkeleton'
+import { currentUser } from '@/lib/auth'
+import { notFound } from 'next/navigation'
 
 function CommentsDataTable({
   formattedComments,
@@ -37,6 +39,9 @@ async function page({
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
+  const user = await currentUser()
+
+  if (!user || user?.role !== 'ADMIN') return notFound()
   const params = await searchParams
   const page = params.page ? +params.page : 1
   const pageSize = params.pageSize ? +params.pageSize : 50

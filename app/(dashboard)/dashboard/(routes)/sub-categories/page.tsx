@@ -11,6 +11,8 @@ import { cn } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
 import { format } from 'date-fns-jalali'
 import { DataTable } from '../../components/shared/DataTable'
+import { currentUser } from '@/lib/auth'
+import { notFound } from 'next/navigation'
 
 function SubCategoryDataTable({
   formattedSubCategory,
@@ -40,6 +42,9 @@ export default async function AdminSubCategoriesPage({
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
+  const user = await currentUser()
+
+  if (!user || user?.role !== 'ADMIN') return notFound()
   const params = await searchParams
   const page = params.page ? +params.page : 1
   const pageSize = params.pageSize ? +params.pageSize : 50

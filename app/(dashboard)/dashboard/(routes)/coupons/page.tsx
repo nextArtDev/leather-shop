@@ -12,6 +12,8 @@ import { DataTable } from '../../components/shared/DataTable'
 import { DataTableSkeleton } from '../../components/shared/DataTableSkeleton'
 import { Heading } from '../../components/shared/Heading'
 import { getAllCoupons } from '../../lib/queries'
+import { currentUser } from '@/lib/auth'
+import { notFound } from 'next/navigation'
 
 function CouponsDataTable({
   formattedCoupons,
@@ -41,6 +43,9 @@ export default async function AdminCouponsPage({
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
+  const user = await currentUser()
+
+  if (!user || user?.role !== 'ADMIN') return notFound()
   const params = await searchParams
   const page = params.page ? +params.page : 1
   const pageSize = params.pageSize ? +params.pageSize : 50

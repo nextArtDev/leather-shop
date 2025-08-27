@@ -8,6 +8,8 @@ import { Suspense } from 'react'
 import { DataTableSkeleton } from '../../components/shared/DataTableSkeleton'
 import { Heading } from '../../components/shared/Heading'
 import { columns, UserColumnType } from './components/columns'
+import { currentUser } from '@/lib/auth'
+import { notFound } from 'next/navigation'
 
 function UsersDataTable({
   formattedUsers,
@@ -37,6 +39,10 @@ async function AdminUsersPage({
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
+  const user = await currentUser()
+
+  if (!user || user?.role !== 'ADMIN') return notFound()
+
   const params = await searchParams
   const page = params.page ? +params.page : 1
   const pageSize = params.pageSize ? +params.pageSize : 50

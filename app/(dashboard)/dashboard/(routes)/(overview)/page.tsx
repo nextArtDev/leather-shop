@@ -13,17 +13,16 @@ import { Metadata } from 'next'
 
 // import Charts from './components/charts'
 import { currentUser } from '@/lib/auth'
+import { notFound } from 'next/navigation'
 
 export const metadata: Metadata = {
-  title: 'Admin Dashboard',
+  title: 'دشبورد',
 }
 
 const AdminOverviewPage = async () => {
   const user = await currentUser()
 
-  if (user?.role !== 'ADMIN') {
-    throw new Error('User is not authorized')
-  }
+  if (!user || user?.role !== 'ADMIN') return notFound()
   // console.log(user)
 
   // const summary = await getOrderSummary()

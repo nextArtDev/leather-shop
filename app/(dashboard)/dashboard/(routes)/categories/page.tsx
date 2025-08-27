@@ -10,6 +10,8 @@ import { buttonVariants } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { DataTableSkeleton } from '../../components/shared/DataTableSkeleton'
 import { DataTable } from '../../components/shared/DataTable'
+import { getCurrentUser } from '@/lib/auth-helpers'
+import { notFound } from 'next/navigation'
 
 function CategoryDataTable({
   formattedCategory,
@@ -39,6 +41,9 @@ export default async function CategoriesPage({
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
+  const user = await getCurrentUser()
+
+  if (!user || user?.role !== 'ADMIN') return notFound()
   const params = await searchParams
   const page = params.page ? +params.page : 1
   const pageSize = params.pageSize ? +params.pageSize : 50
