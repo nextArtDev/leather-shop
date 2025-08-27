@@ -114,8 +114,42 @@ export type SubCategoryForHomePage = {
 export type CategoriesWithStatsResult = CategoryWithStats[]
 
 // 5. Search Products Types
-export type SearchProduct = {
-  // id: string
+export interface SearchFilters {
+  search?: string
+  categoryId?: string
+  subCategoryId?: string
+  minPrice?: number
+  maxPrice?: number
+  sortBy?: 'newest' | 'oldest' | 'price_asc' | 'price_desc' | 'rating' | 'sales'
+  page?: number
+  colors?: string[]
+  sizes?: string[]
+}
+
+export interface SortOption {
+  name: string
+  value: SearchFilters['sortBy']
+}
+
+export interface CategoryData {
+  id: string
+  name: string
+  url: string
+  featured: boolean
+}
+
+export interface FiltersData {
+  priceRange: {
+    min: number
+    max: number
+  }
+  colors: string[]
+  sizes: string[]
+  brands: string[]
+}
+
+export interface SearchProduct {
+  id: string
   name: string
   slug: string
   brand: string
@@ -124,14 +158,14 @@ export type SearchProduct = {
   sales: number
   isSale: boolean
   saleEndDate: string | null
-  images: BasicProductImage[]
-  sizes: ProductSize[]
-  colors: BasicProductColor[]
-  category: CategoryInfo
-  subCategory: SubCategoryInfo
+  images: { url: string }[]
+  sizes: { size: string; price: number; discount: number; quantity: number }[]
+  colors: { name: string }[]
+  category: { name: string; url: string }
+  subCategory: { name: string; url: string }
 }
 
-export type SearchPagination = {
+export interface SearchPagination {
   total: number
   pages: number
   current: number
@@ -139,7 +173,7 @@ export type SearchPagination = {
   hasPrev: boolean
 }
 
-export type SearchProductsResult = {
+export interface SearchProductsResult {
   products: SearchProduct[]
   pagination: SearchPagination
 }
@@ -316,17 +350,6 @@ export interface FiltersData {
 export interface SortOption {
   name: string
   value: SearchFilters['sortBy']
-}
-export type SearchFilters = {
-  search?: string
-  categoryId?: string
-  subCategoryId?: string
-  minPrice?: number
-  maxPrice?: number
-  colors?: string[]
-  sizes?: string[]
-  sortBy?: 'newest' | 'oldest' | 'price_asc' | 'price_desc' | 'rating' | 'sales'
-  page?: number
 }
 
 // For pagination component

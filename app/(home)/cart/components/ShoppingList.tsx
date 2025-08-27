@@ -90,7 +90,7 @@ const ShoppingList = ({ cartItems, mutable = false }: Props) => {
                       variant="outline"
                       className="text-red-500 text-sm sm:text-base px-2 py-1"
                     >
-                      {+item.price * item.quantity}
+                      {+item.price * item.quantity} تومان
                     </Badge>
                   </div>
                 </div>

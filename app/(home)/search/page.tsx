@@ -1,13 +1,43 @@
 import { getAllCategories, searchProducts } from '@/lib/home/queries/products'
 import { getFiltersData } from '@/lib/home/queries/products' // Add this function
-// import { getAllCategories } from '@/app/(dashboard)/dashboard/lib/queries'
-import { SearchFilters } from '@/lib/types/home'
-import SearchPageContent from './components/SearchPageContent'
+
+export async function generateSearchMetadata(searchParams: {
+  q?: string
+  categoryId?: string
+  minPrice?: string
+  maxPrice?: string
+}) {
+  const { q, categoryId, minPrice, maxPrice } = searchParams
+
+  const titleParts = []
+
+  if (q) titleParts.push(`جستجو: ${q}`)
+  if (categoryId) titleParts.push(`دسته‌بندی`)
+  if (minPrice || maxPrice) titleParts.push(`فیلتر قیمت`)
+
+  const title =
+    titleParts.length > 0
+      ? titleParts.join(' | ') + ' - فروشگاه'
+      : 'جستجو و فیلتر محصولات - فروشگاه'
+
+  return {
+    title,
+    description: 'جستجو، فیلتر و مرتب‌سازی محصولات با بهترین قیمت و کیفیت',
+  }
+}
+import { Suspense } from 'react'
+import { Metadata } from 'next'
+import { Card, CardContent } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
+
+import { parseSearchParams } from './components/utils'
+import SearchPageClient from './components/SearchPageClient'
 
 interface SearchPageProps {
   searchParams: Promise<{
     q?: string
     categoryId?: string
+    subCategoryId?: string
     minPrice?: string
     maxPrice?: string
     sortBy?: string
@@ -17,53 +47,99 @@ interface SearchPageProps {
   }>
 }
 
-const sortOptions = [
-  { name: 'جدیدترین', value: 'newest' as const },
-  { name: 'قدیمی‌ترین', value: 'oldest' as const },
-  { name: 'ارزانترین', value: 'price_asc' as const },
-  { name: 'گرانترین', value: 'price_desc' as const },
-  { name: 'بهترین امتیاز', value: 'rating' as const },
-  { name: 'پرفروش‌ترین', value: 'sales' as const },
-]
-
-export default async function SearchPage({ searchParams }: SearchPageProps) {
+export async function generateMetadata({
+  searchParams,
+}: SearchPageProps): Promise<Metadata> {
   const params = await searchParams
+  return generateSearchMetadata(params)
+}
 
-  const currentFilters: SearchFilters = {
-    search: params.q || undefined,
-    categoryId: params.categoryId || undefined,
-    minPrice: params.minPrice ? parseInt(params.minPrice) : undefined,
-    maxPrice: params.maxPrice ? parseInt(params.maxPrice) : undefined,
-    sortBy: (params.sortBy as SearchFilters['sortBy']) || 'newest',
-    page: params.page ? parseInt(params.page) : 1,
-    colors: Array.isArray(params.colors)
-      ? params.colors
-      : params.colors
-      ? [params.colors]
-      : undefined,
-    sizes: Array.isArray(params.sizes)
-      ? params.sizes
-      : params.sizes
-      ? [params.sizes]
-      : undefined,
-  }
+async function SearchPageContent({ searchParams }: SearchPageProps) {
+  const params = await searchParams
+  const filters = parseSearchParams(params)
 
-  // Fetch data in parallel
-  const [searchResults, filtersData, categoriesData] = await Promise.all([
-    searchProducts(currentFilters),
-    getFiltersData(currentFilters.categoryId),
-    getAllCategories({}),
-  ])
+  try {
+    // Fetch data in parallel for better performance
+    const [searchResults, filtersData, categoriesData] = await Promise.all([
+      searchProducts(filters),
+      getFiltersData(filters.categoryId, filters.subCategoryId),
+      getAllCategories({}),
+    ])
 
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <SearchPageContent
-        searchResults={searchResults}
+    return (
+      <SearchPageClient
+        initialResults={searchResults}
         filtersData={filtersData}
         categories={categoriesData.categories}
-        currentFilters={currentFilters}
-        sortOptions={sortOptions}
+        initialFilters={filters}
       />
+    )
+  } catch (error) {
+    console.error('Search page error:', error)
+    return <SearchError />
+  }
+}
+
+function SearchError() {
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <Card>
+        <CardContent className="py-12 text-center">
+          <div className="text-lg font-medium mb-2">خطا در بارگذاری</div>
+          <div className="text-muted-foreground">
+            مشکلی در بارگذاری نتایج جستجو رخ داده است. لطفاً دوباره تلاش کنید.
+          </div>
+        </CardContent>
+      </Card>
     </div>
+  )
+}
+
+function SearchPageSkeleton() {
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex flex-col lg:flex-row gap-8">
+        {/* Sidebar Skeleton */}
+        <div className="w-full lg:w-80 space-y-6">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i}>
+              <CardContent className="p-4">
+                <Skeleton className="h-6 w-24 mb-4" />
+                <div className="space-y-2">
+                  {Array.from({ length: 5 }).map((_, j) => (
+                    <Skeleton key={j} className="h-8 w-full" />
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Main Content Skeleton */}
+        <div className="flex-1">
+          <Skeleton className="h-12 w-full mb-6" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <Card key={i}>
+                <CardContent className="p-4">
+                  <Skeleton className="w-full h-48 mb-4" />
+                  <Skeleton className="h-4 w-3/4 mb-2" />
+                  <Skeleton className="h-4 w-1/2 mb-2" />
+                  <Skeleton className="h-6 w-1/3" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default function SearchPage({ searchParams }: SearchPageProps) {
+  return (
+    <Suspense fallback={<SearchPageSkeleton />}>
+      <SearchPageContent searchParams={searchParams} />
+    </Suspense>
   )
 }

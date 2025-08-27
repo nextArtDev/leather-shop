@@ -3,8 +3,10 @@ import prisma from '@/lib/prisma'
 import {
   CategoryWithStats,
   ProductDetails,
+  SearchFilters,
   SubCategoryForHomePage,
 } from '@/lib/types/home'
+import { redirect } from 'next/navigation'
 
 // Homepage Products (with basic info + first image)
 export async function getHomepageProducts(limit: number = 12) {
@@ -349,6 +351,24 @@ export async function searchProducts({
   }
 }
 
+export async function updateSearchFilters(filters: Partial<SearchFilters>) {
+  const params = new URLSearchParams()
+
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      if (Array.isArray(value)) {
+        value.forEach((v) => params.append(key, v))
+      } else {
+        params.set(key, value.toString())
+      }
+    }
+  })
+
+  // Reset page when filters change
+  params.set('page', '1')
+
+  redirect(`/search?${params.toString()}`)
+}
 // 6. SINGLE PRODUCT PAGE - Full details
 export async function getProductDetails(slug: string): Promise<ProductDetails> {
   const product = await prisma.product.findUnique({
