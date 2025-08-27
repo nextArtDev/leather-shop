@@ -3,11 +3,9 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
+
 import { Slider } from '@/components/ui/slider' // Your existing slider
 import { FiltersData } from '@/lib/types/home'
-import { NumberInput } from '@tremor/react'
 
 interface PriceFilterProps {
   filtersData: FiltersData
@@ -28,8 +26,8 @@ export default function PriceFilter({
   const [localMax, setLocalMax] = useState(
     selectedMaxPrice || filtersData.priceRange.max
   )
-  const [manualMin, setManualMin] = useState('')
-  const [manualMax, setManualMax] = useState('')
+  // const [manualMin, setManualMin] = useState('')
+  // const [manualMax, setManualMax] = useState('')
 
   useEffect(() => {
     setLocalMin(selectedMinPrice || filtersData.priceRange.min)
@@ -39,23 +37,23 @@ export default function PriceFilter({
   const handleSliderChange = (values: number[]) => {
     setLocalMin(values[0])
     setLocalMax(values[1])
-    setManualMin('')
-    setManualMax('')
+    // setManualMin('')
+    // setManualMax('')
   }
 
-  const handleManualChange = () => {
-    const min = manualMin ? parseInt(manualMin) : filtersData.priceRange.min
-    const max = manualMax ? parseInt(manualMax) : filtersData.priceRange.max
+  // const handleManualChange = () => {
+  //   const min = manualMin ? parseInt(manualMin) : filtersData.priceRange.min
+  //   const max = manualMax ? parseInt(manualMax) : filtersData.priceRange.max
 
-    if (
-      min <= max &&
-      min >= filtersData.priceRange.min &&
-      max <= filtersData.priceRange.max
-    ) {
-      setLocalMin(min)
-      setLocalMax(max)
-    }
-  }
+  //   if (
+  //     min <= max &&
+  //     min >= filtersData.priceRange.min &&
+  //     max <= filtersData.priceRange.max
+  //   ) {
+  //     setLocalMin(min)
+  //     setLocalMax(max)
+  //   }
+  // }
 
   const handleApplyPrice = () => {
     const minToApply =
@@ -68,8 +66,8 @@ export default function PriceFilter({
   const handleResetPrice = () => {
     setLocalMin(filtersData.priceRange.min)
     setLocalMax(filtersData.priceRange.max)
-    setManualMin('')
-    setManualMax('')
+    // setManualMin('')
+    // setManualMax('')
     onPriceChange(undefined, undefined)
   }
 

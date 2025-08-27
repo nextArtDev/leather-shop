@@ -395,3 +395,9 @@ export const CouponFormSchema = z.object({
 //         'Only letters, numbers, hyphen, and underscore are allowed in the category url, and consecutive occurrences of hyphens, underscores, or spaces are not permitted.',
 //     }),
 // })
+
+export const updateUserSchema = z.object({
+  name: z.string().optional(),
+  phoneNumber: z.string().min(10, 'شماره موبایل نمی‌تواند خالی باشد.'),
+  role: z.string().min(1, 'مشخص کردن نقش کاربر الزامی است.'),
+})

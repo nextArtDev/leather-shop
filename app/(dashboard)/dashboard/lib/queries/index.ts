@@ -8,6 +8,7 @@ import {
   Order,
   OrderItem,
   PaymentDetails,
+  // Prisma,
   Product,
   Province,
   Question,
@@ -15,6 +16,7 @@ import {
   Size,
   Spec,
   SubCategory,
+  User,
 } from '@/lib/generated/prisma'
 import prisma from '@/lib/prisma'
 import { cache } from 'react'
@@ -389,3 +391,43 @@ export const getAllCoupons = async (
     throw error
   }
 }
+
+interface getAllUsersProps {
+  page?: number
+  pageSize?: number
+}
+
+export const getAllUsers = async (
+  params: getAllUsersProps
+): Promise<{ users: User[] } & { isNext: boolean }> => {
+  const { page = 1, pageSize = 50 } = params
+  const skipAmount = (page - 1) * pageSize
+  try {
+    const user = await getCurrentUser()
+
+    if (!user) throw new Error('Unauthenticated.')
+
+    if (user.role !== 'ADMIN')
+      throw new Error(
+        'Unauthorized Access: Seller Privileges Required for Entry.'
+      )
+    const allUsers = await prisma.user.findMany({
+      where: {},
+
+      orderBy: {
+        updatedAt: 'desc',
+      },
+      skip: skipAmount,
+      take: pageSize,
+    })
+
+    const totalUsers = await prisma.user.count()
+
+    const isNext = totalUsers > skipAmount + allUsers.length
+    return { users: allUsers || [], isNext }
+  } catch (error) {
+    throw error
+  }
+}
+
+// Delete a user
