@@ -16,6 +16,11 @@ import { DataTableSkeleton } from '../../components/shared/DataTableSkeleton'
 import { Heading } from '../../components/shared/Heading'
 import { currentUser } from '@/lib/auth'
 import { notFound } from 'next/navigation'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'سفارشها',
+}
 
 function OrdersDataTable({
   formattedOrders,

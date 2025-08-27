@@ -61,3 +61,65 @@ export const generateUniqueSlug = async (
   }
   return slug
 }
+
+export function formatNumber(num: number): string {
+  return new Intl.NumberFormat('fa-IR').format(num)
+}
+
+export function formatPrice(price: number): string {
+  return new Intl.NumberFormat('fa-IR', {
+    style: 'currency',
+    currency: 'IRR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(price)
+}
+
+export function formatDate(date: Date): string {
+  return new Intl.DateTimeFormat('fa-IR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(date)
+}
+
+export function formatShortDate(date: Date): string {
+  return new Intl.DateTimeFormat('fa-IR', {
+    month: 'short',
+    day: 'numeric',
+  }).format(date)
+}
+
+export const translateOrderStatus = (status: string): string => {
+  const translations: { [key: string]: string } = {
+    Pending: 'در انتظار',
+    Confirmed: 'تأیید شده',
+    Processing: 'در حال پردازش',
+    Shipped: 'ارسال شده',
+    OutforDelivery: 'در حال تحویل',
+    Delivered: 'تحویل شده',
+    Cancelled: 'لغو شده',
+    Failed: 'ناموفق',
+    Refunded: 'برگشت داده شده',
+    Returned: 'برگشت داده شده',
+    PartiallyShipped: 'جزء ارسال شده',
+    OnHold: 'در حالت تعلیق',
+  }
+
+  return translations[status] || status // Return the original status if no translation is found
+}
+
+export const translatePaymentStatus = (status: string): string => {
+  const translations: { [key: string]: string } = {
+    Pending: 'در انتظار',
+    Paid: 'پرداخت شده',
+    Completed: 'تکمیل شده',
+    Failed: 'ناموفق',
+    Declined: 'رد شده',
+    Refunded: 'برگشت داده شده',
+    Cancelled: 'لغو شده',
+    PartiallyRefunded: 'جزء برگشت داده شده',
+  }
+
+  return translations[status] || status // Return the original status if no translation is found
+}

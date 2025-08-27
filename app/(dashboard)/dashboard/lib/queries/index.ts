@@ -430,4 +430,111 @@ export const getAllUsers = async (
   }
 }
 
-// Delete a user
+// Order Summary
+
+export type SalesDataType = Array<{
+  month: string
+  totalSales: number
+}>
+
+export async function getOrderSummary() {
+  try {
+    // Get counts for each resource
+    const [ordersCount, productsCount, usersCount] = await Promise.all([
+      prisma.order.count(),
+      prisma.product.count(),
+      prisma.user.count(),
+    ])
+
+    // Calculate the total sales (using 'total' field as per your schema)
+    const totalSales = await prisma.order.aggregate({
+      _sum: { total: true },
+      where: {
+        paymentStatus: 'Paid', // Only count paid orders
+      },
+    })
+
+    // Get monthly sales data without raw query
+    const currentYear = new Date().getFullYear()
+    const lastYear = currentYear - 1
+
+    // Get orders from last 12 months
+    const startDate = new Date(lastYear, new Date().getMonth(), 1)
+
+    const ordersWithSales = await prisma.order.findMany({
+      where: {
+        createdAt: {
+          gte: startDate,
+        },
+        paymentStatus: 'Paid', // Only paid orders
+      },
+      select: {
+        total: true,
+        createdAt: true,
+      },
+    })
+
+    // Group by month/year and calculate totals
+    const salesDataMap = new Map<string, number>()
+
+    ordersWithSales.forEach((order) => {
+      const month = order.createdAt.toLocaleDateString('fa-IR', {
+        month: 'long',
+        year: '2-digit',
+      })
+      const currentTotal = salesDataMap.get(month) || 0
+      salesDataMap.set(month, currentTotal + order.total)
+    })
+
+    const salesData: SalesDataType = Array.from(salesDataMap.entries())
+      .map(([month, totalSales]) => ({
+        month,
+        totalSales,
+      }))
+      .sort((a, b) => {
+        // Sort by month/year
+        const [aMonth, aYear] = a.month.split('/')
+        const [bMonth, bYear] = b.month.split('/')
+        if (aYear !== bYear) return parseInt(aYear) - parseInt(bYear)
+        return parseInt(aMonth) - parseInt(bMonth)
+      })
+
+    // Get latest sales (recent orders)
+    const latestSales = await prisma.order.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        user: { select: { name: true, phoneNumber: true } },
+      },
+      take: 6,
+    })
+
+    // Get additional useful stats
+    const ordersByStatus = await prisma.order.groupBy({
+      by: ['orderStatus'],
+      _count: {
+        id: true,
+      },
+    })
+
+    const ordersByPaymentStatus = await prisma.order.groupBy({
+      by: ['paymentStatus'],
+      _count: {
+        id: true,
+      },
+    })
+
+    return {
+      ordersCount,
+      productsCount,
+      usersCount,
+      totalSales,
+      latestSales,
+      salesData,
+      ordersByStatus,
+      ordersByPaymentStatus,
+    }
+  } catch (error) {
+    console.error('Error fetching order summary:', error)
+    throw new Error('Failed to fetch order summary')
+  }
+}

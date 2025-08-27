@@ -14,7 +14,11 @@ import { Heading } from '../../components/shared/Heading'
 import { getAllCoupons } from '../../lib/queries'
 import { currentUser } from '@/lib/auth'
 import { notFound } from 'next/navigation'
+import { Metadata } from 'next'
 
+export const metadata: Metadata = {
+  title: 'کوپن تخفیف',
+}
 function CouponsDataTable({
   formattedCoupons,
   page,

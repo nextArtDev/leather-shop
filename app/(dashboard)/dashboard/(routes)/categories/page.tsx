@@ -12,6 +12,11 @@ import { DataTableSkeleton } from '../../components/shared/DataTableSkeleton'
 import { DataTable } from '../../components/shared/DataTable'
 import { getCurrentUser } from '@/lib/auth-helpers'
 import { notFound } from 'next/navigation'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'دسته‌بندی',
+}
 
 function CategoryDataTable({
   formattedCategory,

@@ -12,6 +12,11 @@ import { Heading } from '../../components/shared/Heading'
 import { getAllProductsList } from '../../lib/queries'
 import { columns, ProductColumn } from './components/columns'
 import { currentUser } from '@/lib/auth'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'محصولات',
+}
 
 function ProductDataTable({
   formattedProduct,

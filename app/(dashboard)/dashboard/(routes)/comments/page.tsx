@@ -10,6 +10,11 @@ import { Suspense } from 'react'
 import { DataTableSkeleton } from '../../components/shared/DataTableSkeleton'
 import { currentUser } from '@/lib/auth'
 import { notFound } from 'next/navigation'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'کامنت',
+}
 
 function CommentsDataTable({
   formattedComments,

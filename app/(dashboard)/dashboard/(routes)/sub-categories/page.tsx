@@ -13,6 +13,11 @@ import { format } from 'date-fns-jalali'
 import { DataTable } from '../../components/shared/DataTable'
 import { currentUser } from '@/lib/auth'
 import { notFound } from 'next/navigation'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'زیردسته‌بندی',
+}
 
 function SubCategoryDataTable({
   formattedSubCategory,

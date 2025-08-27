@@ -13,7 +13,7 @@ import { Separator } from '@/components/ui/separator'
 //   BreadcrumbPage,
 //   BreadcrumbSeparator,
 // } from '@/components/ui/breadcrumb'
-import AdminSearch from '@/components/dashboard/admin-search'
+// import AdminSearch from '@/components/dashboard/admin-search'
 import localFont from 'next/font/local'
 import { currentUser } from '@/lib/auth'
 import { notFound } from 'next/navigation'
@@ -46,7 +46,7 @@ export default async function Layout({
               <SidebarTrigger />
               {/* <p>LOGO</p> */}
               <Separator orientation="vertical" className="mr-2 h-4" />
-              <AdminSearch />
+              {/* <AdminSearch /> */}
               {/* <Breadcrumb>
               <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">

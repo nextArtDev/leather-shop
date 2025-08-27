@@ -10,6 +10,11 @@ import { Heading } from '../../components/shared/Heading'
 import { columns, UserColumnType } from './components/columns'
 import { currentUser } from '@/lib/auth'
 import { notFound } from 'next/navigation'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'کاربرها',
+}
 
 function UsersDataTable({
   formattedUsers,
@@ -62,8 +67,8 @@ async function AdminUsersPage({
     <div className="flex-col">
       <div className="flex-1 space-y-4 p-8 pt-6">
         <Heading
-          title={`سفارشات (${formattedUsers?.length})`}
-          description="سفارشات را مدیریت کنید."
+          title={`کاربرها (${formattedUsers?.length})`}
+          description="کاربرها را مدیریت کنید."
         />
 
         <Separator />
