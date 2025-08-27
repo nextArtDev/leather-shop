@@ -1,8 +1,8 @@
 // Base types for common structures
 export type ProductImage = {
-  id: string
+  // id: string
   url: string
-  key: string
+  // key: string
 }
 
 export type BasicProductImage = {
@@ -159,6 +159,7 @@ export interface SearchProduct {
   isSale: boolean
   saleEndDate: string | null
   images: { url: string }[]
+  variantImages: { url: string }[]
   sizes: { size: string; price: number; discount: number; quantity: number }[]
   colors: { name: string }[]
   category: { name: string; url: string }

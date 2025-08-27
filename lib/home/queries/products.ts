@@ -213,13 +213,9 @@ export async function searchProducts({
 
   if (search) {
     where.OR = [
-      // { name: { contains: search, mode: 'insensitive' } },
       { name: { contains: search } },
-      // { description: { contains: search, mode: 'insensitive' } },
       { description: { contains: search } },
-      // { brand: { contains: search, mode: 'insensitive' } },
       { brand: { contains: search } },
-      // { keywords: { contains: search, mode: 'insensitive' } },
       { keywords: { contains: search } },
     ]
   }
@@ -227,42 +223,65 @@ export async function searchProducts({
   if (categoryId) where.categoryId = categoryId
   if (subCategoryId) where.subCategoryId = subCategoryId
 
+  // Build conditions array for complex filtering
+  const conditions: Prisma.ProductWhereInput[] = []
+
   // Price filtering
   if (minPrice || maxPrice) {
-    where.sizes = {
-      some: {
-        price: {
-          ...(minPrice && { gte: minPrice }),
-          ...(maxPrice && { lte: maxPrice }),
+    conditions.push({
+      sizes: {
+        some: {
+          price: {
+            ...(minPrice && { gte: minPrice }),
+            ...(maxPrice && { lte: maxPrice }),
+          },
         },
       },
-    }
-  }
-
-  // Color filtering
-  if (colors && colors.length > 0) {
-    where.colors = {
-      some: {
-        name: {
-          in: colors,
-        },
-      },
-    }
+    })
   }
 
   // Size filtering
   if (sizes && sizes.length > 0) {
-    where.sizes = {
-      some: {
-        size: {
-          in: sizes,
+    conditions.push({
+      sizes: {
+        some: {
+          size: {
+            in: sizes,
+          },
         },
       },
+    })
+  }
+
+  // Color filtering
+  if (colors && colors.length > 0) {
+    conditions.push({
+      colors: {
+        some: {
+          name: {
+            in: colors,
+          },
+        },
+      },
+    })
+  }
+
+  // Apply all conditions
+  if (conditions.length > 0) {
+    if (conditions.length === 1) {
+      // Single condition - merge directly
+      Object.assign(where, conditions[0])
+    } else {
+      // Multiple conditions - use AND
+      where.AND = conditions
     }
   }
 
-  // Build orderBy
-  let orderBy: Prisma.ProductOrderByWithAggregationInput = { createdAt: 'desc' }
+  // Build orderBy for products
+  let orderBy:
+    | Prisma.ProductOrderByWithRelationInput
+    | Prisma.ProductOrderByWithRelationInput[] = { createdAt: 'desc' }
+
   switch (sortBy) {
     case 'newest':
       orderBy = { createdAt: 'desc' }
@@ -276,14 +295,29 @@ export async function searchProducts({
     case 'sales':
       orderBy = { sales: 'desc' }
       break
-    // Note: Price sorting is tricky with multiple sizes, handle separately
+    case 'price_asc':
+    case 'price_desc':
+      // For price sorting, we'll handle it differently
+      // We'll fetch products first, then sort them in JavaScript
+      orderBy = { createdAt: 'desc' } // Default ordering, we'll sort after fetching
+      break
+    default:
+      orderBy = { createdAt: 'desc' }
+      break
   }
 
-  const [products, total] = await Promise.all([
+  // Order sizes within each product (always show lowest price first for display)
+  const sizeOrderBy: Prisma.SizeOrderByWithRelationInput = { price: 'asc' }
+
+  // For price sorting, we need to fetch more products and sort in JavaScript
+  const isPriceSort = sortBy === 'price_asc' || sortBy === 'price_desc'
+  const fetchSkip = isPriceSort ? 0 : skip // Don't skip if we're sorting by price
+
+  const [allProducts, total] = await Promise.all([
     prisma.product.findMany({
       where,
       select: {
-        // id: true,
+        id: true, // You'll likely need this
         name: true,
         slug: true,
         brand: true,
@@ -293,7 +327,6 @@ export async function searchProducts({
         isSale: true,
         saleEndDate: true,
         images: {
-          // take: 2, // Show primary + hover image
           select: {
             url: true,
           },
@@ -310,9 +343,7 @@ export async function searchProducts({
             discount: true,
             quantity: true,
           },
-          orderBy: {
-            price: 'asc',
-          },
+          orderBy: sizeOrderBy,
         },
         colors: {
           select: {
@@ -333,11 +364,31 @@ export async function searchProducts({
         },
       },
       orderBy,
-      skip,
-      take: limit,
+      skip: fetchSkip,
+      take: isPriceSort ? undefined : limit, // Fetch all for price sorting
     }),
     prisma.product.count({ where }),
   ])
+
+  let products = allProducts
+
+  // Handle price sorting in JavaScript
+  if (sortBy === 'price_asc' || sortBy === 'price_desc') {
+    products = allProducts.sort((a, b) => {
+      // Get minimum price for each product
+      const minPriceA = Math.min(...a.sizes.map((size) => size.price))
+      const minPriceB = Math.min(...b.sizes.map((size) => size.price))
+
+      if (sortBy === 'price_asc') {
+        return minPriceA - minPriceB
+      } else {
+        return minPriceB - minPriceA
+      }
+    })
+
+    // Apply pagination after sorting
+    products = products.slice(skip, skip + limit)
+  }
 
   return {
     products,
@@ -376,16 +427,16 @@ export async function getProductDetails(slug: string): Promise<ProductDetails> {
     include: {
       images: {
         select: {
-          id: true,
+          // id: true,
           url: true,
-          key: true,
+          // key: true,
         },
       },
       variantImages: {
         select: {
-          id: true,
+          // id: true,
           url: true,
-          key: true,
+          // key: true,
         },
       },
       sizes: {
@@ -540,7 +591,7 @@ export async function getFiltersData(
   categoryId?: string,
   subCategoryId?: string
 ) {
-  const where: any = {}
+  const where: Prisma.ProductWhereInput = {}
   if (categoryId) where.categoryId = categoryId
   if (subCategoryId) where.subCategoryId = subCategoryId
 

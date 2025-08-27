@@ -85,8 +85,12 @@ export default function AttributeFilter({
             >
               {title === 'رنگ' ? (
                 <span
-                  onClick={() => selectedItems.includes(item)}
-                  className="size-4"
+                  className={cn(
+                    'size-5 cursor-pointer hover:bg-muted rounded-none ',
+                    selectedItems.includes(item) &&
+                      'ring-1 ring-foreground outline-dashed outline-background outline-1  '
+                  )}
+                  onClick={() => toggleItem(item)}
                   style={{ background: item }}
                 ></span>
               ) : (

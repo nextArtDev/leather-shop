@@ -48,7 +48,7 @@ type Props = {
 }
 
 const ProductCard = ({ product }: Props) => {
-  console.log('itemitem', { product })
+  // console.log('itemitem', { product })
   const imageUrls = [
     ...product?.variantImages.map((img) => img.url),
     ...product?.images.map((img) => img.url),
