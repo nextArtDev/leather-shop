@@ -177,6 +177,7 @@ model Product {
   shippingFeeMethod ShippingFeeMethod @default(ITEM)
   views             Int               @default(0)
   images            Image[]           @relation("productImage")
+  variantImages     Image[]           @relation("variantImage")
   freeShipping      FreeShipping?     @relation("ProductFreeShipping")
   isFeatured        Boolean           @default(false)
   isSale            Boolean           @default(false)
@@ -192,8 +193,6 @@ model Product {
   reviews Review[] @relation("ReviewToProduct")
 
   wishlist Wishlist[] @relation("WishlistToProduct")
-
-  variantImages Image[] @relation("variantImage")
 
   sizes Size[] @relation("ProductSizes")
 

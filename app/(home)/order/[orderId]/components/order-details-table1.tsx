@@ -229,7 +229,9 @@ const OrderDetailsTable = ({ order, isAdmin }: OrderDetailsTableProps) => {
         if (result.alreadyPaid) {
           toast('سفارش قبلاً پرداخت شده بود')
         } else {
-          toast('پرداخت با موفقیت انجام شد')
+          toast.success('پرداخت با موفقیت انجام شد', {
+            position: 'top-center',
+          })
         }
 
         // Clean up URL parameters and refresh data

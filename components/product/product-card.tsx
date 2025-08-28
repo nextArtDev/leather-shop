@@ -1,83 +1,151 @@
+'use client'
 import React from 'react'
-import ProductCardCarousel from './product-card-Carousel'
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from '@/components/ui/carousel' // Adjusted path
+import { cn } from '@/lib/utils'
+import { Card, CardContent } from '../ui/card'
+import Image from 'next/image'
+import Autoplay from 'embla-carousel-autoplay'
+
+// Using the detailed product type you provided
+type Product = {
+  id: string
+  name: string
+  slug: string
+  brand: string
+  rating: number
+  sales: number
+  numReviews: number
+  isSale: boolean
+  saleEndDate: string | null
+  images: { url: string }[]
+  variantImages: { url: string }[]
+  sizes: {
+    size: string
+    quantity: number
+    price: number
+    discount: number
+  }[]
+  colors: { name: string }[]
+  category: { name: string; url: string }
+  subCategory: { name: string; url: string }
+}
 
 type Props = {
-  // item: {
-  //   id: string
-  //   title: string
-  //   imageSrc: string[]
-  //   category: string
-  //   link: string
-  //   price: number
-  //   colors: string[]
-  // }
-  product: {
-    id: string
-    name: string
-    slug: string
-    brand: string
-    rating: number
-    sales: number
-    numReviews: number
-    isSale: boolean
-    saleEndDate: string | null
-    images: {
-      url: string
-    }[]
-    variantImages: {
-      url: string
-    }[]
-    sizes: {
-      size: string
-      quantity: number
-      price: number
-      discount: number
-    }[]
-    colors: {
-      name: string
-    }[]
-    category: {
-      name: string
-      url: string
-    }
-    subCategory: {
-      name: string
-      url: string
-    }
-  }
+  product: Product
 }
 
 const ProductCard = ({ product }: Props) => {
-  // console.log('itemitem', { product })
-  const imageUrls = [
-    ...product?.variantImages.map((img) => img.url),
-    ...product?.images.map((img) => img.url),
-  ]
-  return (
-    <div>
-      <div className=" border-none rounded-none grid grid-rows-7   place-content-center bg-transparent ">
-        <article className=" row-span-5 w-full h-full bg-[#eceae8]  ">
-          <ProductCardCarousel urls={imageUrls} />
-        </article>
-        <article className="row-span-2  h-full w-full flex flex-col gap-1 justify-evenly  items-start px-2 text-pretty text-xs md:text-sm lg:text-base">
-          <p className="font-semibold">{product.category.name}</p>
+  const imageUrls = React.useMemo(
+    () => [
+      ...(product.images?.map((img) => img.url) || []),
+      ...(product.variantImages?.map((img) => img.url) || []),
+    ],
+    [product.images, product.variantImages]
+  )
 
+  const [api, setApi] = React.useState<CarouselApi>()
+  const [current, setCurrent] = React.useState(0)
+  const [count, setCount] = React.useState(0)
+
+  React.useEffect(() => {
+    if (!api) return
+
+    setCount(api.scrollSnapList().length)
+    setCurrent(api.selectedScrollSnap())
+
+    api.on('select', () => {
+      setCurrent(api.selectedScrollSnap())
+    })
+  }, [api])
+
+  return (
+    <section>
+      <div className="w-full aspect-square relative">
+        {!imageUrls || imageUrls.length === 0 ? (
+          <div className="w-full h-full bg-[#eceae8] flex items-center justify-center">
+            <p className="text-gray-500 text-xs">No Image</p>
+          </div>
+        ) : (
+          <>
+            <Carousel
+              opts={{
+                align: 'start',
+                direction: 'rtl',
+                loop: true,
+              }}
+              plugins={[
+                Autoplay({
+                  delay: 3000,
+                }),
+              ]}
+              dir="rtl"
+              setApi={setApi}
+              className="w-full h-full"
+            >
+              <CarouselContent>
+                {imageUrls.map((url, index) => (
+                  <CarouselItem key={index}>
+                    <Card className="h-full w-full border-none rounded-none bg-[#eceae8] p-0">
+                      <CardContent className="relative flex aspect-square items-center justify-center p-0 h-full">
+                        <Image
+                          src={url}
+                          alt={product.name}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 50vw, 33vw"
+                        />
+                      </CardContent>
+                    </Card>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+            </Carousel>
+
+            {count > 1 && (
+              <div className="absolute -bottom-[1px] left-2 right-2 flex items-center gap-x-0.5 z-10">
+                {Array.from({ length: count }).map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => api?.scrollTo(index)}
+                    className={cn(
+                      'h-0.25 flex-1 rounded-full',
+                      current === index
+                        ? 'bg-muted-foreground'
+                        : 'bg-muted-foreground/30',
+                      'transition-colors duration-200 ease-in-out'
+                    )}
+                    aria-label={`Go to slide ${index + 1}`}
+                  />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* The rest of your card details */}
+      <div className="pt-2">
+        <div className="flex flex-col gap-1 items-start px-2 text-pretty text-xs md:text-sm">
+          <p className="font-semibold">{product.category.name}</p>
           <p className="font-bold">{product.name}</p>
-          <p>تومان{product.sizes.map((s) => s.price)[0]}</p>
-          <div className="flex gap-0.5 items-center justify-center">
+          <p>تومان {product.sizes[0]?.price}</p>
+          <div className="flex gap-0.5 items-center">
             {product.colors?.map((clr) => (
               <span
                 style={{ background: clr.name }}
                 key={clr.name}
-                className="size-3 "
+                className="size-3 border" // Added border for light colors
               ></span>
             ))}
-            {/* <span className="size-3 bg-black"></span>
-            <span className="size-3 bg-orange-950"></span> */}
           </div>
-        </article>
+        </div>
       </div>
-    </div>
+    </section>
   )
 }
 
