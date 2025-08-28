@@ -24,6 +24,7 @@ export default async function SellerNewProductPage({
       variantImages: true,
       colors: true,
       sizes: true,
+      dimension: true,
     },
   })
   if (!product) return notFound()

@@ -141,7 +141,7 @@ const InputFileUpload = ({
               <div className="relative">
                 <FileUploader
                   value={null}
-                  onValueChange={(droppedFiles: FileList | null) => {
+                  onValueChange={(droppedFiles: File[] | null) => {
                     if (droppedFiles) {
                       // Convert the FileList to a File[] array immediately.
                       const filesArray = Array.from(droppedFiles)
@@ -306,6 +306,7 @@ import {
   useRef,
   useState,
   useMemo,
+  forwardRef,
 } from 'react'
 import ReactCrop, {
   centerCrop,
@@ -551,6 +552,7 @@ export const ImageCropContent = ({
       {...reactCropProps}
     >
       {imgSrc && (
+        // eslint-disable-next-line @next/next/no-img-element
         <img
           alt="crop"
           className="size-full object-contain"
@@ -567,12 +569,10 @@ export type ImageCropApplyProps = ComponentProps<'button'> & {
   asChild?: boolean
 }
 
-export const ImageCropApply = ({
-  asChild = false,
-  children,
-  onClick,
-  ...props
-}: ImageCropApplyProps) => {
+export const ImageCropApply = forwardRef<
+  HTMLButtonElement,
+  ImageCropApplyProps
+>(({ asChild = false, children, onClick, ...props }, ref) => {
   const { applyCrop } = useImageCrop()
 
   const handleClick = async (e: MouseEvent<HTMLButtonElement>) => {
@@ -582,29 +582,37 @@ export const ImageCropApply = ({
 
   if (asChild) {
     return (
-      <Slot.Root onClick={handleClick} {...props}>
+      // Pass the forwarded ref down to Slot.Root
+      <Slot.Root ref={ref} onClick={handleClick} {...props}>
         {children}
       </Slot.Root>
     )
   }
 
   return (
-    <Button onClick={handleClick} size="icon" variant="ghost" {...props}>
+    // Pass the forwarded ref down to the Button
+    <Button
+      ref={ref}
+      onClick={handleClick}
+      size="icon"
+      variant="ghost"
+      {...props}
+    >
       {children ?? <CropIcon className="size-4" />}
     </Button>
   )
-}
+})
+// Add a display name for better debugging
+ImageCropApply.displayName = 'ImageCropApply'
 
 export type ImageCropResetProps = ComponentProps<'button'> & {
   asChild?: boolean
 }
 
-export const ImageCropReset = ({
-  asChild = false,
-  children,
-  onClick,
-  ...props
-}: ImageCropResetProps) => {
+export const ImageCropReset = forwardRef<
+  HTMLButtonElement,
+  ImageCropResetProps
+>(({ asChild = false, children, onClick, ...props }, ref) => {
   const { resetCrop } = useImageCrop()
 
   const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
@@ -614,19 +622,28 @@ export const ImageCropReset = ({
 
   if (asChild) {
     return (
-      <Slot.Root onClick={handleClick} {...props}>
+      // Pass the forwarded ref down to Slot.Root
+      <Slot.Root ref={ref} onClick={handleClick} {...props}>
         {children}
       </Slot.Root>
     )
   }
 
   return (
-    <Button onClick={handleClick} size="icon" variant="ghost" {...props}>
+    // Pass the forwarded ref down to the Button
+    <Button
+      ref={ref}
+      onClick={handleClick}
+      size="icon"
+      variant="ghost"
+      {...props}
+    >
       {children ?? <RotateCcwIcon className="size-4" />}
     </Button>
   )
-}
-
+})
+// Add a display name for better debugging
+ImageCropReset.displayName = 'ImageCropReset'
 // Keep the original Cropper component for backward compatibility
 export type CropperProps = Omit<ReactCropProps, 'onChange'> & {
   file: File

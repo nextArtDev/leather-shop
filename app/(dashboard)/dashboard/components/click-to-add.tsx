@@ -21,7 +21,9 @@ import { ColorPicker } from './color-picker'
 type FormValues = any // Consider defining a more specific type for your form values
 type FieldName = Path<FormValues>
 type ArrayItem<T> = T extends (infer U)[] ? U : never
-type DetailSchemaType = ArrayItem<FormValues['colors' | 'sizes' | 'specs']>
+type DetailSchemaType = ArrayItem<
+  FormValues['colors' | 'sizes' | 'specs' | 'dimension']
+>
 
 // --- Component Props Interface ---
 interface ClickToAddInputsRHFProps {
@@ -165,7 +167,7 @@ const ClickToAddInputsRHF: React.FC<ClickToAddInputsRHFProps> = ({
         onClick={handleAddDetail}
         className="mt-2 self-start"
       >
-        <PlusCircle size={18} className="mr-2" /> + {header || 'Item'}
+        <PlusCircle size={18} className="mr-2" /> {header || 'آیتم'}
       </Button>
     </div>
   )

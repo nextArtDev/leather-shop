@@ -196,6 +196,18 @@ export async function createProduct(
         data: newSizes,
       })
     }
+
+    if (result.data.dimension) {
+      await prisma.dimension.create({
+        data: {
+          height: result.data.dimension.height,
+          width: result.data.dimension.width,
+          length: result.data.dimension.length,
+          productId: product.id,
+        },
+      })
+    }
+
     // console.log({ product })
   } catch (err: unknown) {
     const message =
@@ -704,7 +716,19 @@ export async function editProduct(
           })
         }
       }
-
+      await tx.dimension.deleteMany({
+        where: { productId: productId },
+      })
+      if (result.data.dimension) {
+        await tx.dimension.create({
+          data: {
+            height: result.data.dimension.height,
+            width: result.data.dimension.width,
+            length: result.data.dimension.length,
+            productId: productId,
+          },
+        })
+      }
       // Handle questions - delete and recreate (these don't affect cart)
       await tx.question.deleteMany({
         where: { productId: productId },
@@ -743,7 +767,6 @@ export async function editProduct(
           })
         }
       }
-
       // Handle sizes - SMART UPDATE to preserve IDs and cart items
       if (result.data.sizes) {
         // Get existing sizes

@@ -38,6 +38,7 @@ import { Switch } from '@/components/ui/switch'
 import {
   Category,
   Color,
+  Dimension,
   Image,
   OfferTag,
   Product,
@@ -87,7 +88,9 @@ interface ProductFormProps {
       questions: Partial<Question>[] | null
     } & {
       colors: Partial<Color>[] | null
-    } & { sizes: Partial<Size>[] | null } & { variantImages: Partial<Image>[] }
+    } & { sizes: Partial<Size>[] | null } & {
+      dimension: Partial<Dimension> | null
+    } & { variantImages: Partial<Image>[] }
   >
   categories: Partial<Category>[]
   offerTags: OfferTag[]
@@ -128,15 +131,15 @@ const ProductDetails: FC<ProductFormProps> = ({
       shippingFeeMethod: data?.shippingFeeMethod,
 
       sku: data?.sku ?? '',
-      colors: data?.colors?.map((clr) => ({ color: clr.name })) ?? [
-        { color: '' },
-      ],
+      colors: data?.colors?.map((clr) => ({ color: clr.name })) ?? [],
       sizes: data?.sizes?.map(({ size, price, quantity, discount }) => ({
         size,
         price,
         quantity,
         discount,
       })) ?? [{ size: '', quantity: 1, price: 1000, discount: 0 }],
+      dimension: data?.dimension ?? { length: 0, width: 0, height: 0 },
+
       isSale: data?.isSale || false,
       weight: data?.weight ?? 0,
       saleEndDate: data?.saleEndDate
@@ -589,6 +592,83 @@ const ProductDetails: FC<ProductFormProps> = ({
                   />
                 </div>
               </InputFieldset>
+              <InputFieldset
+                label="ابعاد محصول (cm)"
+                description={'طول، عرض و ارتفاع محصول را وارد کنید'}
+              >
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="dimension.length" // Use dot notation for nested objects
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>طول</FormLabel>
+                        <FormControl>
+                          <NumberInput
+                            // {...field}
+                            value={field.value ?? ''}
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            onBlur={field.onBlur}
+                            ref={field.ref}
+                            name={field.name}
+                            placeholder="طول محصول"
+                            min={1}
+                            step={1}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="dimension.width" // Use dot notation
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>عرض</FormLabel>
+                        <FormControl>
+                          <NumberInput
+                            value={field.value ?? ''}
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            onBlur={field.onBlur}
+                            ref={field.ref}
+                            name={field.name}
+                            placeholder="عرض محصول"
+                            min={1}
+                            step={1}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="dimension.height" // Use dot notation
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>ارتفاع</FormLabel>
+                        <FormControl>
+                          <NumberInput
+                            value={field.value ?? ''}
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            onBlur={field.onBlur}
+                            ref={field.ref}
+                            name={field.name}
+                            placeholder="ارتفاع محصول"
+                            min={1}
+                            step={1}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </InputFieldset>
               <InputFieldset label="خصوصیات محصول" description={''}>
                 <div className="w-full flex flex-col gap-y-3">
                   <ClickToAddInputsRHF
@@ -677,7 +757,12 @@ const ProductDetails: FC<ProductFormProps> = ({
                         </FormControl>
                         <SelectContent>
                           {shippingFeeMethods.map((method) => (
-                            <SelectItem key={method.value} value={method.value}>
+                            <SelectItem
+                              key={method.value}
+                              value={method.value}
+                              defaultValue={shippingFeeMethods[0].value}
+                              // disabled
+                            >
                               {method.description}
                             </SelectItem>
                           ))}
