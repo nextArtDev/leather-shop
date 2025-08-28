@@ -16,12 +16,14 @@ import { Label } from '@/components/ui/label'
 import { PlusCircle, XCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ColorPicker } from './color-picker'
-type FormValues = any
-type FieldName = Path<FormValues>
 
+// --- Type Definitions ---
+type FormValues = any // Consider defining a more specific type for your form values
+type FieldName = Path<FormValues>
 type ArrayItem<T> = T extends (infer U)[] ? U : never
 type DetailSchemaType = ArrayItem<FormValues['colors' | 'sizes' | 'specs']>
 
+// --- Component Props Interface ---
 interface ClickToAddInputsRHFProps {
   fields: FieldArrayWithId<FormValues, FieldName, 'id'>[]
   name: FieldName
@@ -36,14 +38,15 @@ interface ClickToAddInputsRHFProps {
   colorPicker?: boolean
   containerClassName?: string
   inputClassName?: string
-  // errors?: FieldErrorsImpl<DeepRequired<FormValues>>[FieldName]; // For more complex error display
+  // Add a labels prop to accept a map of field keys to custom label strings
+  labels?: Record<string, string>
 }
 
+// --- Component Implementation ---
 const ClickToAddInputsRHF: React.FC<ClickToAddInputsRHFProps> = ({
   fields,
   name,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  control, // Kept for potential use with <Controller /> for complex Shadcn components
+  // control,
   register,
   setValue,
   onAppend,
@@ -53,14 +56,13 @@ const ClickToAddInputsRHF: React.FC<ClickToAddInputsRHFProps> = ({
   colorPicker,
   containerClassName,
   inputClassName,
+  labels, // Destructure the new labels prop
 }) => {
   const handleAddDetail = () => {
     onAppend(initialDetailSchema)
   }
 
   const handleRemoveDetail = (index: number) => {
-    // You can add logic here to prevent removing the last item if needed,
-    // though Zod's .min(1) on the array is the more robust way for validation.
     onRemove(index)
   }
 
@@ -69,7 +71,7 @@ const ClickToAddInputsRHF: React.FC<ClickToAddInputsRHFProps> = ({
       {header && <Label className="text-md font-semibold">{header}</Label>}
 
       {fields.map((fieldItem, index) => {
-        const currentDetail = fieldItem as unknown as DetailSchemaType // Cast to access properties
+        const currentDetail = fieldItem as unknown as DetailSchemaType
 
         return (
           <div
@@ -92,11 +94,12 @@ const ClickToAddInputsRHF: React.FC<ClickToAddInputsRHFProps> = ({
                   key={propertyKey}
                   className="flex flex-col gap-1 flex-grow"
                 >
+                  {/* Use the custom label if provided, otherwise fallback to the propertyKey */}
                   <Label
                     htmlFor={fieldPath}
-                    className="capitalize text-xs text-muted-foreground"
+                    className="text-xs text-muted-foreground"
                   >
-                    {propertyKey}
+                    {labels?.[propertyKey] || propertyKey}
                   </Label>
                   {propertyKey === 'color' && colorPicker ? (
                     <div className="flex items-center gap-x-2">
@@ -128,7 +131,7 @@ const ClickToAddInputsRHF: React.FC<ClickToAddInputsRHFProps> = ({
                       id={fieldPath}
                       type={isNumeric ? 'number' : 'text'}
                       className={cn('placeholder:capitalize', inputClassName)}
-                      placeholder={propertyKey}
+                      placeholder={labels?.[propertyKey] || propertyKey}
                       min={isNumeric ? 0 : undefined}
                       step={
                         isNumeric
@@ -141,8 +144,6 @@ const ClickToAddInputsRHF: React.FC<ClickToAddInputsRHFProps> = ({
                       }
                     />
                   )}
-                  {/* Basic error display for individual fields - enhance as needed */}
-                  {/* <FormMessage for={fieldPath} /> */}
                 </div>
               )
             })}

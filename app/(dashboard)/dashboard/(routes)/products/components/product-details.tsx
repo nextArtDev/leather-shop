@@ -378,6 +378,12 @@ const ProductDetails: FC<ProductFormProps> = ({
                     price: 1000,
                     discount: 0,
                   }}
+                  labels={{
+                    size: 'سایز',
+                    quantity: 'تعداد',
+                    price: 'قیمت',
+                    discount: 'تخفیف',
+                  }}
                 />
                 {form.formState.errors.sizes && (
                   <span className="text-sm font-medium text-destructive">
@@ -482,7 +488,7 @@ const ProductDetails: FC<ProductFormProps> = ({
                             <SelectTrigger>
                               <SelectValue
                                 defaultValue={field.value}
-                                placeholder="یک کد تخفیف انتخاب کنید"
+                                placeholder="یک تگ برای محصول انتخاب کنید"
                               />
                             </SelectTrigger>
                           </FormControl>
@@ -597,6 +603,10 @@ const ProductDetails: FC<ProductFormProps> = ({
                     initialDetailSchema={{ name: '', value: '' }}
                     containerClassName="flex-1"
                     inputClassName="w-full"
+                    labels={{
+                      name: 'نام',
+                      value: 'مقدار',
+                    }}
                   />
                   {errors.specs && (
                     <span className="text-sm font-medium text-destructive">
@@ -627,6 +637,10 @@ const ProductDetails: FC<ProductFormProps> = ({
                     //   question: '',
                     //   answer: '',
                     // }}
+                    labels={{
+                      question: 'سوال',
+                      answer: 'جواب',
+                    }}
                     containerClassName="flex-1"
                     inputClassName="w-full"
                   />

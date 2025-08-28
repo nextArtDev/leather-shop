@@ -92,7 +92,7 @@ const ImageSlider = ({ urls, className, unoptimized }: ImageSliderProps) => {
               fill
               loading="eager"
               className={cn(
-                '-z-10 h-full w-full object-cover object-center',
+                '-z-10 h-full w-full object-contain object-center',
                 className
               )}
               src={url}
@@ -106,10 +106,3 @@ const ImageSlider = ({ urls, className, unoptimized }: ImageSliderProps) => {
 }
 
 export default ImageSlider
-
-// const validUrls = product.images
-//     .map(({ image }) =>
-//       typeof image === 'string' ? image : image.url
-//     )
-//     .filter(Boolean) as string[]
-// <ImageSlider urls={validUrls} />
