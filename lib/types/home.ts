@@ -244,7 +244,7 @@ export type ProductDetails = {
   isFeatured: boolean
   isSale: boolean
   saleEndDate: string | null
-  sku: string
+  sku: string | null
   keywords: string
   weight: number | null
   categoryId: string

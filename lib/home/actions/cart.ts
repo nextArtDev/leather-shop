@@ -219,7 +219,7 @@ export async function saveAllToCart(
         productId: string
         sizeId: string
         productSlug: string
-        sku: string
+        sku: string | ''
         name: string
         image: string
         size: string
@@ -309,7 +309,7 @@ export async function saveAllToCart(
           productId,
           sizeId,
           productSlug: product.slug,
-          sku: product.sku,
+          sku: product.sku || '',
           name: product.name,
           image: product.images[0]?.url || '',
           size: size.size,

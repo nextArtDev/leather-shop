@@ -161,7 +161,6 @@ export const getAllProductsList = cache(
           specs: true,
           colors: true,
           sizes: true,
-          dimension: true,
         },
         skip: skipAmount,
         take: pageSize,

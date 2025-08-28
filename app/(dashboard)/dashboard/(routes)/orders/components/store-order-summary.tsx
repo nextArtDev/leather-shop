@@ -123,7 +123,8 @@ const StoreOrderSummary: FC<Props> = ({ order }) => {
               </h5>
               <div className="text-sm">
                 <p className="font-normal text-muted-foreground">
-                  Sku : <span className="ms-1">{product.sku}</span>
+                  Sku :{' '}
+                  <span className="ms-1">{product.sku ? product.sku : ''}</span>
                 </p>
               </div>
               <div className="text-sm">

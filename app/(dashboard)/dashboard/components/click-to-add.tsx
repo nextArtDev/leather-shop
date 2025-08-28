@@ -21,9 +21,7 @@ import { ColorPicker } from './color-picker'
 type FormValues = any // Consider defining a more specific type for your form values
 type FieldName = Path<FormValues>
 type ArrayItem<T> = T extends (infer U)[] ? U : never
-type DetailSchemaType = ArrayItem<
-  FormValues['colors' | 'sizes' | 'specs' | 'dimension']
->
+type DetailSchemaType = ArrayItem<FormValues['colors' | 'sizes' | 'specs']>
 
 // --- Component Props Interface ---
 interface ClickToAddInputsRHFProps {

@@ -38,7 +38,6 @@ import { Switch } from '@/components/ui/switch'
 import {
   Category,
   Color,
-  Dimension,
   Image,
   OfferTag,
   Product,
@@ -88,9 +87,7 @@ interface ProductFormProps {
       questions: Partial<Question>[] | null
     } & {
       colors: Partial<Color>[] | null
-    } & { sizes: Partial<Size>[] | null } & {
-      dimension: Partial<Dimension> | null
-    } & { variantImages: Partial<Image>[] }
+    } & { sizes: Partial<Size>[] | null } & { variantImages: Partial<Image>[] }
   >
   categories: Partial<Category>[]
   offerTags: OfferTag[]

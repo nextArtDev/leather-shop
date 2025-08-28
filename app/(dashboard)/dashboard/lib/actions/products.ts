@@ -200,17 +200,6 @@ export async function createProduct(
       })
     }
 
-    // if (result.data.dimension) {
-    //   await prisma.dimension.create({
-    //     data: {
-    //       height: result.data.dimension.height,
-    //       width: result.data.dimension.width,
-    //       length: result.data.dimension.length,
-    //       productId: product.id,
-    //     },
-    //   })
-    // }
-
     // console.log({ product })
   } catch (err: unknown) {
     const message =

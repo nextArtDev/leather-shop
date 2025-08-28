@@ -162,13 +162,6 @@ export const ProductFormSchema = z.object({
     )
     .optional(),
 
-  // .default([]),
-
-  // dimension: z.object({
-  //   length: z.number().min(1, { message: 'طول باید از صفر بزرگتر باشد.' }),
-  //   width: z.number().min(1, { message: 'عرض باید از صفر بزرگتر باشد.' }),
-  //   height: z.number().min(1, { message: 'ارتفاع باید از صفر بزرگتر باشد.' }),
-  // }),
   sku: z
     .string()
     .min(6, {
