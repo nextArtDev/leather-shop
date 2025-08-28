@@ -132,13 +132,27 @@ const ProductDetails: FC<ProductFormProps> = ({
 
       sku: data?.sku ?? '',
       colors: data?.colors?.map((clr) => ({ color: clr.name })) ?? [],
-      sizes: data?.sizes?.map(({ size, price, quantity, discount }) => ({
-        size,
-        price,
-        quantity,
-        discount,
-      })) ?? [{ size: '', quantity: 1, price: 1000, discount: 0 }],
-      dimension: data?.dimension ?? { length: 0, width: 0, height: 0 },
+      sizes: data?.sizes?.map(
+        ({ size, price, quantity, discount, height, width, length }) => ({
+          size,
+          price,
+          quantity,
+          discount,
+          height,
+          width,
+          length,
+        })
+      ) ?? [
+        {
+          size: '',
+          quantity: 1,
+          price: 1000,
+          discount: 0,
+          length: 0,
+          width: 0,
+          height: 0,
+        },
+      ],
 
       isSale: data?.isSale || false,
       weight: data?.weight ?? 0,
@@ -372,6 +386,9 @@ const ProductDetails: FC<ProductFormProps> = ({
                       quantity: 1,
                       price: 1000,
                       discount: 0,
+                      length: 0,
+                      width: 0,
+                      height: 0,
                     })
                   }
                   onRemove={removeSize}
@@ -380,12 +397,18 @@ const ProductDetails: FC<ProductFormProps> = ({
                     quantity: 1,
                     price: 1000,
                     discount: 0,
+                    length: 0,
+                    width: 0,
+                    height: 0,
                   }}
                   labels={{
                     size: 'سایز',
                     quantity: 'تعداد',
                     price: 'قیمت',
                     discount: 'تخفیف',
+                    length: 'طول',
+                    width: 'عرض',
+                    height: 'ارتفاع',
                   }}
                 />
                 {form.formState.errors.sizes && (
@@ -592,83 +615,7 @@ const ProductDetails: FC<ProductFormProps> = ({
                   />
                 </div>
               </InputFieldset>
-              <InputFieldset
-                label="ابعاد محصول (cm)"
-                description={'طول، عرض و ارتفاع محصول را وارد کنید'}
-              >
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="dimension.length" // Use dot notation for nested objects
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>طول</FormLabel>
-                        <FormControl>
-                          <NumberInput
-                            // {...field}
-                            value={field.value ?? ''}
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            onBlur={field.onBlur}
-                            ref={field.ref}
-                            name={field.name}
-                            placeholder="طول محصول"
-                            min={1}
-                            step={1}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="dimension.width" // Use dot notation
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>عرض</FormLabel>
-                        <FormControl>
-                          <NumberInput
-                            value={field.value ?? ''}
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            onBlur={field.onBlur}
-                            ref={field.ref}
-                            name={field.name}
-                            placeholder="عرض محصول"
-                            min={1}
-                            step={1}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="dimension.height" // Use dot notation
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>ارتفاع</FormLabel>
-                        <FormControl>
-                          <NumberInput
-                            value={field.value ?? ''}
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            onBlur={field.onBlur}
-                            ref={field.ref}
-                            name={field.name}
-                            placeholder="ارتفاع محصول"
-                            min={1}
-                            step={1}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </InputFieldset>
+
               <InputFieldset label="خصوصیات محصول" description={''}>
                 <div className="w-full flex flex-col gap-y-3">
                   <ClickToAddInputsRHF

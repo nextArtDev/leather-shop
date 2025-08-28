@@ -188,6 +188,9 @@ export async function createProduct(
         price: size.price,
         discount: size.discount,
         productId: product.id,
+        length: size.length,
+        width: size.width,
+        height: size.height,
       }))
     }
 
@@ -197,16 +200,16 @@ export async function createProduct(
       })
     }
 
-    if (result.data.dimension) {
-      await prisma.dimension.create({
-        data: {
-          height: result.data.dimension.height,
-          width: result.data.dimension.width,
-          length: result.data.dimension.length,
-          productId: product.id,
-        },
-      })
-    }
+    // if (result.data.dimension) {
+    //   await prisma.dimension.create({
+    //     data: {
+    //       height: result.data.dimension.height,
+    //       width: result.data.dimension.width,
+    //       length: result.data.dimension.length,
+    //       productId: product.id,
+    //     },
+    //   })
+    // }
 
     // console.log({ product })
   } catch (err: unknown) {
@@ -716,19 +719,7 @@ export async function editProduct(
           })
         }
       }
-      await tx.dimension.deleteMany({
-        where: { productId: productId },
-      })
-      if (result.data.dimension) {
-        await tx.dimension.create({
-          data: {
-            height: result.data.dimension.height,
-            width: result.data.dimension.width,
-            length: result.data.dimension.length,
-            productId: productId,
-          },
-        })
-      }
+
       // Handle questions - delete and recreate (these don't affect cart)
       await tx.question.deleteMany({
         where: { productId: productId },
@@ -778,6 +769,9 @@ export async function editProduct(
             quantity: true,
             price: true,
             discount: true,
+            length: true,
+            width: true,
+            height: true,
           },
         })
 
@@ -798,6 +792,9 @@ export async function editProduct(
                 quantity: sizeData.quantity,
                 price: sizeData.price,
                 discount: sizeData.discount,
+                length: sizeData.length,
+                width: sizeData.width,
+                height: sizeData.height,
               },
             })
           } else {
@@ -807,6 +804,9 @@ export async function editProduct(
                 quantity: sizeData.quantity,
                 price: sizeData.price,
                 discount: sizeData.discount,
+                length: sizeData.length,
+                width: sizeData.width,
+                height: sizeData.height,
                 productId,
               },
             })

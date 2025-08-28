@@ -243,6 +243,9 @@ model Size {
   quantity Int
   price    Float
   discount Float  @default(0)
+  length   Int
+  width    Int
+  height   Int
 
   wishlist Wishlist[] @relation("WishlistToSize")
 

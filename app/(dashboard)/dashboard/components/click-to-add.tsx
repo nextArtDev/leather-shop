@@ -79,7 +79,7 @@ const ClickToAddInputsRHF: React.FC<ClickToAddInputsRHFProps> = ({
           <div
             key={fieldItem.id}
             className={cn(
-              'flex items-end gap-x-3 border p-4 rounded-md relative',
+              'grid grid-cols-4 items-end gap-3 border p-4 rounded-md relative',
               containerClassName
             )}
           >
@@ -94,7 +94,7 @@ const ClickToAddInputsRHF: React.FC<ClickToAddInputsRHFProps> = ({
               return (
                 <div
                   key={propertyKey}
-                  className="flex flex-col gap-1 flex-grow"
+                  className="flex flex-col max-w-xs  gap-1 flex-grow"
                 >
                   {/* Use the custom label if provided, otherwise fallback to the propertyKey */}
                   <Label
@@ -139,6 +139,9 @@ const ClickToAddInputsRHF: React.FC<ClickToAddInputsRHFProps> = ({
                         isNumeric
                           ? propertyKey === 'price' ||
                             propertyKey === 'discount' ||
+                            propertyKey === 'length' ||
+                            propertyKey === 'width' ||
+                            propertyKey === 'height' ||
                             propertyKey === 'weight'
                             ? '0.01'
                             : '1'

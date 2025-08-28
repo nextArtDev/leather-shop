@@ -164,11 +164,11 @@ export const ProductFormSchema = z.object({
 
   // .default([]),
 
-  dimension: z.object({
-    length: z.number().min(1, { message: 'طول باید از صفر بزرگتر باشد.' }),
-    width: z.number().min(1, { message: 'عرض باید از صفر بزرگتر باشد.' }),
-    height: z.number().min(1, { message: 'ارتفاع باید از صفر بزرگتر باشد.' }),
-  }),
+  // dimension: z.object({
+  //   length: z.number().min(1, { message: 'طول باید از صفر بزرگتر باشد.' }),
+  //   width: z.number().min(1, { message: 'عرض باید از صفر بزرگتر باشد.' }),
+  //   height: z.number().min(1, { message: 'ارتفاع باید از صفر بزرگتر باشد.' }),
+  // }),
   sku: z
     .string()
     .min(6, {
@@ -199,6 +199,9 @@ export const ProductFormSchema = z.object({
         .number()
         .min(1000, { message: 'قیمت باید از هزارتومان بیشتر باشد.' }),
       discount: z.number().min(0).default(0).optional(),
+      length: z.number().min(1, { message: 'طول باید از صفر بزرگتر باشد.' }),
+      width: z.number().min(1, { message: 'عرض باید از صفر بزرگتر باشد.' }),
+      height: z.number().min(1, { message: 'ارتفاع باید از صفر بزرگتر باشد.' }),
     })
     .array()
     .min(1, 'حداقل یک سایز را انتخاب کنید.')
