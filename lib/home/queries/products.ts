@@ -177,6 +177,10 @@ export async function getCategoriesWithStats(): Promise<CategoryWithStats[]> {
           id: true,
           name: true,
           url: true,
+          images: {
+            select: { url: true },
+            take: 1,
+          },
           _count: {
             select: {
               products: true,

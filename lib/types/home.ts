@@ -102,6 +102,7 @@ export type CategoryWithStats = {
     id: string
     name: string
     url: string
+    images: BasicProductImage[]
     _count: {
       products: number
     }

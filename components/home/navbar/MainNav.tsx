@@ -69,86 +69,86 @@ interface Page {
   href: string
 }
 
-interface NavigationData {
+export interface NavigationData {
   categories: Category[]
   pages: Page[]
 }
 
 // --- Component Data ---
 
-const navigation: NavigationData = {
-  categories: [
-    {
-      name: 'Women',
-      featured: [
-        {
-          name: 'New Arrivals',
-          href: '#',
-          imageSrc: '/images/hero-image.webp',
-          imageAlt:
-            'Models sitting back to back, wearing Basic Tee in black and bone.',
-        },
-        {
-          name: 'Basic Tees',
-          href: '#',
-          imageSrc: '/images/hero-image.webp',
-          imageAlt:
-            'Close up of Basic Tee fall bundle with off-white, ochre, olive, and black tees.',
-        },
-        {
-          name: 'Accessories',
-          href: '#',
-          imageSrc: '/images/hero-image.webp',
-          imageAlt:
-            'Model wearing minimalist watch with black wristband and white watch face.',
-        },
-        {
-          name: 'Carry',
-          href: '#',
-          imageSrc: '/images/hero-image.webp',
-          imageAlt:
-            'Model opening tan leather long wallet with credit card pockets and cash pouch.',
-        },
-      ],
-    },
-    {
-      name: 'Men',
-      featured: [
-        {
-          name: 'New Arrivals',
-          href: '#',
-          imageSrc: '/images/hero-image.webp',
-          imageAlt:
-            'Hats and sweaters on wood shelves next to various colors of t-shirts on hangers.',
-        },
-        {
-          name: 'Basic Tees',
-          href: '#',
-          imageSrc: '/images/hero-image.webp',
-          imageAlt: 'Model wearing light heather gray t-shirt.',
-        },
-        {
-          name: 'Accessories',
-          href: '#',
-          imageSrc: '/images/hero-image.webp',
-          imageAlt:
-            'Grey 6-panel baseball hat with black brim, black mountain graphic on front, and light heather gray body.',
-        },
-        {
-          name: 'Carry',
-          href: '#',
-          imageSrc: '/images/hero-image.webp',
-          imageAlt:
-            'Model putting folded cash into slim card holder olive leather wallet with hand stitching.',
-        },
-      ],
-    },
-  ],
-  pages: [
-    { name: 'Company', href: '#' },
-    { name: 'Stores', href: '#' },
-  ],
-}
+// const navigation: NavigationData = {
+//   categories: [
+//     {
+//       name: 'Women',
+//       featured: [
+//         {
+//           name: 'New Arrivals',
+//           href: '#',
+//           imageSrc: '/images/hero-image.webp',
+//           imageAlt:
+//             'Models sitting back to back, wearing Basic Tee in black and bone.',
+//         },
+//         {
+//           name: 'Basic Tees',
+//           href: '#',
+//           imageSrc: '/images/hero-image.webp',
+//           imageAlt:
+//             'Close up of Basic Tee fall bundle with off-white, ochre, olive, and black tees.',
+//         },
+//         {
+//           name: 'Accessories',
+//           href: '#',
+//           imageSrc: '/images/hero-image.webp',
+//           imageAlt:
+//             'Model wearing minimalist watch with black wristband and white watch face.',
+//         },
+//         {
+//           name: 'Carry',
+//           href: '#',
+//           imageSrc: '/images/hero-image.webp',
+//           imageAlt:
+//             'Model opening tan leather long wallet with credit card pockets and cash pouch.',
+//         },
+//       ],
+//     },
+//     {
+//       name: 'Men',
+//       featured: [
+//         {
+//           name: 'New Arrivals',
+//           href: '#',
+//           imageSrc: '/images/hero-image.webp',
+//           imageAlt:
+//             'Hats and sweaters on wood shelves next to various colors of t-shirts on hangers.',
+//         },
+//         {
+//           name: 'Basic Tees',
+//           href: '#',
+//           imageSrc: '/images/hero-image.webp',
+//           imageAlt: 'Model wearing light heather gray t-shirt.',
+//         },
+//         {
+//           name: 'Accessories',
+//           href: '#',
+//           imageSrc: '/images/hero-image.webp',
+//           imageAlt:
+//             'Grey 6-panel baseball hat with black brim, black mountain graphic on front, and light heather gray body.',
+//         },
+//         {
+//           name: 'Carry',
+//           href: '#',
+//           imageSrc: '/images/hero-image.webp',
+//           imageAlt:
+//             'Model putting folded cash into slim card holder olive leather wallet with hand stitching.',
+//         },
+//       ],
+//     },
+//   ],
+//   pages: [
+//     { name: 'Company', href: '#' },
+//     { name: 'Stores', href: '#' },
+//   ],
+// }
 
 // --- Child Components ---
 
@@ -191,8 +191,8 @@ const ListItem = React.forwardRef<
 })
 ListItem.displayName = 'ListItem'
 
-const DesktopNav = () => (
-  <NavigationMenu className="hidden lg:block">
+const DesktopNav = ({ navigation }: { navigation: NavigationData }) => (
+  <NavigationMenu dir="rtl" className="hidden lg:block">
     <NavigationMenuList>
       {navigation.categories.map((category) => (
         <NavigationMenuItem key={category.name}>
@@ -229,7 +229,7 @@ const DesktopNav = () => (
   </NavigationMenu>
 )
 
-const MobileNav = () => (
+const MobileNav = ({ navigation }: { navigation: NavigationData }) => (
   <Sheet>
     <SheetTrigger asChild>
       <Button variant="ghost" size="icon" className="lg:hidden">
@@ -238,16 +238,16 @@ const MobileNav = () => (
       </Button>
     </SheetTrigger>
     <SheetContent side="left" className="flex flex-col">
-      <div className="flex items-center justify-between pr-2">
-        <Logo />
+      <div className="w-full h-fit ">
+        {/* <Logo /> */}
         <SheetClose asChild>
           <Button variant="ghost" size="icon" className="rounded-full sr-only">
             Close
           </Button>
         </SheetClose>
       </div>
-      <Separator className="my-4" />
-      <div className="flex-1 overflow-y-auto">
+      {/* <Separator className="my-4" /> */}
+      <div className="flex-1 overflow-y-auto pt-6 ">
         <nav className="grid items-start px-4 text-sm font-medium space-y-4">
           {navigation.categories.map((category) => (
             <div key={category.name}>
@@ -278,13 +278,13 @@ const MobileNav = () => (
         </nav>
       </div>
       <Separator className="my-4" />
-      <div className="space-y-2 px-4">
+      <div className="space-y-2 px-4 pb-6">
         <Button asChild variant="default" className="w-full">
-          <Link href="/register">Create an account</Link>
+          <Link href="/sign-in">ایجاد حساب کاربری</Link>
         </Button>
-        <Button asChild variant="secondary" className="w-full">
+        {/* <Button asChild variant="secondary" className="w-full">
           <Link href="/login">Sign in</Link>
-        </Button>
+        </Button> */}
       </div>
     </SheetContent>
   </Sheet>
@@ -319,7 +319,7 @@ const SearchBar = ({
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Search for products..."
+                placeholder="جست‌و‌جوی محصولات..."
                 className="w-full pl-10 h-12"
                 autoFocus
               />
@@ -364,7 +364,11 @@ const TopBanner = () => {
 
 // --- Main Exported Component ---
 
-export default function MainNav() {
+export default function MainNav({
+  navigation,
+}: {
+  navigation: NavigationData
+}) {
   const [isSearchOpen, setIsSearchOpen] = React.useState(false)
 
   const toggleSearch = React.useCallback(() => {
@@ -383,34 +387,33 @@ export default function MainNav() {
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="flex h-16 items-center justify-between">
                 <div className="flex flex-1 items-center lg:hidden">
-                  <MobileNav />
-                </div>
-
-                <div className="hidden lg:items-center h-full lg:flex">
-                  <DesktopNav />
-                </div>
-
-                <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-center">
-                  <Logo />
+                  <MobileNav navigation={navigation} />
                 </div>
 
                 <div className="lg:hidden">
                   <Logo />
                 </div>
 
-                <div className="flex flex-1 items-center justify-end">
-                  <div className="flex items-center space-x-4">
+                <div className="flex flex-1 items-center justify-end lg:justify-start">
+                  <div className="flex lg:flex-row-reverse items-center space-x-4">
                     <SearchBar isOpen={isSearchOpen} onToggle={toggleSearch} />
                     {/* <Button
                       variant="ghost"
                       size="icon"
                       aria-label="User account"
-                    >
+                      >
                       <User className="h-6 w-6" />
-                    </Button> */}
+                      </Button> */}
                     <UserSession />
                     <DrawerCart />
                   </div>
+                </div>
+                <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-center">
+                  <Logo />
+                </div>
+
+                <div className="hidden lg:items-center h-full lg:flex">
+                  <DesktopNav navigation={navigation} />
                 </div>
               </div>
             </div>

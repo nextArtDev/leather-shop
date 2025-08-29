@@ -1,4 +1,4 @@
-import MainNav from '@/components/home/navbar/MainNav'
+import Navbar from '@/components/home/navbar/Navbar'
 
 import Footer from '@/components/home/shared/Footer'
 
@@ -9,9 +9,8 @@ export default function layout({
 }>) {
   return (
     <section className="relative w-full h-full ">
-      {/* <NavBar /> */}
+      <Navbar />
 
-      <MainNav />
       {children}
       <Footer />
     </section>
