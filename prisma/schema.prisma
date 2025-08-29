@@ -508,6 +508,8 @@ model Order {
 
   //  orderGroupId String
   // orderGroup   OrderItem @relation("OrderItemToGroup", fields: [orderGroupId], references: [id], onDelete: Cascade)
+  couponId String?
+  coupon   Coupon? @relation("CouponToOrder", fields: [couponId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -532,12 +534,11 @@ model OrderItem {
   price       Float
   totalPrice  Float
 
-  status ProductStatus @default(Pending)
-
+  status    ProductStatus @default(Pending)
   orderId   String
-  order     Order    @relation("OrderToItem", fields: [orderId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  order     Order         @relation("OrderToItem", fields: [orderId], references: [id])
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 }
 
 model OrderGroup {
@@ -555,14 +556,14 @@ model OrderGroup {
   // orderId String
   // order   Order  @relation("OrderGroupToOrder", fields: [orderId], references: [id])
 
-  couponId String?
-  coupon   Coupon? @relation("CouponToOrderGroup", fields: [couponId], references: [id])
+  // couponId String?
+  // coupon   Coupon? @relation("CouponToOrderGroup", fields: [couponId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // @@index([orderId])
-  @@index([couponId])
+  // @@index([couponId])
 }
 
 model PaymentDetails {
@@ -659,8 +660,8 @@ model Coupon {
   endDate   String
   discount  Int
 
-  orders OrderGroup[] @relation("CouponToOrderGroup")
-  users  User[]       @relation("CouponToUser")
+  orders Order[] @relation("CouponToOrder")
+  users  User[]  @relation("CouponToUser")
 
   carts Cart[] @relation("CouponToCart")
 

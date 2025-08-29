@@ -59,12 +59,12 @@ export default function SearchSidebar({
           />
 
           {/* Brand Filter */}
-          <AttributeFilter
+          {/* <AttributeFilter
             title="برند"
             items={filtersData.brands}
             selectedItems={[]} // Add brand filter to SearchFilters type if needed
             onSelectionChange={() => {}} // Implement brand filtering
-          />
+          /> */}
         </div>
       </ScrollArea>
     </div>

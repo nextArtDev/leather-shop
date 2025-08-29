@@ -45,7 +45,7 @@ export default function SearchHeader({
   if (!hasActiveFilters && totalResults === 0) return null
 
   return (
-    <Card className="mb-6">
+    <Card className="mb-6 p-0 rounded-none">
       <CardContent className="p-4">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-2">
@@ -68,9 +68,9 @@ export default function SearchHeader({
                 variant="ghost"
                 size="sm"
                 onClick={onClearFilters}
-                className="h-6 px-2 text-xs"
+                className="h-6 px-2 text-xs text-red-400"
               >
-                <X className="w-3 h-3 mr-1" />
+                <X className="w-3 h-3 mr-1 " />
                 حذف همه
               </Button>
             </div>

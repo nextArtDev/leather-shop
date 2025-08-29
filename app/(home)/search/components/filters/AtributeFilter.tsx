@@ -42,7 +42,7 @@ export default function AttributeFilter({
   if (items.length === 0) return null
 
   return (
-    <Card>
+    <Card dir="rtl" className=" rounded-none">
       <CardHeader className="pb-3">
         <div className="flex justify-between items-center">
           <CardTitle className="text-base font-medium">{title}</CardTitle>
@@ -51,26 +51,29 @@ export default function AttributeFilter({
               variant="ghost"
               size="sm"
               onClick={clearAll}
-              className="text-xs h-auto p-1 text-muted-foreground"
+              className="text-xs h-auto p-1   text-red-500"
             >
               پاک کردن
             </Button>
           )}
         </div>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-3   flex flex-col items-center justify-center">
         {/* Selected Items */}
         {selectedItems.length > 0 && (
-          <div className="flex flex-wrap gap-1">
+          <div className="flex  gap-2">
             {selectedItems.map((item) => (
               <Badge
                 key={item}
                 variant="default"
-                className={cn('text-xs cursor-pointer hover:bg-destructive')}
+                className={cn(
+                  'text-xs bg-indigo-600 cursor-pointer hover:bg-destructive',
+                  title === 'رنگ' && '  p-2'
+                )}
                 style={{ background: title === 'رنگ' ? item : '' }}
                 onClick={() => toggleItem(item)}
               >
-                {item} ×
+                {title === 'رنگ' ? '' : `${item} ×`}
               </Badge>
             ))}
           </div>
@@ -122,12 +125,12 @@ export default function AttributeFilter({
           >
             {isExpanded ? (
               <>
-                کمتر <ChevronUp className="w-4 h-4 mr-1" />
+                کمتر <ChevronUp className="w-4 h-4 " />
               </>
             ) : (
               <>
                 بیشتر ({items.length - maxVisible}){' '}
-                <ChevronDown className="w-4 h-4 mr-1" />
+                <ChevronDown className="w-4 h-4  " />
               </>
             )}
           </Button>

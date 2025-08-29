@@ -26,13 +26,13 @@ export default function CategoryFilter({
   const displayCategories = showFeaturedOnly ? featuredCategories : categories
 
   return (
-    <Card>
+    <Card dir="rtl" className=" rounded-none">
       <CardHeader className="pb-3">
         <CardTitle className="text-base font-medium">دسته‌بندی</CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
         <Button
-          variant={!selectedCategory ? 'default' : 'outline'}
+          variant={!selectedCategory ? 'indigo' : 'outline'}
           size="sm"
           onClick={() => onCategoryChange(undefined)}
           className="w-full justify-start"
@@ -42,19 +42,22 @@ export default function CategoryFilter({
 
         {displayCategories.map((category) => (
           <div key={category.id} className="flex items-center gap-2">
+            {category.featured && (
+              <Badge
+                variant="outline"
+                className="text-xs rounded-xs border-none"
+              >
+                پیشنهادی:
+              </Badge>
+            )}
             <Button
-              variant={selectedCategory === category.id ? 'default' : 'outline'}
+              variant={selectedCategory === category.id ? 'indigo' : 'outline'}
               size="sm"
               onClick={() => onCategoryChange(category.id)}
-              className="flex-1 justify-start"
+              className="flex-1 justify-center"
             >
               {category.name}
             </Button>
-            {category.featured && (
-              <Badge variant="secondary" className="text-xs">
-                پیشنهادی
-              </Badge>
-            )}
           </div>
         ))}
 

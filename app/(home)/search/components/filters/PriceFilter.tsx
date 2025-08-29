@@ -76,7 +76,7 @@ export default function PriceFilter({
     localMax !== (selectedMaxPrice || filtersData.priceRange.max)
 
   return (
-    <Card>
+    <Card dir="rtl" className=" rounded-none">
       <CardHeader className="pb-3">
         <CardTitle className="text-base font-medium">محدوده قیمت</CardTitle>
       </CardHeader>
@@ -89,7 +89,7 @@ export default function PriceFilter({
             max={filtersData.priceRange.max}
             min={filtersData.priceRange.min}
             step={10000}
-            className="w-full"
+            className="w-full "
           />
         </div>
 
@@ -134,7 +134,12 @@ export default function PriceFilter({
         {/* Action Buttons */}
         {isChanged && (
           <div className="flex gap-2">
-            <Button size="sm" onClick={handleApplyPrice} className="flex-1">
+            <Button
+              variant={'indigo'}
+              size="sm"
+              onClick={handleApplyPrice}
+              className="flex-1"
+            >
               اعمال فیلتر
             </Button>
             <Button size="sm" variant="outline" onClick={handleResetPrice}>

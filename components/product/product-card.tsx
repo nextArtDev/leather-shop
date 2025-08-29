@@ -71,7 +71,7 @@ const ProductCard = ({ product }: Props) => {
             <p className="text-gray-500 text-xs">No Image</p>
           </div>
         ) : (
-          <>
+          <article className="my-6">
             <Carousel
               opts={{
                 align: 'start',
@@ -87,7 +87,7 @@ const ProductCard = ({ product }: Props) => {
               setApi={setApi}
               className="w-full h-full"
             >
-              <CarouselContent>
+              <CarouselContent className="">
                 {imageUrls.map((url, index) => (
                   <CarouselItem key={index}>
                     <Card className="h-full w-full border-none rounded-none bg-[#eceae8] p-0">
@@ -113,7 +113,7 @@ const ProductCard = ({ product }: Props) => {
                     key={index}
                     onClick={() => api?.scrollTo(index)}
                     className={cn(
-                      'h-0.25 flex-1 rounded-full',
+                      'h-[1.5px] flex-1 rounded-full',
                       current === index
                         ? 'bg-muted-foreground'
                         : 'bg-muted-foreground/30',
@@ -124,7 +124,7 @@ const ProductCard = ({ product }: Props) => {
                 ))}
               </div>
             )}
-          </>
+          </article>
         )}
       </div>
 

@@ -79,18 +79,18 @@ export default function SearchPageClient({
   )
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-6">
+    <div className="min-h-screen overflow-x-hidden">
+      <div className="  mx-auto px-4 py-6">
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">
             {currentFilters.search
               ? `نتایج جستجو برای "${currentFilters.search}"`
-              : 'جستجوی محصولات'}
+              : '  محصولات'}
           </h1>
-          <p className="text-muted-foreground">
+          {/* <p className="text-muted-foreground">
             بهترین محصولات را با فیلترهای پیشرفته پیدا کنید
-          </p>
+          </p> */}
         </div>
 
         {/* Search Results Header */}
@@ -108,7 +108,7 @@ export default function SearchPageClient({
           <div className="lg:hidden">
             <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
               <SheetTrigger asChild>
-                <Button variant="outline" className="w-full mb-6">
+                <Button variant="outline" className="w-full mb-6 rounded-none">
                   <Filter className="w-4 h-4 mr-2" />
                   فیلترها و دسته‌بندی
                 </Button>
@@ -124,7 +124,7 @@ export default function SearchPageClient({
             {/* Sort Menu */}
             <div className="flex justify-between items-center mb-6">
               <div className="text-sm text-muted-foreground">
-                صفحه {results.pagination.current} از {results.pagination.pages}
+                {results.pagination.current}/{results.pagination.pages}
               </div>
               <SortMenu
                 options={sortOptions}

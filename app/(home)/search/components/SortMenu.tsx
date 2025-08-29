@@ -29,12 +29,13 @@ export default function SortMenu({
         مرتب‌سازی:
       </span>
       <Select
+        dir="rtl"
         value={(selectedSort ?? 'newest') as SearchFilters['sortBy']}
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
         onValueChange={onSortChange}
       >
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="w-[180px] rounded-none">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
