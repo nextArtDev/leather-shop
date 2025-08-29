@@ -84,28 +84,28 @@ const navigation: NavigationData = {
         {
           name: 'New Arrivals',
           href: '#',
-          imageSrc: '/images/hero-image.jpg',
+          imageSrc: '/images/hero-image.webp',
           imageAlt:
             'Models sitting back to back, wearing Basic Tee in black and bone.',
         },
         {
           name: 'Basic Tees',
           href: '#',
-          imageSrc: '/images/hero-image.jpg',
+          imageSrc: '/images/hero-image.webp',
           imageAlt:
             'Close up of Basic Tee fall bundle with off-white, ochre, olive, and black tees.',
         },
         {
           name: 'Accessories',
           href: '#',
-          imageSrc: '/images/hero-image.jpg',
+          imageSrc: '/images/hero-image.webp',
           imageAlt:
             'Model wearing minimalist watch with black wristband and white watch face.',
         },
         {
           name: 'Carry',
           href: '#',
-          imageSrc: '/images/hero-image.jpg',
+          imageSrc: '/images/hero-image.webp',
           imageAlt:
             'Model opening tan leather long wallet with credit card pockets and cash pouch.',
         },
@@ -117,27 +117,27 @@ const navigation: NavigationData = {
         {
           name: 'New Arrivals',
           href: '#',
-          imageSrc: '/images/hero-image.jpg-01.jpg',
+          imageSrc: '/images/hero-image.webp',
           imageAlt:
             'Hats and sweaters on wood shelves next to various colors of t-shirts on hangers.',
         },
         {
           name: 'Basic Tees',
           href: '#',
-          imageSrc: '/images/hero-image.jpg-02.jpg',
+          imageSrc: '/images/hero-image.webp',
           imageAlt: 'Model wearing light heather gray t-shirt.',
         },
         {
           name: 'Accessories',
           href: '#',
-          imageSrc: '/images/hero-image.jpg-03.jpg',
+          imageSrc: '/images/hero-image.webp',
           imageAlt:
             'Grey 6-panel baseball hat with black brim, black mountain graphic on front, and light heather gray body.',
         },
         {
           name: 'Carry',
           href: '#',
-          imageSrc: '/images/hero-image.jpg-04.jpg',
+          imageSrc: '/images/hero-image.webp',
           imageAlt:
             'Model putting folded cash into slim card holder olive leather wallet with hand stitching.',
         },

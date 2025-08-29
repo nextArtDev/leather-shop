@@ -1,7 +1,7 @@
 import React from 'react'
 import { Bounded } from '@/components/shared/Bounded'
 import Image from 'next/image'
-import heroImage from '../../../public/images/hero-image.jpg'
+import heroImage from '../../../public/images/hero-image.webp'
 // import Link from 'next/link'
 // import { RevealText } from '@/components/shared/reveal-text'
 

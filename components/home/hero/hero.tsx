@@ -18,7 +18,6 @@ const Hero = ({
     <Bounded
       className={`relative w-full h-full  overflow-hidden bg-neutral-950 `}
     >
-      {/* motion-safe: for accessability; just scale eit up when its needed */}
       <FadeIn
         vars={{ scale: 1, opacity: 0.5 }}
         className=" absolute inset-0 pt-12 max-h-svh origin-top lg:h-screen motion-safe:scale-125 motion-reduce:opacity-50 "
@@ -60,7 +59,7 @@ const Hero = ({
             href={'/products'}
             className=" w-fit inline-flex items-center justify-center px-12 py-4 text-center font-extrabold tracking-wider uppercase transition-colors duration-300  border border-white text-white hover:bg-white/20"
           >
-            Shop now
+            محصولات
           </Link>
         </FadeIn>
         <FadeIn
@@ -72,8 +71,8 @@ const Hero = ({
               {subCategories?.map((sub) => (
                 <li key={sub.id}>
                   <Link
-                    href={sub.url}
-                    className="bg-gradient-to-b from-background/5 to-background/30 backdrop-blur-[2px] border border-background rounded-none  px-2 py-1 text-center  "
+                    href={`/sub-categories/${sub.url}`}
+                    className="bg-gradient-to-b from-background/5 to-background/30 backdrop-blur-[2px] border border-background rounded-none  px-2 py-1 text-center text-white "
                   >
                     {sub.name}
                   </Link>

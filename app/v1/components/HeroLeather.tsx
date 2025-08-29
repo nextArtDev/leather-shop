@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import React from 'react'
-import img from '../../../public/images/hero-image.jpg'
+import img from '../../../public/images/hero-image.webp'
 import Link from 'next/link'
 // import brderImage from '../../../public/images/border.webp'
 // import brderImage1 from '../../../public/images/border-rounded.webp'

@@ -777,3 +777,55 @@ export async function getAllCategories({}) {
     categories,
   }
 }
+
+export async function getSubCategoryBySlug({ slug }: { slug: string }) {
+  return await prisma.subCategory.findFirst({
+    where: {
+      url: slug,
+    },
+    include: {
+      images: {
+        select: { url: true },
+      },
+      products: {
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          slug: true,
+          rating: true,
+          isFeatured: true,
+          isSale: true,
+          saleEndDate: true,
+
+          images: {
+            take: 1,
+            select: {
+              id: true,
+              url: true,
+              key: true,
+            },
+          },
+
+          sizes: {
+            select: {
+              price: true,
+              discount: true,
+            },
+            orderBy: {
+              price: 'asc',
+            },
+            take: 1,
+          },
+        },
+      },
+      category: {
+        select: {
+          id: true,
+          name: true,
+          url: true,
+        },
+      },
+    },
+  })
+}

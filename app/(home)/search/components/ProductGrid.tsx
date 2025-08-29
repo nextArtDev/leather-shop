@@ -18,7 +18,7 @@ export default function ProductGrid({
     return (
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4   gap-6">
         {Array.from({ length: 12 }).map((_, i) => (
-          <Card key={i}>
+          <Card key={i} className="rounded-none">
             <CardContent className="p-4">
               <Skeleton className="w-full h-48 mb-4" />
               <Skeleton className="h-4 w-3/4 mb-2" />
@@ -33,7 +33,7 @@ export default function ProductGrid({
 
   if (products.length === 0) {
     return (
-      <Card>
+      <Card className="rounded-none">
         <CardContent className="py-12 text-center">
           <div className="text-lg font-medium mb-2">محصولی یافت نشد</div>
           <div className="text-muted-foreground">

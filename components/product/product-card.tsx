@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils'
 import { Card, CardContent } from '../ui/card'
 import Image from 'next/image'
 import Autoplay from 'embla-carousel-autoplay'
+import Link from 'next/link'
 
 // Using the detailed product type you provided
 type Product = {
@@ -68,10 +69,10 @@ const ProductCard = ({ product }: Props) => {
       <div className="w-full aspect-square relative">
         {!imageUrls || imageUrls.length === 0 ? (
           <div className="w-full h-full bg-[#eceae8] flex items-center justify-center">
-            <p className="text-gray-500 text-xs">No Image</p>
+            <p className="text-gray-500 text-xs">بدون عکس</p>
           </div>
         ) : (
-          <article className="my-6">
+          <Link href={`/products/${product.slug}`} className="my-6">
             <Carousel
               opts={{
                 align: 'start',
@@ -88,8 +89,8 @@ const ProductCard = ({ product }: Props) => {
               className="w-full h-full"
             >
               <CarouselContent className="">
-                {imageUrls.map((url, index) => (
-                  <CarouselItem key={index}>
+                {imageUrls.map((url) => (
+                  <CarouselItem key={url}>
                     <Card className="h-full w-full border-none rounded-none bg-[#eceae8] p-0">
                       <CardContent className="relative flex aspect-square items-center justify-center p-0 h-full">
                         <Image
@@ -107,13 +108,13 @@ const ProductCard = ({ product }: Props) => {
             </Carousel>
 
             {count > 1 && (
-              <div className="absolute -bottom-[1px] left-2 right-2 flex items-center gap-x-0.5 z-10">
+              <div className="absolute -bottom-[1px] left-0.25 right-0.25 flex items-center gap-x-0.5 z-10">
                 {Array.from({ length: count }).map((_, index) => (
                   <button
                     key={index}
                     onClick={() => api?.scrollTo(index)}
                     className={cn(
-                      'h-[1.5px] flex-1 rounded-full',
+                      'h-0.25 md:h-[1.5px] flex-1 rounded-full',
                       current === index
                         ? 'bg-muted-foreground'
                         : 'bg-muted-foreground/30',
@@ -124,12 +125,12 @@ const ProductCard = ({ product }: Props) => {
                 ))}
               </div>
             )}
-          </article>
+          </Link>
         )}
       </div>
 
       {/* The rest of your card details */}
-      <div className="pt-2">
+      <div className="pt-2 pb-4">
         <div className="flex flex-col gap-1 items-start px-2 text-pretty text-xs md:text-sm">
           <p className="font-semibold">{product.category.name}</p>
           <p className="font-bold">{product.name}</p>
