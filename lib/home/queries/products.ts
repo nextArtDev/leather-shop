@@ -134,13 +134,22 @@ export async function getNewProducts(limit: number = 8) {
 export async function getSubCategories(): Promise<SubCategoryForHomePage[]> {
   return await prisma.subCategory.findMany({
     where: { featured: true },
-    select: {
-      id: true,
-      name: true,
-      url: true,
+    // select: {
+    //   id: true,
+    //   name: true,
+    //   url: true,
+
+    // },
+    include: {
+      images: {
+        select: {
+          url: true,
+        },
+        take: 1,
+      },
     },
     orderBy: {
-      featured: 'desc',
+      createdAt: 'desc',
     },
   })
 }
@@ -789,33 +798,40 @@ export async function getSubCategoryBySlug({ slug }: { slug: string }) {
       },
       products: {
         select: {
-          id: true,
+          id: true, // You'll likely need this
           name: true,
-          description: true,
           slug: true,
+          brand: true,
           rating: true,
-          isFeatured: true,
+          numReviews: true,
+          sales: true,
           isSale: true,
           saleEndDate: true,
-
           images: {
-            take: 1,
             select: {
-              id: true,
               url: true,
-              key: true,
             },
           },
-
+          variantImages: {
+            select: {
+              url: true,
+            },
+          },
           sizes: {
             select: {
+              size: true,
               price: true,
               discount: true,
+              quantity: true,
             },
             orderBy: {
-              price: 'asc',
+              discount: 'desc',
             },
-            take: 1,
+          },
+          colors: {
+            select: {
+              name: true,
+            },
           },
         },
       },

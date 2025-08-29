@@ -1,3 +1,5 @@
+import { SubCategory } from '../generated/prisma'
+
 // Base types for common structures
 export type ProductImage = {
   // id: string
@@ -106,11 +108,13 @@ export type CategoryWithStats = {
   }[]
 }
 
-export type SubCategoryForHomePage = {
-  id: string
-  name: string
-  url: string
-}
+// export type SubCategoryForHomePage = {
+//   id: string
+//   name: string
+//   url: string
+//   images:{url:string}
+// }
+export type SubCategoryForHomePage = SubCategory & { images: { url: string }[] }
 export type CategoriesWithStatsResult = CategoryWithStats[]
 
 // 5. Search Products Types
@@ -162,8 +166,8 @@ export interface SearchProduct {
   variantImages: { url: string }[]
   sizes: { size: string; price: number; discount: number; quantity: number }[]
   colors: { name: string }[]
-  category: { name: string; url: string }
-  subCategory: { name: string; url: string }
+  category?: { name: string; url: string }
+  subCategory?: { name: string; url: string }
 }
 
 export interface SearchPagination {

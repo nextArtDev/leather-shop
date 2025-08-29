@@ -32,8 +32,8 @@ type Product = {
     discount: number
   }[]
   colors: { name: string }[]
-  category: { name: string; url: string }
-  subCategory: { name: string; url: string }
+  category?: { name: string; url: string }
+  subCategory?: { name: string; url: string }
 }
 
 type Props = {
@@ -132,7 +132,7 @@ const ProductCard = ({ product }: Props) => {
       {/* The rest of your card details */}
       <div className="pt-2 pb-4">
         <div className="flex flex-col gap-1 items-start px-2 text-pretty text-xs md:text-sm">
-          <p className="font-semibold">{product.category.name}</p>
+          <p className="font-semibold">{product?.category?.name}</p>
           <p className="font-bold">{product.name}</p>
           <p>تومان {product.sizes[0]?.price}</p>
           <div className="flex gap-0.5 items-center">

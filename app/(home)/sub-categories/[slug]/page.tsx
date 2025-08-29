@@ -1,12 +1,12 @@
 import { notFound } from 'next/navigation'
 import React from 'react'
-import { currentUser } from '@/lib/auth'
 import { getSubCategoryBySlug } from '@/lib/home/queries/products'
 import { Bounded } from '@/components/shared/Bounded'
 import { FadeIn } from '@/components/shared/fade-in'
 import Image from 'next/image'
 import { RevealText } from '@/components/shared/reveal-text'
 import Link from 'next/link'
+import ProductGrid from '../../search/components/ProductGrid'
 
 const SubcategoryDetailsPage = async ({
   params,
@@ -22,7 +22,7 @@ const SubcategoryDetailsPage = async ({
   if (!subcategory) notFound()
 
   return (
-    <div className="flex flex-col">
+    <div className="w-full h-full flex flex-col items-center justify-center gap-8">
       <Bounded
         className={`relative w-full h-full  overflow-hidden bg-neutral-950 `}
       >
@@ -69,6 +69,9 @@ const SubcategoryDetailsPage = async ({
           </FadeIn>
         </div>
       </Bounded>
+      <div className="flex-1 w-full h-full">
+        <ProductGrid products={subcategory.products} />
+      </div>
     </div>
   )
 }
