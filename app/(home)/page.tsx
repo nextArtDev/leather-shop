@@ -16,6 +16,7 @@ import {
 
 export default async function Home() {
   // await new Promise((resolve) => setTimeout(resolve, 10000))
+
   const products = await getHomepageProducts()
   // const categories = await getCategoriesWithStats()
   const subCategories = await getSubCategories()
