@@ -21,7 +21,7 @@ export default function Footer() {
   return (
     <footer className="relative border-t bg-background text-foreground transition-colors duration-300">
       <div className="container mx-auto px-4 py-12 md:px-6 lg:px-8">
-        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {/* <div className="relative">
             <h2 className="mb-4 text-3xl font-bold tracking-tight">
               Stay Connected
@@ -47,42 +47,42 @@ export default function Footer() {
             <div className="absolute -right-4 top-0 h-24 w-24 rounded-full bg-primary/10 blur-2xl" />
           </div> */}
           <div>
-            <h3 className="mb-4 text-lg font-semibold">Quick Links</h3>
+            <h3 className="mb-4 text-lg font-semibold">دسترسی سریع</h3>
             <nav className="space-y-2 text-sm">
               <Link
-                href="#"
+                href="/"
                 className="block transition-colors hover:text-primary"
               >
-                Home
+                خانه
               </Link>
               <Link
-                href="#"
+                href="/products"
                 className="block transition-colors hover:text-primary"
               >
-                About Us
+                محصولات
               </Link>
               <Link
-                href="#"
+                href="/about-us"
                 className="block transition-colors hover:text-primary"
               >
-                Services
+                درباره ما
               </Link>
               <Link
-                href="#"
+                href="/contact-us"
                 className="block transition-colors hover:text-primary"
               >
-                Products
+                ارتباط با ما
               </Link>
               <Link
-                href="#"
+                href="/faq"
                 className="block transition-colors hover:text-primary"
               >
-                Contact
+                سوالات متداول
               </Link>
             </nav>
           </div>
           <div>
-            <h3 className="mb-4 text-lg font-semibold">Contact Us</h3>
+            <h3 className="mb-4 text-lg font-semibold">ارتباط با ما</h3>
             <address className="space-y-2 text-sm not-italic">
               <p>123 Innovation Street</p>
               <p>Tech City, TC 12345</p>
@@ -91,8 +91,8 @@ export default function Footer() {
             </address>
           </div>
           <div className="relative">
-            <h3 className="mb-4 text-lg font-semibold">Follow Us</h3>
-            <div className="mb-6 flex space-x-4">
+            <h3 className="mb-4   text-lg font-semibold">ما را دنبال کنید</h3>
+            <div className="mb-6 flex items-center  space-x-4">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>

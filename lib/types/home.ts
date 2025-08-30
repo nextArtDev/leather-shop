@@ -471,3 +471,27 @@ export enum PaymentStatus {
   Refunded = 'Refunded',
   Chargeback = 'Chargeback',
 }
+
+// Navigation Types
+
+interface FeaturedItem {
+  name: string
+  href: string
+  imageSrc: string
+  imageAlt: string
+}
+
+interface Category {
+  name: string
+  featured: FeaturedItem[]
+}
+
+interface Page {
+  name: string
+  href: string
+}
+
+export interface NavigationData {
+  categories: Category[]
+  pages: Page[]
+}

@@ -1,6 +1,6 @@
 'use client'
 
-import { Menu, Package2, Search } from 'lucide-react'
+import { Package2, Search } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import * as React from 'react'
@@ -17,17 +17,19 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu'
-import { Separator } from '@/components/ui/separator'
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetTrigger,
-} from '@/components/ui/sheet'
+// import { Separator } from '@/components/ui/separator'
+// import {
+//   Sheet,
+//   SheetClose,
+//   SheetContent,
+//   SheetTrigger,
+// } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
 import TextRotate from '../shared/text-rotate'
 import DrawerCart from './DrawerCart'
 import UserSession from './UserSession'
+import { NavigationData } from '@/lib/types/home'
+import MobileNav from './MobileNav'
 
 // Hook to ensure consistent client-side rendering
 function useIsomorphicLayoutEffect(
@@ -51,28 +53,6 @@ function useHydrationSafe() {
 }
 
 // --- TypeScript Definitions for Navigation Data ---
-
-interface FeaturedItem {
-  name: string
-  href: string
-  imageSrc: string
-  imageAlt: string
-}
-
-interface Category {
-  name: string
-  featured: FeaturedItem[]
-}
-
-interface Page {
-  name: string
-  href: string
-}
-
-export interface NavigationData {
-  categories: Category[]
-  pages: Page[]
-}
 
 // --- Component Data ---
 
@@ -229,66 +209,66 @@ const DesktopNav = ({ navigation }: { navigation: NavigationData }) => (
   </NavigationMenu>
 )
 
-const MobileNav = ({ navigation }: { navigation: NavigationData }) => (
-  <Sheet>
-    <SheetTrigger asChild>
-      <Button variant="ghost" size="icon" className="lg:hidden">
-        <Menu className="h-6 w-6" />
-        <span className="sr-only">Open menu</span>
-      </Button>
-    </SheetTrigger>
-    <SheetContent side="left" className="flex flex-col">
-      <div className="w-full h-fit ">
-        {/* <Logo /> */}
-        <SheetClose asChild>
-          <Button variant="ghost" size="icon" className="rounded-full sr-only">
-            Close
-          </Button>
-        </SheetClose>
-      </div>
-      {/* <Separator className="my-4" /> */}
-      <div className="flex-1 overflow-y-auto pt-6 ">
-        <nav className="grid items-start px-4 text-sm font-medium space-y-4">
-          {navigation.categories.map((category) => (
-            <div key={category.name}>
-              <p className="font-semibold text-foreground px-2 mb-2">
-                {category.name}
-              </p>
-              {category.featured.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </div>
-          ))}
-          <Separator className="my-4" />
-          {navigation.pages.map((page) => (
-            <Link
-              key={page.name}
-              href={page.href}
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-            >
-              {page.name}
-            </Link>
-          ))}
-        </nav>
-      </div>
-      <Separator className="my-4" />
-      <div className="space-y-2 px-4 pb-6">
-        <Button asChild variant="default" className="w-full">
-          <Link href="/sign-in">ایجاد حساب کاربری</Link>
-        </Button>
-        {/* <Button asChild variant="secondary" className="w-full">
-          <Link href="/login">Sign in</Link>
-        </Button> */}
-      </div>
-    </SheetContent>
-  </Sheet>
-)
+// const MobileNav = ({ navigation }: { navigation: NavigationData }) => (
+//   <Sheet>
+//     <SheetTrigger asChild>
+//       <Button variant="ghost" size="icon" className="lg:hidden">
+//         <Menu className="h-6 w-6" />
+//         <span className="sr-only">Open menu</span>
+//       </Button>
+//     </SheetTrigger>
+//     <SheetContent side="left" className="flex flex-col">
+//       <div className="w-full h-fit ">
+//         {/* <Logo /> */}
+//         <SheetClose asChild>
+//           <Button variant="ghost" size="icon" className="rounded-full sr-only">
+//             Close
+//           </Button>
+//         </SheetClose>
+//       </div>
+//       {/* <Separator className="my-4" /> */}
+//       <div className="flex-1 overflow-y-auto pt-6 ">
+//         <nav className="grid items-start px-4 text-sm font-medium space-y-4">
+//           {navigation.categories.map((category) => (
+//             <div key={category.name}>
+//               <p className="font-semibold text-foreground px-2 mb-2">
+//                 {category.name}
+//               </p>
+//               {category.featured.map((item) => (
+//                 <Link
+//                   key={item.name}
+//                   href={item.href}
+//                   className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+//                 >
+//                   {item.name}
+//                 </Link>
+//               ))}
+//             </div>
+//           ))}
+//           <Separator className="my-4" />
+//           {navigation.pages.map((page) => (
+//             <Link
+//               key={page.name}
+//               href={page.href}
+//               className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+//             >
+//               {page.name}
+//             </Link>
+//           ))}
+//         </nav>
+//       </div>
+//       <Separator className="my-4" />
+//       <div className="space-y-2 px-4 pb-6">
+//         <Button asChild variant="default" className="w-full">
+//           <Link href="/sign-in">ایجاد حساب کاربری</Link>
+//         </Button>
+//         {/* <Button asChild variant="secondary" className="w-full">
+//           <Link href="/login">Sign in</Link>
+//         </Button> */}
+//       </div>
+//     </SheetContent>
+//   </Sheet>
+// )
 
 const SearchBar = ({
   isOpen,

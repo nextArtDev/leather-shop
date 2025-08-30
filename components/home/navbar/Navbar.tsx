@@ -1,6 +1,7 @@
 import { getCategoriesWithStats } from '@/lib/home/queries/products'
 import React from 'react'
-import MainNav, { NavigationData } from './MainNav'
+import MainNav from './MainNav'
+import { NavigationData } from '@/lib/types/home'
 
 const Navbar = async () => {
   const allCategories = await getCategoriesWithStats()
@@ -15,8 +16,8 @@ const Navbar = async () => {
       })),
     })),
     pages: [
-      { name: 'درباره ما', href: '#' },
-      { name: 'ارتباط با ما', href: '#' },
+      { name: 'درباره ما', href: '/contact-us' },
+      { name: 'ارتباط با ما', href: '/about-us' },
       { name: 'سوالات متداول', href: '/faq' },
     ],
   }
