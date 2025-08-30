@@ -17,6 +17,7 @@ const Navbar = async () => {
     pages: [
       { name: 'درباره ما', href: '#' },
       { name: 'ارتباط با ما', href: '#' },
+      { name: 'سوالات متداول', href: '/faq' },
     ],
   }
   //   console.log(navigation)
