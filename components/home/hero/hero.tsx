@@ -33,7 +33,8 @@ const Hero = ({
       </FadeIn>
       <div className="relative flex h-screen flex-col justify-center">
         <RevealText
-          text="Effortless Elegance"
+          // text="Effortless Elegance"
+          text="کارگاه چرم خورمک"
           id="hero-heading"
           className="font-display max-w-xl text-6xl leading-none text-neutral-50 md:text-7xl lg:text-8xl"
           staggerAmount={0.2}
@@ -45,9 +46,12 @@ const Hero = ({
           vars={{ delay: 1, duration: 1.3 }}
         >
           <p className=" ">
-            An expression of quiet luxury, Côte Royale is designed for the man
-            who commands attention without seeking it. A reflection of nature’s
-            raw beauty.
+            {/* An expression of quiet luxury, Côte Royale is designed for the
+            womans who commands attention without seeking it. A reflection of
+            nature’s raw beauty. */}
+            محصولات ما برای زنانی طراحی شده‌اند که به دنبال بیان اصیل شخصیت خود
+            است، نه نشان دادن آن. هر کیف، تجلی زیبایی خام و طبیعی و هنر دستی است
+            که با عشق ساخته شده است.
           </p>
         </FadeIn>
 

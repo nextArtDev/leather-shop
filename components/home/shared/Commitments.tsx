@@ -9,30 +9,52 @@ import {
 import Image from 'next/image'
 import React from 'react'
 
+// const items = [
+//   {
+//     id: '1',
+//     title: 'Full-grain leather',
+//     description:
+//       'At Le Tanneur, we passionately source the finest materials and use full-grain leather, the noblest part, perfected over 125 years. Our leather is 100% certified by the Leather Working Group (LWG), and we aim for all our products to be certified by 2025.',
+//     url: '/images/commit1.webp',
+//   },
+//   {
+//     id: '2',
+//     title: 'An ethical production',
+//     description:
+//       'Le Tanneur’s partner workshops in Europe, North Africa, and Asia follow our Ethical Charter. Each season, we prioritize production in our French workshops and offer collections like Sans Couture, Louise, and Madeleine, all crafted in France.',
+//     url: '/images/commit2.webp',
+//   },
+//   {
+//     id: '3',
+//     title: 'Our engagements',
+//     description:
+//       'Le Tanneur uses recycled materials with full-grain leather for durable pieces. Leather scraps are repurposed for watch and jewelry boxes, mostly made from recycled leather. All packaging is made from recycled and recyclable materials, using FSC and PEFC certified paper and solvent-free vegetable-based inks, ensuring sustainability.',
+//     url: '/images/commit3.jpg',
+//   },
+// ]
 const items = [
   {
     id: '1',
-    title: 'Full-grain leather',
+    title: 'عشق به چرم اصیل',
     description:
-      'At Le Tanneur, we passionately source the finest materials and use full-grain leather, the noblest part, perfected over 125 years. Our leather is 100% certified by the Leather Working Group (LWG), and we aim for all our products to be certified by 2025.',
-    url: '/images/commit1.webp',
+      'ما تنها از مرغوب‌ترین چرم‌های طبیعی تمام‌دانه (Full-grain) استفاده می‌کنیم. این چرم‌ها با دوخت دقیق و هنرمندانه، به محصولاتی ماندگار و منحصربه‌فرد تبدیل می‌شوند که با گذر زمان، زیباتر و اصیل‌تر خواهند شد. تضمین می‌کنیم که هیچ‌یک از محصولات ما از چرم مصنوعی (پلاستیکی) نیست.',
+    url: '/images/commit1.webp', // تصویر از یک رول چرم زیبا یا هنرمند در حال کار
   },
   {
     id: '2',
-    title: 'An ethical production',
+    title: 'ساختِ اخلاق‌مدار و مسئولانه',
     description:
-      'Le Tanneur’s partner workshops in Europe, North Africa, and Asia follow our Ethical Charter. Each season, we prioritize production in our French workshops and offer collections like Sans Couture, Louise, and Madeleine, all crafted in France.',
-    url: '/images/commit2.webp',
+      'تولید در کارگاه خودمان تحت شرایطی عادلانه و محترمانه انجام می‌شود. ما به محیط زیست و حقوق انسان‌ها احترام می‌گذاریم و در فرآیند تولید، تا حد امکان از مواد اولیه بازیافتی و کم‌آب‌بر استفاده کرده و از آلاینده‌ها دوری می‌کنیم. قدم‌های کوچک ما برای آینده‌ای سبزتر.',
+    url: '/images/commit2.webp', // تصویر از کارگاه روشن و مرتب یا هنرمندان در حال کار
   },
   {
     id: '3',
-    title: 'Our engagements',
+    title: 'توجه وسواس‌گونه به جزئیات',
     description:
-      'Le Tanneur uses recycled materials with full-grain leather for durable pieces. Leather scraps are repurposed for watch and jewelry boxes, mostly made from recycled leather. All packaging is made from recycled and recyclable materials, using FSC and PEFC certified paper and solvent-free vegetable-based inks, ensuring sustainability.',
-    url: '/images/commit3.jpg',
+      'به هیچ چیز جز کمال راضی نیستیم. از انتخاب یک قطعه چرم تا آخرین کوک و نصب یک قفل، تمامی مراحل با دقتی وسواس‌گونه و عشقی هنرمندانه انجام می‌گیرد. هر کیف نه یک کالا، که یک اثر هنری است که نام شما را بر خود دارد.',
+    url: '/images/commit3.jpg', // تصویر ماکرو از دوخت ظریف یک دسته یا جزئیات یک قفل
   },
 ]
-
 export default function Commitments() {
   return (
     <Carousel
@@ -49,10 +71,10 @@ export default function Commitments() {
         {items.map((item) => (
           <CarouselItem
             key={item.id}
-            className="pr-1 mx-auto basis-1/2 md:pl-2 md:basis-1/3 lg:basis-1/4 xl:pl-4 xl:basis-1/5"
+            className=" mx-auto basis-1/2   md:basis-1/3 lg:basis-1/4   xl:basis-1/5"
             /* Adjusted basis for better fit (e.g., 2 on mobile, 3 on md, 4 on lg, 5 on xl); made padding responsive */
           >
-            <div className="flex flex-col border-none rounded-none gap-4">
+            <div className="flex flex-col border-none rounded-none gap-2 md:gap-4">
               {/* Moved gap-4 here to space image and text */}
               <figure className="relative w-full aspect-square bg-[#eceae8] border-none rounded-none">
                 {/* Changed to figure for semantic; simplified, removed min-h to let aspect-square handle */}
@@ -63,9 +85,9 @@ export default function Commitments() {
                   className="object-cover mix-blend-darken" // Uncommented; remove if not needed
                 />
               </figure>
-              <article className="flex flex-col gap-3 justify-evenly py-3 px-2 text-pretty text-xs md:text-sm lg:text-base">
-                <p className="font-bold text-lg text-left">{item.title}</p>
-                <p className="text-sm">{item.description}</p>
+              <article className="flex flex-col gap-3 justify-evenly py-3 px-2 text-pretty text-xs md:text-sm lg:text-base  text-right">
+                <p className="font-bold text-lg">{item.title}</p>
+                <p className="text-sm text-justify">{item.description}</p>
               </article>
             </div>
           </CarouselItem>
