@@ -94,6 +94,7 @@ export type CategoryWithStats = {
   name: string
   url: string
   featured: boolean
+  updatedAt: Date
   images: BasicProductImage[]
   _count: {
     products: number

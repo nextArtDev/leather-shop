@@ -183,7 +183,7 @@ const ListItem = React.forwardRef<
           {title}
         </div>
         <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-          Shop Now
+          مشاهده
         </p>
       </Link>
     </NavigationMenuLink>

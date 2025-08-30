@@ -21,6 +21,7 @@ export async function getHomepageProducts(limit: number = 12) {
       isFeatured: true,
       isSale: true,
       saleEndDate: true,
+      updatedAt: true,
       // Get only the first image for performance
       images: {
         take: 1,
@@ -159,6 +160,7 @@ export async function getCategoriesWithStats(): Promise<CategoryWithStats[]> {
       id: true,
       name: true,
       url: true,
+      updatedAt: true,
       featured: true,
       images: {
         take: 1,
@@ -187,12 +189,21 @@ export async function getCategoriesWithStats(): Promise<CategoryWithStats[]> {
             },
           },
         },
+        take: 5,
+        // orderBy:{
+
+        // }
+        // orderBy: {Prisma.sql`RANDOM()`}
       },
     },
     orderBy: {
       featured: 'desc',
     },
   })
+  // for (const category of categories) {
+  //   category.subCategories = shuffleArray(category.subCategories).slice(0, 5) // Get up to 5 random subcategories
+  // }
+  //return categories;
 }
 
 // 5. SEARCH/FILTER PAGE - More comprehensive

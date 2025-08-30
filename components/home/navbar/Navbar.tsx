@@ -19,7 +19,7 @@ const Navbar = async () => {
       { name: 'ارتباط با ما', href: '#' },
     ],
   }
-  console.log(navigation)
+  //   console.log(navigation)
   return (
     <div>
       <MainNav navigation={navigation} />
