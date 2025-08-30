@@ -67,28 +67,28 @@ const iconComponents = {
 // ]
 const defaultValues: AboutUsProps['values'] = [
   {
-    title: 'هنر و اصالت', // Art & Authenticity
+    title: 'هنر و اصالت',
     description:
       'در هر دوخت، اصالت هنر دست و عشق به چرم طبیعی را حفظ می‌کنیم. هر محصول داستان منحصربه‌فرد خود را روایت می‌کند.',
-    icon: 'ScanHeart', // پیشنهاد آیکون: دستی که یک قلب را نگه داشته
+    icon: 'ScanHeart',
   },
   {
-    title: 'کیفیت و ماندگاری', // Quality & Longevity
+    title: 'کیفیت و ماندگاری',
     description:
       'از برترین چرم‌های طبیعی و محکم‌ترین دوخت استفاده می‌کنیم تا محصولاتی بیافرینیم که برای سال‌ها همراه شما بمانند.',
-    icon: 'ShieldCheck', // پیشنهاد آیکون: یک سپر همراه با تیک تأیید
+    icon: 'ShieldCheck',
   },
   {
     title: 'توجه به جزئیات', // Attention to Detail
     description:
       'هیچ جزئیاتی را به شانس واگذار نمی‌کنیم؛ از صاف بودن یک درز گرفته تا ظرافت یک سجاف.',
-    icon: 'ScanEye', // پیشنهاد آیکون: یک ذره‌بین
+    icon: 'ScanEye',
   },
   {
     title: 'ارتباط پایدار', // Sustainable Connection
     description:
       'به دنبال ایجاد رابطه‌ای پایدار با مشتریان و محیط زیست هستیم. چرمی که به عمر محصولی ارزشمند تبدیل شود، پایدارترین انتخاب است.',
-    icon: 'Hop', // پیشنهاد آیکون: یک جوانه یا برگ (نماد پایداری)
+    icon: 'Hop',
   },
 ]
 export default function AboutUs1() {
@@ -134,7 +134,7 @@ export default function AboutUs1() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
-          className="mx-auto mb-16 max-w-2xl text-center"
+          className="mx-auto mb-16 max-w-md text-center"
         >
           <h1 className="from-foreground/80 via-foreground to-foreground/80 bg-gradient-to-r bg-clip-text text-4xl font-bold tracking-tight text-transparent sm:text-5xl md:text-6xl">
             {aboutData.title}
@@ -147,16 +147,16 @@ export default function AboutUs1() {
         {/* Mission & Vision Section */}
         <div ref={missionRef} className="relative mx-auto mb-24 max-w-7xl">
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={
-              missionInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }
+              missionInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
             }
             transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
             className="relative z-10 grid gap-12 md:grid-cols-2"
           >
             <motion.div
               whileHover={{ y: -5, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
-              className="group border-border/40 relative block overflow-hidden rounded-2xl border bg-gradient-to-br p-10 backdrop-blur-3xl"
+              className="group border-border/40 relative block overflow-hidden rounded-md border bg-gradient-to-br p-10 backdrop-blur-3xl"
             >
               <BorderBeam
                 duration={8}
@@ -164,7 +164,7 @@ export default function AboutUs1() {
                 className="via-primary/40 from-transparent to-transparent"
               />
 
-              <div className="from-primary/20 to-primary/5 mb-6 inline-flex aspect-square h-16 w-16 flex-1 items-center justify-center rounded-2xl bg-gradient-to-br backdrop-blur-sm">
+              <div className="from-primary/20 to-primary/5 mb-6 inline-flex aspect-square h-16 w-16 flex-1 items-center justify-center rounded-sm bg-gradient-to-br backdrop-blur-sm">
                 <Rocket className="text-primary h-8 w-8" />
               </div>
 
@@ -181,7 +181,7 @@ export default function AboutUs1() {
 
             <motion.div
               whileHover={{ y: -5, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
-              className="group border-border/40 relative block overflow-hidden rounded-2xl border bg-gradient-to-br p-10 backdrop-blur-3xl"
+              className="group border-border/40 relative block overflow-hidden rounded-md border bg-gradient-to-br p-10 backdrop-blur-3xl"
             >
               <BorderBeam
                 duration={8}
@@ -189,7 +189,7 @@ export default function AboutUs1() {
                 className="from-transparent via-blue-500/40 to-transparent"
                 reverse
               />
-              <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500/20 to-blue-500/5 backdrop-blur-sm">
+              <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-sm bg-gradient-to-br from-blue-500/20 to-blue-500/5 backdrop-blur-sm">
                 <Target className="h-8 w-8 text-blue-500" />
               </div>
 
@@ -216,28 +216,28 @@ export default function AboutUs1() {
             <h2 className="from-foreground/80 via-foreground to-foreground/80 bg-gradient-to-r bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-4xl">
               ارزشهای اصیل کار ما
             </h2>
-            <p className="text-muted-foreground mx-auto mt-4 max-w-2xl text-lg">
+            <p className="text-muted-foreground mx-auto mt-4 max-w-md text-lg">
               اصولی که ما را در هر کار و تصمیم راهبر است.
             </p>
           </motion.div>
 
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-flow-row-dense gap-4 md:grid-cols-2 xl:grid-cols-4">
             {aboutData.values?.map((value, index) => {
               const IconComponent = iconComponents[value.icon]
 
               return (
                 <motion.div
                   key={value.title}
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 15 }}
                   animate={
-                    valuesInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }
+                    valuesInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 15 }
                   }
                   transition={{
                     duration: 0.6,
                     delay: index * 0.1 + 0.2,
                     ease: 'easeOut',
                   }}
-                  whileHover={{ y: -5, scale: 1.02 }}
+                  //   whileHover={{ y: -5, scale: 1.02 }}
                 >
                   <CardHoverEffect
                     icon={<IconComponent className="h-6 w-6" />}
