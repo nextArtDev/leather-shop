@@ -46,9 +46,15 @@ export default function MobileNav({ navigation }: MobileNavProps) {
   return (
     <>
       <motion.button
-        className="text-foreground hover:bg-muted rounded-lg p-2 transition-colors duration-200 lg:hidden"
+        className="text-foreground hover:bg-muted rounded-sm p-2 transition-colors duration-200 lg:hidden cursor-pointer"
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         whileTap={{ scale: 0.95 }}
+        aria-label={
+          isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'
+        }
+        aria-expanded={isMobileMenuOpen}
+        aria-controls="mobile-navigation-menu"
+        aria-haspopup="true"
       >
         {isMobileMenuOpen ? (
           <X className="h-6 w-6" />
@@ -68,7 +74,7 @@ export default function MobileNav({ navigation }: MobileNavProps) {
               onClick={() => setIsMobileMenuOpen(false)}
             />
             <motion.div
-              className="border-border bg-background fixed top-16 right-4 z-50 w-80 max-h-[80vh] overflow-y-auto rounded-2xl border shadow-2xl lg:hidden"
+              className="border-border bg-background fixed top-16 right-4 z-50 w-80 max-h-[80vh] overflow-y-auto rounded-sm border shadow-2xl lg:hidden"
               style={{
                 overflowX: 'hidden', // Prevent horizontal scrolling
                 width: 'calc(100vw - 2rem)', // Responsive width
@@ -90,6 +96,15 @@ export default function MobileNav({ navigation }: MobileNavProps) {
                     <button
                       className="text-foreground hover:bg-muted flex w-full items-center justify-between rounded-lg px-4 py-3 font-medium transition-colors duration-200"
                       onClick={() => toggleCategory(category.name)}
+                      aria-expanded={expandedCategory === category.name}
+                      aria-controls={`submenu-${category.name
+                        .replace(/\s+/g, '-')
+                        .toLowerCase()}`}
+                      aria-label={`${category.name}, ${
+                        expandedCategory === category.name
+                          ? 'expanded'
+                          : 'collapsed'
+                      }`}
                     >
                       <span>{category.name}</span>
                       <ChevronDown
@@ -146,22 +161,22 @@ export default function MobileNav({ navigation }: MobileNavProps) {
                 className="border-border space-y-3 border-t p-4"
                 variants={mobileItemVariants}
               >
-                <Link
+                {/* <Link
                   prefetch={false}
-                  href="/login"
+                  href="/sign-in"
                   className="text-foreground hover:bg-muted block w-full rounded-lg py-3 text-center font-medium transition-colors duration-200"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Sign In
-                </Link>
-                <Link
+                  ورود/عضویت
+                </Link> */}
+                {/* <Link
                   prefetch={false}
                   href="/signup"
                   className="bg-foreground text-background hover:bg-foreground/90 block w-full rounded-lg py-3 text-center font-medium transition-all duration-200"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Get Started
-                </Link>
+                </Link> */}
               </motion.div>
             </motion.div>
           </>

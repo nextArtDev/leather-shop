@@ -154,3 +154,13 @@ input[type='tel'],
 .phone {
   font-family: var(--font-vazir) !important;
 }
+
+.spinning {
+  animation: spinning 5s linear infinite;
+}
+
+@keyframes spinning {
+  to {
+    transform: rotate(360deg);
+  }
+}
