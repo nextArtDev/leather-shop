@@ -1,13 +1,13 @@
 'use client'
 
-import { Package2, Search } from 'lucide-react'
+import { Package2, SearchIcon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import * as React from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible'
-import { Input } from '@/components/ui/input'
+// import { Input } from '@/components/ui/input'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -30,6 +30,7 @@ import DrawerCart from './DrawerCart'
 import UserSession from './UserSession'
 import { NavigationData } from '@/lib/types/home'
 import MobileNav from './MobileNav'
+import SearchCombobox from '../shared/SearchCombo'
 
 // Hook to ensure consistent client-side rendering
 function useIsomorphicLayoutEffect(
@@ -51,86 +52,6 @@ function useHydrationSafe() {
 
   return isHydrated
 }
-
-// --- TypeScript Definitions for Navigation Data ---
-
-// --- Component Data ---
-
-// const navigation: NavigationData = {
-//   categories: [
-//     {
-//       name: 'Women',
-//       featured: [
-//         {
-//           name: 'New Arrivals',
-//           href: '#',
-//           imageSrc: '/images/hero-image.webp',
-//           imageAlt:
-//             'Models sitting back to back, wearing Basic Tee in black and bone.',
-//         },
-//         {
-//           name: 'Basic Tees',
-//           href: '#',
-//           imageSrc: '/images/hero-image.webp',
-//           imageAlt:
-//             'Close up of Basic Tee fall bundle with off-white, ochre, olive, and black tees.',
-//         },
-//         {
-//           name: 'Accessories',
-//           href: '#',
-//           imageSrc: '/images/hero-image.webp',
-//           imageAlt:
-//             'Model wearing minimalist watch with black wristband and white watch face.',
-//         },
-//         {
-//           name: 'Carry',
-//           href: '#',
-//           imageSrc: '/images/hero-image.webp',
-//           imageAlt:
-//             'Model opening tan leather long wallet with credit card pockets and cash pouch.',
-//         },
-//       ],
-//     },
-//     {
-//       name: 'Men',
-//       featured: [
-//         {
-//           name: 'New Arrivals',
-//           href: '#',
-//           imageSrc: '/images/hero-image.webp',
-//           imageAlt:
-//             'Hats and sweaters on wood shelves next to various colors of t-shirts on hangers.',
-//         },
-//         {
-//           name: 'Basic Tees',
-//           href: '#',
-//           imageSrc: '/images/hero-image.webp',
-//           imageAlt: 'Model wearing light heather gray t-shirt.',
-//         },
-//         {
-//           name: 'Accessories',
-//           href: '#',
-//           imageSrc: '/images/hero-image.webp',
-//           imageAlt:
-//             'Grey 6-panel baseball hat with black brim, black mountain graphic on front, and light heather gray body.',
-//         },
-//         {
-//           name: 'Carry',
-//           href: '#',
-//           imageSrc: '/images/hero-image.webp',
-//           imageAlt:
-//             'Model putting folded cash into slim card holder olive leather wallet with hand stitching.',
-//         },
-//       ],
-//     },
-//   ],
-//   pages: [
-//     { name: 'Company', href: '#' },
-//     { name: 'Stores', href: '#' },
-//   ],
-// }
-
-// --- Child Components ---
 
 const Logo = () => (
   <Link href="/" className="flex items-center space-x-2">
@@ -273,9 +194,11 @@ const DesktopNav = ({ navigation }: { navigation: NavigationData }) => (
 const SearchBar = ({
   isOpen,
   onToggle,
+  categories,
 }: {
   isOpen: boolean
   onToggle: () => void
+  categories: { category: string }[]
 }) => (
   <>
     <Button
@@ -285,24 +208,27 @@ const SearchBar = ({
       aria-expanded={isOpen}
       onClick={onToggle}
     >
-      <Search className="h-6 w-6" />
+      <SearchIcon className="h-6 w-6" />
     </Button>
+
     <Collapsible
       open={isOpen}
       onOpenChange={onToggle}
-      className="absolute top-full left-0 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b z-10"
+      className="absolute top-full right-0 w-full bg-background  border-b z-10"
     >
       <CollapsibleContent>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="relative flex h-16 items-center">
+          <div className="relative w-full flex h-16 items-center">
             <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input
+              {/* <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" /> */}
+              {/* <Input
                 type="search"
                 placeholder="جست‌و‌جوی محصولات..."
                 className="w-full pl-10 h-12"
                 autoFocus
-              />
+                /> */}
+              <SearchCombobox categories={categories || ['']} />
+              {/* <Search categories={categories || ['']} /> */}
             </div>
           </div>
         </div>
@@ -335,7 +261,7 @@ const TopBanner = () => {
         />
       ) : (
         <div className="flex items-center justify-center px-2 sm:px-2 md:px-3 py-0.5 sm:py-1 md:py-1">
-          All duties and taxes included. within the US
+          {/* All duties and taxes included. within the US */}
         </div>
       )}
     </div>
@@ -376,7 +302,24 @@ export default function MainNav({
 
                 <div className="flex flex-1 items-center justify-end lg:justify-start">
                   <div className="flex lg:flex-row-reverse items-center space-x-4">
-                    <SearchBar isOpen={isSearchOpen} onToggle={toggleSearch} />
+                    <SearchBar
+                      isOpen={isSearchOpen}
+                      onToggle={toggleSearch}
+                      categories={navigation.categories.map((cat) => {
+                        return {
+                          category: cat.name,
+                        }
+                      })}
+                    />
+                    {/* <SearchCombobox
+                      isOpen={isSearchOpen}
+                      onToggle={toggleSearch}
+                      categories={navigation.categories.map((cat) => {
+                        return {
+                          category: cat.name,
+                        }
+                      })}
+                    /> */}
                     {/* <Button
                       variant="ghost"
                       size="icon"

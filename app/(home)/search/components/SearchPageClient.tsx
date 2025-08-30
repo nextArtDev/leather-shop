@@ -79,7 +79,7 @@ export default function SearchPageClient({
   )
 
   return (
-    <div className="min-h-screen overflow-x-hidden">
+    <div className="min-h-screen pt-16 overflow-x-hidden">
       <div className="  mx-auto px-4 py-6">
         {/* Page Header */}
         <div className="mb-8">
