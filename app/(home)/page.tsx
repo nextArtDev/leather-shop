@@ -5,6 +5,7 @@ import StoreStatement from '@/components/home/shared/StoreStatement'
 import WorkVideo from '@/components/home/shared/WorkVideo'
 import TestimonialCarousel from '@/components/home/testemonial/Testemonial'
 import MainPageCarousel from '@/components/product/main-page-carousel'
+
 import {
   // getCategoriesWithStats,
   getHomepageProducts,
@@ -14,10 +15,10 @@ import {
 // import { headers } from 'next/headers'
 
 export default async function Home() {
+  // await new Promise((resolve) => setTimeout(resolve, 10000))
   const products = await getHomepageProducts()
   // const categories = await getCategoriesWithStats()
   const subCategories = await getSubCategories()
-
   // #eceae8
 
   return (
@@ -28,6 +29,7 @@ export default async function Home() {
       {/* <div className=" ">
         <FadeMenu />
       </div> */}
+      {/* <Loader variant="magnetic-dots" size={72} /> */}
       <Hero subCategories={subCategories} />
       <StoreStatement />
       <section className="w-full h-full flex flex-col gap-8 py-8 px-3 ">
