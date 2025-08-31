@@ -1,5 +1,5 @@
 // import { PhoneCall } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
+// import { Badge } from '@/components/ui/badge'
 import {
   Accordion,
   AccordionContent,
@@ -47,11 +47,11 @@ const faqs = [
   },
 ]
 const FaqPage = () => (
-  <div className="w-full py-20 lg:py-40">
+  <div className="w-full py-20 lg:py-40 overflow-x-hidden">
     <div className="container mx-auto">
       <div className="flex flex-col gap-10">
         <div className="flex text-center justify-center items-center gap-4 flex-col">
-          <Badge variant="outline">سوالات پرتکرار</Badge>
+          {/* <Badge variant="outline">سوالات پرتکرار</Badge> */}
           <div className="flex gap-2 flex-col">
             <h4 className="text-3xl md:text-5xl tracking-tighter max-w-xl text-center font-regular">
               سوالات متداول (پرسش و پاسخ)
@@ -71,12 +71,16 @@ const FaqPage = () => (
           </div> */}
         </div>
 
-        <div className="max-w-3xl w-full mx-auto">
-          <Accordion type="single" collapsible className="w-full">
+        <div className="max-w-3xl w-full ">
+          <Accordion type="single" collapsible className="w-full mx-4">
             {faqs.map((q, index) => (
               <AccordionItem key={index} value={'index-' + index}>
-                <AccordionTrigger>{q.question}</AccordionTrigger>
-                <AccordionContent>{q.answer}</AccordionContent>
+                <AccordionTrigger className="text-md md:text-lg">
+                  {q.question}
+                </AccordionTrigger>
+                <AccordionContent className="text-md md:text-lg">
+                  {q.answer}
+                </AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>

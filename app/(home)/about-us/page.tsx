@@ -39,32 +39,6 @@ const iconComponents = {
   Target: Target,
 }
 
-// const defaultValues: AboutUsProps['values'] = [
-//   {
-//     title: 'Innovation',
-//     description:
-//       'We constantly push boundaries and explore new possibilities to create cutting-edge solutions.',
-//     icon: 'Lightbulb',
-//   },
-//   {
-//     title: 'Collaboration',
-//     description:
-//       'We believe in the power of teamwork and diverse perspectives to achieve extraordinary results.',
-//     icon: 'Users',
-//   },
-//   {
-//     title: 'Excellence',
-//     description:
-//       'We strive for perfection in everything we do, consistently delivering high-quality work.',
-//     icon: 'Sparkles',
-//   },
-//   {
-//     title: 'Impact',
-//     description:
-//       "We measure our success by the positive difference we make in people's lives and businesses.",
-//     icon: 'Globe',
-//   },
-// ]
 const defaultValues: AboutUsProps['values'] = [
   {
     title: 'هنر و اصالت',

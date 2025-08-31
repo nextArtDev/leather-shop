@@ -8,11 +8,13 @@ import { SearchProduct } from '@/lib/types/home'
 interface ProductGridProps {
   products: SearchProduct[]
   loading?: boolean
+  isInSearchPage?: boolean
 }
 
 export default function ProductGrid({
   products,
   loading = false,
+  isInSearchPage = true,
 }: ProductGridProps) {
   if (loading) {
     return (
@@ -35,10 +37,12 @@ export default function ProductGrid({
     return (
       <Card className="rounded-none">
         <CardContent className="py-12 text-center">
-          <div className="text-lg font-medium mb-2">محصولی یافت نشد</div>
-          <div className="text-muted-foreground">
-            لطفاً فیلترها را تغییر دهید یا عبارت دیگری جستجو کنید
-          </div>
+          <div className="text-lg font-medium mb-2">محصولی یافت نشد!</div>
+          {isInSearchPage && (
+            <div className="text-muted-foreground">
+              لطفاً فیلترها را تغییر دهید یا عبارت دیگری جستجو کنید
+            </div>
+          )}
         </CardContent>
       </Card>
     )

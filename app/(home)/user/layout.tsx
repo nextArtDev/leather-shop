@@ -5,6 +5,10 @@ import MainNav from './components/main-nav'
 import Menu from './components/menu'
 import ModalProvider from '@/providers/modal-provider'
 
+export const metadata = {
+  title: 'حساب کاربری',
+}
+
 export default function UserLayout({
   children,
 }: Readonly<{
