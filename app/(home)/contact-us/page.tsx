@@ -11,7 +11,6 @@ import { BorderBeam } from '../about-us/components/border-beam'
 
 export default function AboutUs1() {
   const missionRef = useRef(null)
-
   const missionInView = useInView(missionRef, { once: true, amount: 0.3 })
   return (
     <section className="relative w-full overflow-hidden pt-20">

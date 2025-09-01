@@ -1,11 +1,8 @@
+'use client'
 // import { PhoneCall } from 'lucide-react'
 // import { Badge } from '@/components/ui/badge'
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion'
+import { Spotlight } from '../about-us/components/spotlight'
+import FAQ from './components/FAQ'
 // import { Button } from '@/components/ui/button'
 
 const faqs = [
@@ -35,7 +32,7 @@ const faqs = [
   },
   {
     id: '5',
-    question: 'چگونه می‌توانم اندازه صحیح کیف یا کفش خود را انتخاب کنم؟',
+    question: 'چگونه می‌توانم اندازه صحیح کیف خود را انتخاب کنم؟',
     answer:
       'در صفحه هر محصول، یک راهنمای اندازه‌گیری دقیق (بر حسب سانتیمتر) قرار داده شده است. لطفاً قبل از خرید، با استفاده از یک خطکش یا متر، اندازه مورد نیاز خود را مطابق با راهنما کنترل کنید.',
   },
@@ -46,48 +43,19 @@ const faqs = [
       '    از تماس طولانی‌مدت با آب و نور مستقیم خورشید خودداری کنید. برای تمیز کردن از یک پارچه نرم و خشک استفاده کنید. هر ۶ تا ۱۲ ماه یکبار با استفاده از مغز چرم (Leather Conditioner) محصول خود را تغذیه کنید تا نرمی و انعطاف آن حفظ شود. هنگامی که از محصول استفاده نمی‌کنید، آن را درون کیسه پارچه‌ای خود (دماری) قرار داده و در جای خشک و خنک نگهداری کنید.',
   },
 ]
-const FaqPage = () => (
-  <div className="w-full py-20 lg:py-40 overflow-x-hidden">
-    <div className="container mx-auto">
-      <div className="flex flex-col gap-10">
-        <div className="flex text-center justify-center items-center gap-4 flex-col">
-          {/* <Badge variant="outline">سوالات پرتکرار</Badge> */}
-          <div className="flex gap-2 flex-col">
-            <h4 className="text-3xl md:text-5xl tracking-tighter max-w-xl text-center font-regular">
-              سوالات متداول (پرسش و پاسخ)
-            </h4>
-            <p className="text-lg leading-relaxed tracking-tight text-muted-foreground max-w-xl text-center">
-              عزیزان و همراهان گرامی، در این صفحه به پرتکرارترین سوالاتی که ممکن
-              است درباره محصولات چرم دست‌ساز، فرآیند خرید و نگهداری از آنها
-              داشته باشید، پاسخ داده‌ایم. اگر پاسخ پرسش خود را نیافتید، از طریق
-              راه‌های ارتباطی با ما در تماس باشید. خوشحال می‌شویم به شما کمک
-              کنیم.
-            </p>
-          </div>
-          {/* <div>
-            <Button className="gap-4" variant="outline">
-              Any questions? Reach out <PhoneCall className="w-4 h-4" />
-            </Button>
-          </div> */}
-        </div>
-
-        <div className="max-w-3xl w-full ">
-          <Accordion type="single" collapsible className="w-full mx-4">
-            {faqs.map((q, index) => (
-              <AccordionItem key={index} value={'index-' + index}>
-                <AccordionTrigger className="text-md md:text-lg">
-                  {q.question}
-                </AccordionTrigger>
-                <AccordionContent className="text-md md:text-lg">
-                  {q.answer}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </div>
-      </div>
-    </div>
-  </div>
-)
+const FaqPage = () => {
+  return (
+    <section className="relative w-full overflow-hidden py-16">
+      <Spotlight
+        gradientFirst="radial-gradient(68.54% 68.72% at 55.02% 31.46%, hsla(336, 100%, 50%, 0.08) 0, hsla(341, 100%, 55%, 0.04) 50%, hsla(336, 100%, 45%, 0) 80%)"
+        gradientSecond="radial-gradient(50% 50% at 50% 50%, hsla(333, 100%, 85%, 0.08) 0, hsla(335, 100%, 55%, 0.04) 80%, transparent 100%)"
+        gradientThird="radial-gradient(50% 50% at 50% 50%, hsla(332, 100%, 85%, 0.06) 0, hsla(327, 100%, 85%, 0.06) 80%, transparent 100%)"
+      />
+      <div className="bg-primary/5 absolute top-20 -left-20 h-64 w-64 rounded-full blur-3xl" />
+      <div className="bg-primary/5 absolute -right-20 bottom-20 h-64 w-64 rounded-full blur-3xl" />
+      <FAQ faqs={faqs} />
+    </section>
+  )
+}
 
 export default FaqPage
