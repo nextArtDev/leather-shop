@@ -15,7 +15,7 @@ import useFromStore from '@/hooks/useFromStore'
 import { cn } from '@/lib/utils'
 import { useCartStore } from '@/hooks/useCartStore'
 import { ThemeSwitcher } from '@/components/shared/theme-switcher'
-import UserSession from '@/components/home/navbar/UserSession'
+// import UserSession from '@/components/home/navbar/UserSession'
 
 const Menu = () => {
   const cartItems = useFromStore(useCartStore, (state) => state.cart)
@@ -40,7 +40,7 @@ const Menu = () => {
             {cartItems?.length || 0}
           </span>
         </Link>
-        <UserSession />
+        {/* <UserSession /> */}
       </nav>
       <nav className="md:hidden">
         <Sheet>
@@ -67,7 +67,7 @@ const Menu = () => {
                 {cartItems?.length || 0}
               </span>
             </Link>
-            <UserSession />
+            {/* <UserSession /> */}
             <SheetDescription></SheetDescription>
           </SheetContent>
         </Sheet>

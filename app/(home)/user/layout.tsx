@@ -1,8 +1,8 @@
-import Image from 'next/image'
-import Link from 'next/link'
+// import Image from 'next/image'
+// import Link from 'next/link'
 
 import MainNav from './components/main-nav'
-import Menu from './components/menu'
+// import Menu from './components/menu'
 import ModalProvider from '@/providers/modal-provider'
 
 export const metadata = {
@@ -19,7 +19,7 @@ export default function UserLayout({
       <div className="w-full h-full flex flex-col">
         <div className="w-full h-full border-b  mx-auto">
           <div className="w-full  flex justify-around items-center h-16 px-4">
-            <article>
+            {/* <article>
               <Link href="/" className="w-22">
                 <Image
                   src={'/images/logo.svg'}
@@ -28,11 +28,11 @@ export default function UserLayout({
                   alt={'SEP'}
                 />
               </Link>
-            </article>
+            </article> */}
             <MainNav className="mx-2" />
-            <div className="  items-center flex space-x-4">
+            {/* <div className="  items-center flex space-x-4">
               <Menu />
-            </div>
+            </div> */}
           </div>
         </div>
 

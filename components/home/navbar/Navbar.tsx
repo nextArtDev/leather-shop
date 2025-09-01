@@ -2,9 +2,11 @@ import { getCategoriesWithStats } from '@/lib/home/queries/products'
 import React from 'react'
 import MainNav from './MainNav'
 import { NavigationData } from '@/lib/types/home'
+import { getCurrentUser } from '@/lib/auth-helpers'
 
 const Navbar = async () => {
   const allCategories = await getCategoriesWithStats()
+  const session = await getCurrentUser()
   const navigation: NavigationData = {
     categories: allCategories.map((cat) => ({
       name: cat.name,
@@ -24,7 +26,7 @@ const Navbar = async () => {
   //   console.log(navigation)
   return (
     <div>
-      <MainNav navigation={navigation} />
+      <MainNav navigation={navigation} session={session} />
     </div>
   )
 }

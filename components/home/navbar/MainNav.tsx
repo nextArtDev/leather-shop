@@ -28,7 +28,7 @@ import { cn } from '@/lib/utils'
 import TextRotate from '../shared/text-rotate'
 import DrawerCart from './DrawerCart'
 import UserSession from './UserSession'
-import { NavigationData } from '@/lib/types/home'
+import { CurrentUserType, NavigationData } from '@/lib/types/home'
 import MobileNav from './MobileNav'
 import SearchCombobox from '../shared/SearchCombo'
 
@@ -272,8 +272,10 @@ const TopBanner = () => {
 
 export default function MainNav({
   navigation,
+  session,
 }: {
   navigation: NavigationData
+  session: CurrentUserType
 }) {
   const [isSearchOpen, setIsSearchOpen] = React.useState(false)
 
@@ -327,7 +329,7 @@ export default function MainNav({
                       >
                       <User className="h-6 w-6" />
                       </Button> */}
-                    <UserSession />
+                    <UserSession session={session} />
                     <DrawerCart />
                   </div>
                 </div>

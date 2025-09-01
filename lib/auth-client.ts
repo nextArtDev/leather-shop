@@ -1,9 +1,11 @@
 import { createAuthClient } from 'better-auth/react'
 import { phoneNumberClient } from 'better-auth/client/plugins'
+import { nextCookies } from 'better-auth/next-js'
 
 export const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL || 'http://localhost:3000',
-  plugins: [phoneNumberClient()],
+  // plugins: [phoneNumberClient()],
+  plugins: [nextCookies(), phoneNumberClient()],
 })
 
 export const { signIn, signUp, signOut, useSession, getSession } = authClient

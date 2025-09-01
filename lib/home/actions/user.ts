@@ -303,3 +303,47 @@ export async function updateProfile(user: { name: string; phone?: string }) {
     return { success: false, message: formatError(error) }
   }
 }
+
+// interface SignOutFormState {
+//   errors: {
+//     _form?: string[]
+//   }
+// }
+// export async function signOutAction(
+//   // path: string,
+//   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+//   formState: SignOutFormState,
+//   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+//   formData: FormData
+// ): Promise<SignOutFormState> {
+//   const user = await currentUser()
+
+//   if (!user) redirect('/sign-in')
+
+//   try {
+//     const ascr = await authClient.signOut()
+//     console.log({ ascr })
+//   } catch (err: unknown) {
+//     if (err instanceof Error) {
+//       return {
+//         errors: {
+//           _form: [err.message],
+//         },
+//       }
+//     } else {
+//       return {
+//         errors: {
+//           _form: ['مشکلی پیش آمده، لطفا دوباره امتحان کنید!'],
+//         },
+//       }
+//     }
+//   }
+//   // revalidatePath(path)
+//   redirect('/sign-in')
+// }
+
+export async function signOutServerAction() {
+  // Revalidate all auth-related paths
+  revalidatePath('/', 'layout')
+  redirect('/sign-in')
+}

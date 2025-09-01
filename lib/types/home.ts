@@ -1,4 +1,5 @@
-import { SubCategory } from '../generated/prisma'
+import { getCurrentUser } from '../auth-helpers'
+import { Prisma, SubCategory } from '../generated/prisma'
 
 // Base types for common structures
 export type ProductImage = {
@@ -495,3 +496,5 @@ export interface NavigationData {
   categories: Category[]
   pages: Page[]
 }
+
+export type CurrentUserType = Prisma.PromiseReturnType<typeof getCurrentUser>

@@ -1,4 +1,3 @@
-'use client'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -9,43 +8,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { authClient } from '@/lib/auth-client'
 import { User } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { FormEvent, useTransition } from 'react'
+import SignOutBtn from '../shared/SignOutBtn'
+// import { getCurrentUser } from '@/lib/auth-helpers'
+import { CurrentUserType } from '@/lib/types/home'
 
-export default function UserSession() {
-  const {
-    data: session,
-    // isPending, //loading state
-    // error, //error object
-    // refetch, //refetch the session
-  } = authClient.useSession()
-  const [isPending, startTransition] = useTransition()
-
-  const router = useRouter()
-
-  //   const [actionState, updateAction, pending] = useActionState(
-  //    await authClient.signOut({
-  //   fetchOptions: {
-  //     onSuccess: () => {
-  //       router.push("/sign-in")
-  //     },
-  //   }}),{}
-  //   )
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
-    startTransition(async () => {
-      await authClient.signOut({
-        fetchOptions: {
-          onSuccess: () => {
-            router.push('/sign-in')
-          },
-        },
-      })
-    })
+export default function UserSession(session: {
+  session: CurrentUserType | null
+}) {
+  if (!session.session?.id) {
+    return (
+      <Link href={'/sign-in'} className="w-full ">
+        <User className="h-6 w-6" />
+      </Link>
+    )
   }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -55,16 +34,12 @@ export default function UserSession() {
       </DropdownMenuTrigger>
       <DropdownMenuContent
         className="w-fit rounded-none bg-background/20 backdrop-blur-lg   "
-        align="end"
+        align="start"
       >
-        <DropdownMenuLabel dir="rtl" className="cursor-pointer">
-          {session ? (
-            session.user?.name
-          ) : (
-            <Link href={'/sign-in'}> {'ورود/عضویت'}</Link>
-          )}
+        <DropdownMenuLabel dir="rtl" className="cursor-pointer" asChild>
+          {session.session?.name}
         </DropdownMenuLabel>
-        {session?.user.phoneNumber && (
+        {session.session?.phoneNumber && (
           <>
             <DropdownMenuGroup dir="rtl">
               <Link href={'/user/profile'}>
@@ -75,18 +50,12 @@ export default function UserSession() {
             </DropdownMenuGroup>
 
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild dir="rtl" className="cursor-pointer">
-              <form onSubmit={handleSubmit}>
-                <input className="hidden" />
-                <Button
-                  disabled={isPending}
-                  variant={'ghost'}
-                  type="submit"
-                  className=" "
-                >
-                  خروج
-                </Button>
-              </form>
+            <DropdownMenuItem
+              asChild
+              dir="rtl"
+              className="cursor-pointer w-full"
+            >
+              <SignOutBtn className="w-full" />
             </DropdownMenuItem>
           </>
         )}
