@@ -105,7 +105,8 @@ const CountrySelect = ({
           type="button"
           variant="outline"
           className="flex gap-1 rounded-r-none rounded-l-lg  px-3 focus:z-10"
-          disabled={disabled}
+          // disabled={disabled}
+          disabled
         >
           <FlagComponent
             country={selectedCountry}
@@ -113,7 +114,7 @@ const CountrySelect = ({
           />
           <ChevronsUpDown
             className={cn(
-              '-mr-2 size-4 opacity-50',
+              '-mr-2 size-4 opacity-70',
               disabled ? 'hidden' : 'opacity-100'
             )}
           />

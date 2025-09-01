@@ -4,6 +4,8 @@ import { formatDistanceToNowStrict } from 'date-fns'
 import * as locale from 'date-fns/locale/fa-IR'
 import qs from 'query-string'
 import { CartProductType } from './types/home'
+import { STORE_NAME } from '@/constants/store'
+import { Metadata } from 'next'
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -218,27 +220,134 @@ export function formatError(error: any) {
   }
 }
 
-export async function generateSearchMetadata(searchParams: {
+// export async function generateSearchMetadata(searchParams: {
+//   q?: string
+//   categoryId?: string
+//   minPrice?: string
+//   maxPrice?: string
+// }) {
+//   const { q, categoryId, minPrice, maxPrice } = searchParams
+
+//   const titleParts = []
+
+//   if (q) titleParts.push(`جستجو: ${q}`)
+//   if (categoryId) titleParts.push(`دسته‌بندی`)
+//   if (minPrice || maxPrice) titleParts.push(`فیلتر قیمت`)
+
+//   const title =
+//     titleParts.length > 0
+//       ? titleParts.join(' | ') + ' - فروشگاه'
+//       : 'جستجو و فیلتر محصولات - فروشگاه'
+
+//   return {
+//     title,
+//     description: 'جستجو، فیلتر و مرتب‌سازی محصولات با بهترین قیمت و کیفیت',
+//   }
+// }
+
+export async function generateSearchMetadata(params: {
   q?: string
   categoryId?: string
+  subCategoryId?: string
   minPrice?: string
   maxPrice?: string
-}) {
-  const { q, categoryId, minPrice, maxPrice } = searchParams
+  sortBy?: string
+  page?: string
+  colors?: string | string[]
+  sizes?: string | string[]
+}): Promise<Metadata> {
+  const query = params.q || ''
+  const page = Number(params.page) || 1
+  const isSearch = !!query
 
-  const titleParts = []
+  // Build dynamic title and description
+  let title = ''
+  let description = ''
+  let keywords: string[] = []
 
-  if (q) titleParts.push(`جستجو: ${q}`)
-  if (categoryId) titleParts.push(`دسته‌بندی`)
-  if (minPrice || maxPrice) titleParts.push(`فیلتر قیمت`)
+  if (isSearch) {
+    title = `"${query} نتایج جست‌وجوی"${
+      page > 1 ? ` ${page} - صفحه ` : ''
+    } | ${STORE_NAME}`
+    description = `"${query}" پیدا کردن بهترین نتایج برای.`
+    keywords = [
+      query,
+      'جست‌وجو',
+      'محصولات',
+      'فروشگاه چرم آنلاین',
+      'فروشگاه چرم',
+    ]
+  } else {
+    title = `محصولات${page > 1 ? ` - Page ${page}` : ''} | ${STORE_NAME}`
+    description = 'جست‌وجوی محصولات کامل فروشگاه'
+    // 'Discover our complete product collection. Filter by category, price, color, and size to find exactly what you need.'
+    keywords = [
+      'چرم طبیعی',
+      'کیف چرمی',
+      'خرید آنلاین',
+      'فروشگاه چرم',
+      'فروشگاه چرم',
+    ]
+  }
 
-  const title =
-    titleParts.length > 0
-      ? titleParts.join(' | ') + ' - فروشگاه'
-      : 'جستجو و فیلتر محصولات - فروشگاه'
+  // Add filter-based keywords
+  if (params.colors) {
+    const colors = Array.isArray(params.colors)
+      ? params.colors
+      : [params.colors]
+    keywords.push(...colors.map((c) => `محصولات${c} `))
+  }
+
+  if (params.sizes) {
+    const sizes = Array.isArray(params.sizes) ? params.sizes : [params.sizes]
+    keywords.push(...sizes.map((s) => `  ${s}سایز`))
+  }
+
+  const currentUrl = new URL(`${process.env.NEXT_PUBLIC_SITE_URL}/products`)
+  Object.entries(params).forEach(([key, value]) => {
+    if (value) currentUrl.searchParams.set(key, String(value))
+  })
 
   return {
     title,
-    description: 'جستجو، فیلتر و مرتب‌سازی محصولات با بهترین قیمت و کیفیت',
+    description,
+    keywords: keywords.join(', '),
+
+    openGraph: {
+      type: 'website',
+      title: isSearch ? `${query}جست‌وجوی: ` : 'محصولات',
+      description,
+      url: currentUrl.toString(),
+      siteName: `${STORE_NAME}`,
+      images: ['/default-search-og.jpg'], // Add a default search page image
+    },
+
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['/default-search-twitter.jpg'],
+    },
+
+    robots: {
+      index: page === 1, // Only index page 1
+      follow: true,
+      googleBot: {
+        index: page === 1,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+
+    alternates: {
+      canonical: page === 1 ? currentUrl.toString() : undefined, // Only canonical for page 1
+    },
+
+    other: {
+      'search-query': query || '',
+      'page-number': page.toString(),
+      'results-type': isSearch ? 'search' : 'catalog',
+    },
   }
 }

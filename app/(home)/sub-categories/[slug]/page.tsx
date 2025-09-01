@@ -5,7 +5,7 @@ import { Bounded } from '@/components/shared/Bounded'
 import { FadeIn } from '@/components/shared/fade-in'
 import Image from 'next/image'
 import { RevealText } from '@/components/shared/reveal-text'
-import Link from 'next/link'
+// import Link from 'next/link'
 import ProductGrid from '../../search/components/ProductGrid'
 import { Metadata } from 'next'
 
@@ -228,7 +228,7 @@ const SubcategoryDetailsPage = async ({ params }: SubcategoryPageProps) => {
             </p>
             </FadeIn>} */}
 
-            <FadeIn
+            {/* <FadeIn
               className="mt-8 translate-y-5"
               vars={{ delay: 1.7, duration: 1.1 }}
             >
@@ -238,7 +238,7 @@ const SubcategoryDetailsPage = async ({ params }: SubcategoryPageProps) => {
               >
                 {subcategory.category.name}
               </Link>
-            </FadeIn>
+            </FadeIn> */}
           </div>
         </Bounded>
         <div className="flex-1 w-full h-full">

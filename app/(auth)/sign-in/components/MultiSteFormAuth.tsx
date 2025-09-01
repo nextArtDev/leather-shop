@@ -23,6 +23,7 @@ import {
   Phone,
   Shield,
   LucideIcon,
+  Loader,
 } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 import { useRouter } from 'next/navigation'
@@ -87,14 +88,16 @@ MultiStepFormAuthProps) {
     {
       id: 'phone',
       title: 'تایید شماره موبایل',
-      description: 'شماره موبایل خود را وارد کنید',
+      // description: 'شماره موبایل خود را وارد کنید',
+      description: 'شماره موبایل خود را وارد کنید.',
       schema: phoneSchema,
       icon: Phone,
     },
     {
       id: 'otp',
       title: 'کد تایید',
-      description: 'کد ارسال شده را وارد کنید',
+      // description: 'کد ارسال شده را وارد کنید',
+      description: '',
       schema: otpSchema,
       icon: Shield,
     },
@@ -277,7 +280,7 @@ MultiStepFormAuthProps) {
   return (
     <div
       className={cn(
-        'mx-auto w-full max-w-md rounded-lg border bg-card p-6 shadow-lg',
+        'mx-auto w-full max-w-md rounded-none border  p-6 shadow-lg bg-card/5 backdrop-blur-2xl text-white',
         className
       )}
       dir="rtl"
@@ -292,9 +295,9 @@ MultiStepFormAuthProps) {
                 <div key={s.id} className="flex flex-col items-center">
                   <div
                     className={cn(
-                      'flex h-10 w-10 border-indigo-600 items-center justify-center rounded-full border-2 text-xs font-bold transition-colors',
+                      'flex h-10 w-10 border-indigo-600 items-center justify-center rounded-full border-2 text-xs font-bold transition-colors mb-2',
                       i < step
-                        ? 'border-indigo-600 bg-indigo-600 text-muted-foreground'
+                        ? 'border-indigo-600 bg-indigo-600 text-muted dark:text-muted-foreground'
                         : i === step
                         ? 'border-indigo-600 bg-indigo-600 text-primary-foreground'
                         : 'border-muted bg-muted text-muted-foreground'
@@ -306,7 +309,7 @@ MultiStepFormAuthProps) {
                       <Icon className="h-5 w-5" />
                     )}
                   </div>
-                  <span className="mt-2 hidden text-xs font-medium text-muted-foreground sm:block">
+                  <span className="mt-2 hidden text-xs font-medium text-muted dark:text-muted-foreground sm:block">
                     {s.title}
                   </span>
                 </div>
@@ -317,10 +320,10 @@ MultiStepFormAuthProps) {
           <div dir="rtl" className="mb-8">
             <Progress value={progress} className="h-2  " />
             <div className="my-2 flex justify-between">
-              <span className="text-xs font-medium text-indigo-600 ">
+              <span className="text-xs font-medium text-indigo-400 ">
                 {step + 1}/{steps.length}
               </span>
-              {/* <span className="text-sm font-medium text-muted-foreground">
+              {/* <span className="text-sm font-medium text-muted dark:text-muted-foreground">
                 {Math.round(progress)}%
               </span> */}
             </div>
@@ -337,13 +340,13 @@ MultiStepFormAuthProps) {
               transition={{ duration: 0.3 }}
             >
               <div className="mb-6 text-center">
-                <h2 className="text-xl font-bold">{currentStep.title}</h2>
-                <p className="text-sm text-muted-foreground">
+                <h2 className="text-xl font-bold  ">{currentStep.title}</h2>
+                <p className="text-sm text-muted dark:text-muted-foreground">
                   {currentStep.description}
                 </p>
                 {step === 1 && phoneNumber && (
-                  <p className="mt-2 text-sm text-indigo-600">
-                    کد تایید به شماره {phoneNumber} ارسال شد
+                  <p className="mt-2 text-sm text-indigo-900 dark:text-indigo-200">
+                    کد تایید به شماره {phoneNumber} ارسال شد.
                   </p>
                 )}
               </div>
@@ -351,7 +354,8 @@ MultiStepFormAuthProps) {
               <form onSubmit={handleFormSubmit} className="space-y-4">
                 {step === 0 ? (
                   <div className="space-y-2">
-                    <Label htmlFor="phone">شماره موبایل</Label>
+                    {/* <Label htmlFor="phone">شماره موبایل</Label> */}
+                    <Label htmlFor="phone"></Label>
                     <div dir="ltr">
                       <PhoneInput
                         dir="ltr"
@@ -371,8 +375,10 @@ MultiStepFormAuthProps) {
                     )}
                   </div>
                 ) : (
-                  <div className="space-y-2">
-                    <Label htmlFor="code">کد تایید</Label>
+                  <div className="space-y-2 w-full flex item-center flex-col gap-2">
+                    <Label htmlFor="code" className="text-center ">
+                      {/* کد تایید: */}
+                    </Label>
                     <div dir="ltr" className="flex justify-center">
                       <InputOTP
                         key={otpKey}
@@ -408,7 +414,7 @@ MultiStepFormAuthProps) {
                       variant="link"
                       onClick={handleResendOtp}
                       disabled={isPending}
-                      className="text-sm text-muted-foreground"
+                      className="text-sm text-white/80  "
                     >
                       ارسال مجدد کد تایید
                     </Button>
@@ -419,10 +425,13 @@ MultiStepFormAuthProps) {
                 <div className="flex justify-between pt-4">
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="ghost"
                     onClick={handlePrevStep}
                     disabled={step === 0 || isPending}
-                    className={cn(step === 0 && 'invisible')}
+                    className={cn(
+                      'rounded-xs border',
+                      step === 0 && 'invisible'
+                    )}
                   >
                     <ArrowRight className="ml-2 h-4 w-4" />
                     قبلی
@@ -430,15 +439,23 @@ MultiStepFormAuthProps) {
 
                   <Button
                     type="submit"
+                    variant={'indigo'}
                     disabled={
                       isPending || (step === 1 && otpValue.length !== 6)
                     }
+                    className="rounded-xs"
                   >
                     {isPending ? (
                       step === 0 ? (
-                        'در حال ارسال...'
+                        <span className="flex gap-1">
+                          <Loader className="animate-spin" />
+                          <p>{'در حال ارسال...'}</p>
+                        </span>
                       ) : (
-                        'در حال بررسی...'
+                        <span className="flex gap-1">
+                          <Loader className="animate-spin" />
+                          <p>{'در حال بررسی...'}</p>
+                        </span>
                       )
                     ) : step === 0 ? (
                       <>
@@ -466,7 +483,7 @@ MultiStepFormAuthProps) {
             <CheckCircle2 className="h-8 w-8 text-green-600" />
           </div>
           <h2 className="mb-2 text-2xl font-bold">تایید موفقیت‌آمیز!</h2>
-          <p className="mb-6 text-muted-foreground">
+          <p className="mb-6 text-muted dark:text-muted-foreground">
             شماره موبایل شما با موفقیت تایید شد.
           </p>
         </motion.div>

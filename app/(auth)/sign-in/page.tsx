@@ -7,21 +7,21 @@ import { getCurrentUser } from '@/lib/auth-helpers'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
-
+import Image from 'next/image'
+import heroImage from '../../../public/images/hero-image.webp'
 const page = async () => {
-  // const session = await auth.api.getSession({
-  //   headers: await headers(),
-  // })
   const session = await getCurrentUser()
 
   if (session?.phoneNumber) {
     redirect('/')
   }
   return (
-    <section aria-label="sign-in" className=" ">
-      {/* <SignInForm /> */}
-      {/* <MultiStepPhoneAuth /> */}
-      {/* <MultiStepAuth /> */}
+    <section
+      aria-label="sign-in"
+      className="relative w-full h-full min-h-screen"
+    >
+      <Image fill src={heroImage} alt="Store Logo" className="  object-cover" />
+      <div className="absolute inset-0 bg-background/5 backdrop-blur-xs" />
       <Link
         href={'/'}
         className={cn(
@@ -31,7 +31,7 @@ const page = async () => {
       >
         بازگشت &larr;
       </Link>
-      <div className="relative w-full h-full">
+      <div className="relative w-full h-full flex items-center justify-center max-w-sm mx-auto">
         <MultiStepFormAuth />
       </div>
     </section>
