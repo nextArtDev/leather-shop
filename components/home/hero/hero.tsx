@@ -16,11 +16,11 @@ const Hero = ({
 }) => {
   return (
     <Bounded
-      className={`relative w-full h-full  overflow-hidden bg-neutral-950 `}
+      className={`relative w-full h-full  overflow-hidden bg-foreground dark:bg-background backdrop-blur-lg text-background  text-center`}
     >
       <FadeIn
         vars={{ scale: 1, opacity: 0.5 }}
-        className=" absolute inset-0 pt-12 max-h-svh origin-top lg:h-screen motion-safe:scale-125 motion-reduce:opacity-50 "
+        className=" absolute inset-0 pt-12 min-h-svh origin-top lg:h-svh motion-safe:scale-125 motion-reduce:opacity-50 "
       >
         <Image
           src={heroImage}
@@ -31,7 +31,7 @@ const Hero = ({
           className="object-cover origin-top "
         />
       </FadeIn>
-      <div className="relative flex h-screen flex-col justify-center">
+      <div className="relative flex h-screen flex-col justify-center items-center">
         <RevealText
           // text="Effortless Elegance"
           text="کارگاه چرم خارَک"
@@ -56,8 +56,8 @@ const Hero = ({
         </FadeIn>
 
         <FadeIn
-          className="mt-8 translate-y-5"
-          vars={{ delay: 1.7, duration: 1.1 }}
+          className="mt-8 translate-y-15"
+          vars={{ delay: 1.5, duration: 1.1 }}
         >
           <Link
             href={'/products'}
@@ -67,16 +67,16 @@ const Hero = ({
           </Link>
         </FadeIn>
         <FadeIn
-          className="mt-8 translate-y-5"
-          vars={{ delay: 2, duration: 1.1 }}
+          className="mt-8 -translate-y-15"
+          vars={{ delay: 1.5, duration: 1.1 }}
         >
           <article className="mt-12  text-secondary flex flex-wrap items-center justify-center">
-            <ul className=" flex items-center justify-center w-full h-full  flex-wrap max-w-[70vw] mx-auto gap-x-2 md:gap-x-4">
+            <ul className=" flex items-center justify-center w-full h-full gap-3 flex-wrap max-w-[70vw] mx-auto  md:gap-x-6">
               {subCategories?.map((sub) => (
                 <li key={sub.id}>
                   <Link
                     href={`/sub-categories/${sub.url}`}
-                    className="bg-gradient-to-b from-background/5 to-background/30 backdrop-blur-[2px] border border-background rounded-none  px-2 py-1 text-center text-white "
+                    className="bg-gradient-to-b from-white/5 to-white/30 backdrop-blur-[2px] border rounded-none  px-2 py-1 text-center text-white border-white "
                   >
                     {sub.name}
                   </Link>

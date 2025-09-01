@@ -5,7 +5,7 @@ const WorkVideo = () => {
   return (
     <section className="w-full py-12 flex flex-col items-center justify-center mx-auto gap-12  text-center">
       <div className="container w-[90vw] m-w-xl flex flex-col gap-4">
-        <h2 className="text-xl md:text-3xl font-bold uppercase">
+        <h2 className="text-xl md:text-3xl font-bold uppercase py-8">
           {/* Savoir-faire */}
           هنرِ ساخت: اصالت در هر دوخت
         </h2>

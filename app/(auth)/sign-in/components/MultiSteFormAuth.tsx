@@ -82,6 +82,7 @@ MultiStepFormAuthProps) {
   const [otpValue, setOtpValue] = useState<string>('')
   const [otpKey, setOtpKey] = useState<number>(0)
   const [isSuccess, setIsSuccess] = useState<boolean>(false)
+
   const router = useRouter()
   // Define steps
   const steps: FormStep[] = [
@@ -280,7 +281,7 @@ MultiStepFormAuthProps) {
   return (
     <div
       className={cn(
-        'mx-auto w-full max-w-md rounded-none border  p-6 shadow-lg bg-card/5 backdrop-blur-2xl text-white',
+        'mx-auto w-full max-w-md rounded-none border  p-6 shadow-lg bg-card/5 backdrop-blur-2xl text-white ',
         className
       )}
       dir="rtl"
@@ -297,7 +298,7 @@ MultiStepFormAuthProps) {
                     className={cn(
                       'flex h-10 w-10 border-indigo-600 items-center justify-center rounded-full border-2 text-xs font-bold transition-colors mb-2',
                       i < step
-                        ? 'border-indigo-600 bg-indigo-600 text-muted dark:text-muted-foreground'
+                        ? 'border-indigo-600 bg-indigo-600 text-muted dark:text-white/80'
                         : i === step
                         ? 'border-indigo-600 bg-indigo-600 text-primary-foreground'
                         : 'border-muted bg-muted text-muted-foreground'
@@ -309,7 +310,7 @@ MultiStepFormAuthProps) {
                       <Icon className="h-5 w-5" />
                     )}
                   </div>
-                  <span className="mt-2 hidden text-xs font-medium text-muted dark:text-muted-foreground sm:block">
+                  <span className="mt-2 hidden text-xs font-medium text-muted dark:text-white/80 sm:block">
                     {s.title}
                   </span>
                 </div>
@@ -320,10 +321,10 @@ MultiStepFormAuthProps) {
           <div dir="rtl" className="mb-8">
             <Progress value={progress} className="h-2  " />
             <div className="my-2 flex justify-between">
-              <span className="text-xs font-medium text-indigo-400 ">
+              <span className="text-xs font-medium  dark:text-white/70">
                 {step + 1}/{steps.length}
               </span>
-              {/* <span className="text-sm font-medium text-muted dark:text-muted-foreground">
+              {/* <span className="text-sm font-medium text-muted dark:text-white/80">
                 {Math.round(progress)}%
               </span> */}
             </div>
@@ -341,7 +342,7 @@ MultiStepFormAuthProps) {
             >
               <div className="mb-6 text-center">
                 <h2 className="text-xl font-bold  ">{currentStep.title}</h2>
-                <p className="text-sm text-muted dark:text-muted-foreground">
+                <p className="text-sm text-muted dark:text-white/80">
                   {currentStep.description}
                 </p>
                 {step === 1 && phoneNumber && (
@@ -483,7 +484,7 @@ MultiStepFormAuthProps) {
             <CheckCircle2 className="h-8 w-8 text-green-600" />
           </div>
           <h2 className="mb-2 text-2xl font-bold">تایید موفقیت‌آمیز!</h2>
-          <p className="mb-6 text-muted dark:text-muted-foreground">
+          <p className="mb-6 text-muted dark:text-white/80">
             شماره موبایل شما با موفقیت تایید شد.
           </p>
         </motion.div>

@@ -303,7 +303,10 @@ export async function generateSearchMetadata(params: {
     keywords.push(...sizes.map((s) => `  ${s}سایز`))
   }
 
-  const currentUrl = new URL(`${process.env.NEXT_PUBLIC_SITE_URL}/products`)
+  const currentUrl = new URL(
+    // `${process.env.NEXT_PUBLIC_SITE_URL}/products` || 'localhost:3000/products'
+    `localhost:3000/products`
+  )
   Object.entries(params).forEach(([key, value]) => {
     if (value) currentUrl.searchParams.set(key, String(value))
   })

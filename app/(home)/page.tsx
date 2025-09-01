@@ -32,26 +32,34 @@ export default async function Home() {
       </div> */}
       {/* <Loader variant="magnetic-dots" size={72} /> */}
       <Hero subCategories={subCategories} />
-      <StoreStatement />
+      <div className="py-16">
+        <StoreStatement />
+      </div>
       <section className="w-full h-full flex flex-col gap-8 py-8 px-3 ">
-        <h2 className="text-xl md:text-3xl font-bold uppercase">
+        <h2 className="text-xl md:text-3xl font-bold uppercase text-center py-8">
           پرفروش‌ترینها
         </h2>
         <MainPageCarousel items={products} />
       </section>
       <section className="w-full h-full flex flex-col gap-8 py-8 px-3 ">
-        <h2 className="text-xl md:text-3xl font-bold uppercase">جدیدترینها</h2>
+        <h2 className="text-xl md:text-3xl font-bold uppercase text-center py-8">
+          جدیدترینها
+        </h2>
         <MainPageCarousel items={products} />
       </section>
-      <section>
+      <section className="py-12">
         <WorkVideo />
       </section>
-      <section className="flex flex-col items-center gap-6 text-3xl text-left">
-        <h2 className="uppercase adad">تعهدات ما</h2>
+      <section className="flex flex-col items-center gap-6 ">
+        <h2 className="text-xl md:text-3xl font-bold uppercase text-center  py-8">
+          تعهدات ما
+        </h2>
         <Commitments />
       </section>
-      <section className="flex flex-col w-full h-full gap-6 text-3xl text-center py-12 ">
-        <h2 className="uppercase">بیشتر </h2>
+      <section className="flex flex-col w-full h-full gap-6  text-center py-12 ">
+        <h2 className="text-xl md:text-3xl font-bold uppercase text-center py-8  ">
+          بیشتر{' '}
+        </h2>
         <DiscoverMoreCarousel subCategories={subCategories} />
       </section>
       <TestimonialCarousel />
