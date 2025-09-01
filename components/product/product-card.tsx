@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useRef } from 'react'
 import {
   Carousel,
   CarouselContent,
@@ -11,7 +11,8 @@ import { Card, CardContent } from '../ui/card'
 import Image from 'next/image'
 import Autoplay from 'embla-carousel-autoplay'
 import Link from 'next/link'
-
+import { FadeIn } from '../shared/fade-in'
+import { useInView } from 'framer-motion'
 // Using the detailed product type you provided
 type Product = {
   id: string
@@ -64,9 +65,12 @@ const ProductCard = ({ product }: Props) => {
     })
   }, [api])
 
+  const carouselRef = useRef(null)
+
+  const isInView = useInView(carouselRef, { once: true, amount: 0.3 })
   return (
-    <section>
-      <div className="w-full aspect-square relative">
+    <FadeIn vars={{ delay: 0.25, duration: 0.25, ease: 'sine.inOut' }}>
+      <div ref={carouselRef} className="w-full aspect-square relative">
         {!imageUrls || imageUrls.length === 0 ? (
           <div className="w-full h-full bg-[#eceae8] flex items-center justify-center">
             <p className="text-gray-500 text-xs">بدون عکس</p>
@@ -79,11 +83,15 @@ const ProductCard = ({ product }: Props) => {
                 direction: 'rtl',
                 loop: true,
               }}
-              plugins={[
-                Autoplay({
-                  delay: 3000,
-                }),
-              ]}
+              plugins={
+                isInView
+                  ? [
+                      Autoplay({
+                        delay: 3000,
+                      }),
+                    ]
+                  : []
+              }
               dir="rtl"
               setApi={setApi}
               className="w-full h-full"
@@ -141,12 +149,12 @@ const ProductCard = ({ product }: Props) => {
                 style={{ background: clr.name }}
                 key={clr.name}
                 className="size-3 border" // Added border for light colors
-              ></span>
+              />
             ))}
           </div>
         </div>
       </div>
-    </section>
+    </FadeIn>
   )
 }
 

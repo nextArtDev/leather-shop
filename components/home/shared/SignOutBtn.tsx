@@ -4,6 +4,7 @@ import { authClient } from '@/lib/auth-client'
 import { signOutServerAction } from '@/lib/home/actions/user'
 import { type VariantProps } from 'class-variance-authority'
 import React, { FormEvent, useTransition } from 'react'
+import { toast } from 'sonner'
 
 type ButtonVariant = VariantProps<typeof buttonVariants>['variant']
 
@@ -22,6 +23,9 @@ const SignOutBtn = ({
         fetchOptions: {
           onSuccess: async () => {
             await signOutServerAction()
+          },
+          onError: () => {
+            toast.error('مشکلی پیش آمده، لطفا بعدا دوباره امتحان کنید!')
           },
         },
       })

@@ -72,14 +72,19 @@ const Hero = ({
         >
           <article className="mt-12  text-secondary flex flex-wrap items-center justify-center">
             <ul className=" flex items-center justify-center w-full h-full gap-3 flex-wrap max-w-[70vw] mx-auto  md:gap-x-6">
-              {subCategories?.map((sub) => (
+              {subCategories?.map((sub, i) => (
                 <li key={sub.id}>
-                  <Link
-                    href={`/sub-categories/${sub.url}`}
-                    className="bg-gradient-to-b from-white/5 to-white/30 backdrop-blur-[2px] border rounded-none  px-2 py-1 text-center text-white border-white "
+                  <FadeIn
+                    className="translate-y-10"
+                    vars={{ delay: 0.2 * i, duration: 1, ease: 'sine.in' }}
                   >
-                    {sub.name}
-                  </Link>
+                    <Link
+                      href={`/sub-categories/${sub.url}`}
+                      className="bg-gradient-to-b from-white/5 to-white/30 backdrop-blur-[2px] border rounded-none  px-2 py-1 text-center text-white border-white "
+                    >
+                      {sub.name}
+                    </Link>
+                  </FadeIn>
                 </li>
               ))}
             </ul>

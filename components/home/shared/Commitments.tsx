@@ -1,4 +1,5 @@
 'use client' // Added if not present in parent; required for client components
+import { FadeIn } from '@/components/shared/fade-in'
 import {
   Carousel,
   CarouselContent,
@@ -7,7 +8,9 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel'
 import Image from 'next/image'
-import React from 'react'
+import React, { useRef } from 'react'
+import { useInView } from 'framer-motion'
+import Autoplay from 'embla-carousel-autoplay'
 
 // const items = [
 //   {
@@ -56,6 +59,9 @@ const items = [
   },
 ]
 export default function Commitments() {
+  const carouselRef = useRef(null)
+
+  const isInView = useInView(carouselRef, { once: true, amount: 0.3 })
   return (
     <Carousel
       opts={{
@@ -63,33 +69,47 @@ export default function Commitments() {
         direction: 'rtl',
         // loop: true, // Added for infinite looping; remove if not wanted
       }}
+      plugins={
+        isInView
+          ? [
+              Autoplay({
+                delay: 3000,
+              }),
+            ]
+          : []
+      }
       dir="rtl"
       className="w-full "
     >
       <CarouselContent className=" ">
         {/* Responsive negative margin to offset item padding */}
-        {items.map((item) => (
+        {items.map((item, i) => (
           <CarouselItem
             key={item.id}
             className=" mx-auto basis-1/2   md:basis-1/3 lg:basis-1/4   xl:basis-1/5"
             /* Adjusted basis for better fit (e.g., 2 on mobile, 3 on md, 4 on lg, 5 on xl); made padding responsive */
           >
-            <div className="flex flex-col border-none rounded-none gap-2 md:gap-4">
-              {/* Moved gap-4 here to space image and text */}
-              <figure className="relative w-full aspect-square bg-[#eceae8] border-none rounded-none">
-                {/* Changed to figure for semantic; simplified, removed min-h to let aspect-square handle */}
-                <Image
-                  src={item.url}
-                  fill
-                  alt={item.title}
-                  className="object-cover mix-blend-darken" // Uncommented; remove if not needed
-                />
-              </figure>
-              <article className="flex flex-col gap-3 justify-evenly py-3 px-2 text-pretty text-xs md:text-sm lg:text-base  text-right">
-                <p className="font-bold text-lg">{item.title}</p>
-                <p className="text-sm text-justify">{item.description}</p>
-              </article>
-            </div>
+            <FadeIn
+              className="translate-y-5"
+              vars={{ delay: 0.2 * i, duration: 0.3, ease: 'sine.inOut' }}
+            >
+              <div className="flex flex-col border-none rounded-none gap-2 md:gap-4">
+                {/* Moved gap-4 here to space image and text */}
+                <figure className="relative w-full aspect-square bg-[#eceae8] border-none rounded-none">
+                  {/* Changed to figure for semantic; simplified, removed min-h to let aspect-square handle */}
+                  <Image
+                    src={item.url}
+                    fill
+                    alt={item.title}
+                    className="object-cover mix-blend-darken" // Uncommented; remove if not needed
+                  />
+                </figure>
+                <article className="flex flex-col gap-3 justify-evenly py-3 px-2 text-pretty text-xs md:text-sm lg:text-base  text-right">
+                  <p className="font-bold text-lg">{item.title}</p>
+                  <p className="text-sm text-justify">{item.description}</p>
+                </article>
+              </div>
+            </FadeIn>
           </CarouselItem>
         ))}
       </CarouselContent>

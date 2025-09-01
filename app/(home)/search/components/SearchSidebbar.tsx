@@ -21,7 +21,7 @@ export default function SearchSidebar({
 }: SearchSidebarProps) {
   return (
     <div className="w-full lg:w-80">
-      <ScrollArea className="h-[calc(100vh-50px)]">
+      <ScrollArea className="h-[calc(100vh-10px)]">
         <div className="space-y-6 p-1">
           {/* Category Filter */}
           <CategoryFilter
