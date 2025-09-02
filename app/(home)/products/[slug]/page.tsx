@@ -1,4 +1,7 @@
-import { getProductDetails } from '@/lib/home/queries/products'
+import {
+  getProductDetails,
+  getRelatedProducts,
+} from '@/lib/home/queries/products'
 import { notFound } from 'next/navigation'
 import React from 'react'
 import ProductPage from '../components/ProductPage'
@@ -25,7 +28,10 @@ const ProductDetailsPage = async ({
 
   const product = await getProductDetails(slug)
   if (!product) notFound()
-
+  const relatedProducts = await getRelatedProducts(
+    product.id,
+    product.subCategoryId
+  )
   const sizeId =
     product.sizes.find((s) => s.id === searchParamsSizeId)?.id ||
     product.sizes?.[0].id ||
@@ -63,6 +69,7 @@ const ProductDetailsPage = async ({
         reviews={product.reviews}
         userId={!!user?.id ? user.id : null}
         userReview={userReview}
+        relatedProducts={relatedProducts}
       />
     </div>
   )

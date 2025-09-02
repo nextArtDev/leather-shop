@@ -9,6 +9,7 @@ import {
   ProductDetails,
   ProductReview,
   ProductSize,
+  RelatedProduct,
 } from '@/lib/types/home'
 import { FC } from 'react'
 import ReviewList from './ReviewList'
@@ -18,54 +19,9 @@ import { SingleStarRating } from '@/components/home/testemonial/SingleStartRatin
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import FAQItem from '../../faq/components/FAQItem'
+import { Badge } from '@/components/ui/badge'
+import RelatedProductCarousel from '@/components/product/related-products-carousel'
 
-// const images = [
-//   { id: '1', url: bag },
-//   { id: '2', url: bag2 },
-//   { id: '3', url: bag3 },
-// ]
-// const bestSellersItems = [
-//   {
-//     id: '1',
-//     title: 'small handbag in grained leather',
-//     imageSrc: '/images/bag.webp',
-//     category: 'Juliette',
-//     link: '/products',
-//     price: 750,
-//   },
-//   {
-//     id: '2',
-//     title: 'medium handbag with double flap in grained leather',
-//     imageSrc: '/images/bag-2.webp',
-//     category: 'Emilie',
-//     link: '/products',
-//     price: 690,
-//   },
-//   {
-//     id: '3',
-//     title: 'Louise small tote bag in grained leather',
-//     imageSrc: '/images/bag-3.webp',
-//     category: 'Louise',
-//     link: '/products',
-//     price: 570,
-//   },
-//   {
-//     id: '4',
-//     title: 'medium-sized handbag in grained leather',
-//     imageSrc: '/images/bag-4.webp',
-//     category: 'Emilie',
-//     link: '/products',
-//     price: 580,
-//   },
-//   {
-//     id: '5',
-//     title: 'medium handbag in smooth leather and nubuck',
-//     imageSrc: '/images/bag-5.webp',
-//     category: 'Juliette',
-//     link: '/products',
-//     price: 670,
-//   },
-// ]
 type ProductPageProp = {
   data: NonNullable<ProductDetails>
   userId?: string | null
@@ -73,6 +29,7 @@ type ProductPageProp = {
   productAverageRating: { rating: number; count: number } | null
   userReview: Review | null
   sizeId: string
+  relatedProducts: RelatedProduct[] | null
 }
 const ProductPage: FC<ProductPageProp> = ({
   data,
@@ -82,6 +39,7 @@ const ProductPage: FC<ProductPageProp> = ({
   userId,
   userReview,
   sizeId,
+  relatedProducts,
 }) => {
   // console.log({ reviews, numReviews })
   const {
@@ -100,7 +58,7 @@ const ProductPage: FC<ProductPageProp> = ({
     shippingFeeMethod,
     questions,
     specs,
-    // keywords,
+    keywords,
     // rating,
     // sales,
     // views,
@@ -253,17 +211,34 @@ const ProductPage: FC<ProductPageProp> = ({
           سبد خرید
         </Link>
 
-        <article className="flex flex-col gap-6 items-start">
+        <article className="flex flex-col gap-6 items-start py-12">
           <div className="flex flex-col gap-4 justify-around">
             {/* <p className="text-sm">{name}</p> */}
-            <p
-              dangerouslySetInnerHTML={{ __html: description }}
-              className="font-bold line-clamp-2 text-justify"
-            />
+            {description && (
+              <div className="flex  gap-3">
+                <p className="font-semibold ">توضیحات:</p>
+                <p
+                  dangerouslySetInnerHTML={{ __html: description }}
+                  className="font-semibold  text-justify"
+                />
+              </div>
+            )}
+            {sku && (
+              <p dir="ltr" className="text-xs">
+                SKU:{sku}
+              </p>
+            )}
 
-            <p dir="ltr" className="text-xs">
-              SKU:{sku}
-            </p>
+            {!!keywords && (
+              <div className="flex gap-3">
+                <h1 className="font-semibold ">کلمات کلیدی:</h1>
+                {keywords.split(',').map((k, i) => (
+                  <Badge key={i} variant={'outline'}>
+                    #{k}
+                  </Badge>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="w-full h-full flex  flex-wrap gap-2  items-start  ">
@@ -356,10 +331,12 @@ const ProductPage: FC<ProductPageProp> = ({
           </div>
         )}
       </div>
-      <section className="  flex gap-6 flex-col justify-center items-center py-8">
-        <h2 className="font-bold text-2xl ">You may also like</h2>
-        {/* <MainPageCarousel items={bestSellersItems} /> */}
-      </section>
+      {!!relatedProducts?.length && (
+        <section className="  flex gap-6 flex-col justify-center items-center py-8">
+          <h2 className="font-bold text-2xl ">محصولات مرتبط</h2>
+          <RelatedProductCarousel items={relatedProducts} />
+        </section>
+      )}
     </section>
   )
 }

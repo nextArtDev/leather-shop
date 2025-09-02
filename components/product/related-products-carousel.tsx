@@ -9,11 +9,10 @@ import {
 import Image from 'next/image'
 import React, { useRef } from 'react'
 import Link from 'next/link'
-import { HomepageProduct } from '@/lib/types/home'
+import { RelatedProduct } from '@/lib/types/home'
 import { FadeIn } from '../shared/fade-in'
 import { useInView } from 'framer-motion'
 import Autoplay from 'embla-carousel-autoplay'
-import { cn } from '@/lib/utils'
 
 export type item = {
   id: string
@@ -24,11 +23,13 @@ export type item = {
   imageSrc: string
 }
 
-type MainPageCarousel = {
-  items: HomepageProduct[]
+type RelatedProductCarousel = {
+  items: RelatedProduct[]
 }
 
-export default function MainPageCarousel({ items }: MainPageCarousel) {
+export default function RelatedProductCarousel({
+  items,
+}: RelatedProductCarousel) {
   const carouselRef = useRef(null)
 
   const isInView = useInView(carouselRef, { once: true, amount: 0.3 })
@@ -78,31 +79,12 @@ export default function MainPageCarousel({ items }: MainPageCarousel) {
                   />
                 </figure>
                 <article className="flex flex-col gap-1 justify-evenly py-3 px-2 text-pretty text-xs md:text-sm lg:text-base">
-                  <p className="font-semibold">{item.category.name}</p>
+                  {/* <p className="font-semibold">{item.category.name}</p> */}
                   {/* <p
                   dangerouslySetInnerHTML={{ __html: item.description }}
                   className="font-bold line-clamp-2 text-justify "
                   ></p> */}
                   <p className="font-bold">{item.name}</p>
-                  {!!item.sizes && (
-                    <p>
-                      {item.sizes.map((size, i) => (
-                        <div key={i} className="flex items-center gap-1">
-                          {!!size.discount && (
-                            <p className="text-red-500">
-                              {size.price - size.price * (size.discount / 100)}{' '}
-                              تومان
-                            </p>
-                          )}
-                          <p
-                            className={cn('', size.discount && 'line-through')}
-                          >
-                            {size.price} تومان
-                          </p>
-                        </div>
-                      ))}
-                    </p>
-                  )}
                   {/* <p>
                     {item.sizes.map((size) =>
                       size.discount ? size.price * size.discount : size.price

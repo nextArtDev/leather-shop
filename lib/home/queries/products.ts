@@ -576,12 +576,12 @@ export async function getProductDetails(slug: string): Promise<ProductDetails> {
 // 7. RELATED PRODUCTS
 export async function getRelatedProducts(
   productId: string,
-  categoryId: string,
+  subCategoryId: string,
   limit: number = 6
 ) {
   return await prisma.product.findMany({
     where: {
-      categoryId,
+      subCategoryId,
       id: { not: productId },
     },
     select: {
