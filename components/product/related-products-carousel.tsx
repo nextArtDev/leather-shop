@@ -69,8 +69,6 @@ export default function RelatedProductCarousel({
                 className="flex flex-col border-none rounded-none bg-transparent gap-4" /* Switched to flex-col for consistent height; moved gap here */
               >
                 <figure className="relative w-full aspect-square bg-[#eceae8] border-none rounded-none">
-                  {' '}
-                  {/* Fixed aspect-square for uniform image height */}
                   <Image
                     src={item.images.map((img) => img.url)[0]}
                     fill
@@ -84,7 +82,7 @@ export default function RelatedProductCarousel({
                   dangerouslySetInnerHTML={{ __html: item.description }}
                   className="font-bold line-clamp-2 text-justify "
                   ></p> */}
-                  <p className="font-bold">{item.name}</p>
+                  {/* <p className="font-bold">{item.name}</p> */}
                   {/* <p>
                     {item.sizes.map((size) =>
                       size.discount ? size.price * size.discount : size.price

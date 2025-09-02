@@ -25,7 +25,7 @@ export type item = {
 }
 
 type MainPageCarousel = {
-  items: HomepageProduct[]
+  items: Partial<HomepageProduct>[]
 }
 
 export default function MainPageCarousel({ items }: MainPageCarousel) {
@@ -67,18 +67,20 @@ export default function MainPageCarousel({ items }: MainPageCarousel) {
                 href={`/products/${item.slug}`}
                 className="flex flex-col border-none rounded-none bg-transparent gap-4" /* Switched to flex-col for consistent height; moved gap here */
               >
-                <figure className="relative w-full aspect-square bg-[#eceae8] border-none rounded-none">
-                  {' '}
-                  {/* Fixed aspect-square for uniform image height */}
-                  <Image
-                    src={item.images.map((img) => img.url)[0]}
-                    fill
-                    alt={item.name}
-                    className="object-cover mix-blend-darken" // Uncommented; remove if not needed
-                  />
-                </figure>
+                {!!item.images && (
+                  <figure className="relative w-full aspect-square bg-[#eceae8] border-none rounded-none">
+                    {' '}
+                    {/* Fixed aspect-square for uniform image height */}
+                    <Image
+                      src={item.images.map((img) => img.url)[0]}
+                      fill
+                      alt={item.name!}
+                      className="object-cover mix-blend-darken" // Uncommented; remove if not needed
+                    />
+                  </figure>
+                )}
                 <article className="flex flex-col gap-1 justify-evenly py-3 px-2 text-pretty text-xs md:text-sm lg:text-base">
-                  <p className="font-semibold">{item.category.name}</p>
+                  <p className="font-semibold">{item.category!.name}</p>
                   {/* <p
                   dangerouslySetInnerHTML={{ __html: item.description }}
                   className="font-bold line-clamp-2 text-justify "

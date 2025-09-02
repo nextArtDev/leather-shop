@@ -82,6 +82,20 @@ export async function getBestSellers(limit: number = 8) {
           url: true,
         },
       },
+      category: {
+        select: {
+          id: true,
+          name: true,
+          url: true,
+        },
+      },
+      subCategory: {
+        select: {
+          id: true,
+          name: true,
+          url: true,
+        },
+      },
       sizes: {
         select: {
           price: true,
@@ -863,3 +877,88 @@ export async function getSubCategoryBySlug({ slug }: { slug: string }) {
     },
   })
 }
+
+// export async function getBestSellers(limit: number = 8) {
+//   const bestSellersByQuantity = await prisma.orderItem.groupBy({
+//     by: ['productId'],
+//     _sum: {
+//       quantity: true,
+//     },
+//     where: {
+//       // IMPORTANT: Only count items from successful orders
+//       order: {
+//         paymentStatus: 'Paid',
+//         orderStatus: {
+//           notIn: ['Cancelled', 'Refunded', 'Failed'],
+//         },
+//       },
+//     },
+//     orderBy: {
+//       _sum: {
+//         quantity: 'desc',
+//       },
+//     },
+//     take: limit,
+//   })
+//   if (bestSellersByQuantity.length === 0) {
+//     return [] // No best sellers found
+//   }
+
+//   // Extract just the product IDs in the correct order
+//   const bestSellerProductIds = bestSellersByQuantity.map(
+//     (item) => item.productId
+//   )
+
+//   const products = await prisma.product.findMany({
+//     where: {
+//       id: {
+//         in: bestSellerProductIds,
+//       },
+//     },
+//     take: limit,
+//     select: {
+//       id: true,
+//       name: true,
+//       slug: true,
+//       rating: true,
+//       sales: true,
+//       images: {
+//         take: 1,
+//         select: {
+//           url: true,
+//         },
+//       },
+//       category: {
+//         select: {
+//           id: true,
+//           name: true,
+//           url: true,
+//         },
+//       },
+//       subCategory: {
+//         select: {
+//           id: true,
+//           name: true,
+//           url: true,
+//         },
+//       },
+//       sizes: {
+//         select: {
+//           price: true,
+//           discount: true,
+//         },
+//         orderBy: {
+//           price: 'asc',
+//         },
+//         take: 1,
+//       },
+//     },
+//     orderBy: {
+//       createdAt: 'asc',
+//     },
+//   })
+//   const orderedProducts = bestSellerProductIds.map((id) =>
+//     products.find((p) => p.id === id)
+//   )
+//   return orderedProducts.filter(Boolean)
+// }

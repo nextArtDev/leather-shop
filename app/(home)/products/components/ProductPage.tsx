@@ -279,7 +279,7 @@ const ProductPage: FC<ProductPageProp> = ({
             )}
             {/* specs */}
 
-            {!!specs.length && (
+            {!!specs.filter((s) => s.name.trim().length > 0).length && (
               <article className="mx-auto py-8 w-fit max-w-md">
                 <h1 className="text-xl font-bold w-full text-center">
                   خصوصیات
@@ -317,8 +317,9 @@ const ProductPage: FC<ProductPageProp> = ({
           // numReviews={numReviews}
           userReview={userReview}
         />
+
         <Separator />
-        {!!questions.length && (
+        {!!questions.filter((q) => q.question.trim().length > 0).length && (
           <div className="mx-auto max-w-2xl space-y-2">
             {questions.map((faq, index) => (
               <FAQItem

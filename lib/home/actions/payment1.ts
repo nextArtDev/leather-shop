@@ -500,6 +500,16 @@ export async function updateOrderToPaid({
           },
         },
       })
+      await tx.product.update({
+        where: {
+          id: item.productId,
+        },
+        data: {
+          sales: {
+            increment: item.quantity,
+          },
+        },
+      })
     }
 
     // Mark order as paid

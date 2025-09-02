@@ -7,6 +7,7 @@ import TestimonialCarousel from '@/components/home/testemonial/Testemonial'
 import MainPageCarousel from '@/components/product/main-page-carousel'
 
 import {
+  getBestSellers,
   // getCategoriesWithStats,
   getHomepageProducts,
   getSubCategories,
@@ -18,29 +19,25 @@ export default async function Home() {
   // await new Promise((resolve) => setTimeout(resolve, 10000))
 
   const products = await getHomepageProducts()
+  const bestSellers = await getBestSellers()
   // const categories = await getCategoriesWithStats()
   const subCategories = await getSubCategories()
   // #eceae8
-
+  // console.log(bestSellers)
   return (
     <div className="relative w-full h-full items-center justify-items-center min-h-screen mx-auto">
-      {/* <div className="sticky w-full h-full top-0 z-20 ">
-        <BannerText />
-      </div> */}
-      {/* <div className=" ">
-        <FadeMenu />
-      </div> */}
-      {/* <Loader variant="magnetic-dots" size={72} /> */}
       <Hero subCategories={subCategories} />
       <div className="py-16">
         <StoreStatement />
       </div>
-      <section className="w-full h-full flex flex-col gap-8 py-8 px-3 ">
-        <h2 className="text-xl md:text-3xl font-bold uppercase text-center py-8">
-          پرفروش‌ترینها
-        </h2>
-        <MainPageCarousel items={products} />
-      </section>
+      {!!bestSellers && (
+        <section className="w-full h-full flex flex-col gap-8 py-8 px-3 ">
+          <h2 className="text-xl md:text-3xl font-bold uppercase text-center py-8">
+            پرفروش‌ترینها
+          </h2>
+          <MainPageCarousel items={bestSellers} />
+        </section>
+      )}
       <section className="w-full h-full flex flex-col gap-8 py-8 px-3 ">
         <h2 className="text-xl md:text-3xl font-bold uppercase text-center py-8">
           جدیدترینها
