@@ -164,12 +164,12 @@ export const ProductFormSchema = z.object({
 
   sku: z
     .string()
-    .min(6, {
-      message: 'SKU باید حداقل 6 کاراکتر باشد.',
-    })
-    .max(50, {
-      message: 'SKU حداکثر می‌تواند 50 کاراکتر باشد',
-    })
+    // .min(6, {
+    //   message: 'SKU باید حداقل 6 کاراکتر باشد.',
+    // })
+    // .max(50, {
+    //   message: 'SKU حداکثر می‌تواند 50 کاراکتر باشد',
+    // })
     .optional(),
   weight: z.number().default(0).optional(),
   // .optional(),

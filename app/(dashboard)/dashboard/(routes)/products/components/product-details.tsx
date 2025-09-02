@@ -66,16 +66,19 @@ import { handleServerErrors } from '../../../lib/server-utils'
 
 const shippingFeeMethods = [
   {
-    value: ShippingFeeMethod.ITEM,
-    description: 'ITEM (Fees calculated based on number of products.)',
+    value: ShippingFeeMethod.WEIGHT,
+    // description: 'WEIGHT (Fees calculated based on product weight)',
+    description: 'وزن: پست براساس وزن محصول',
   },
   {
-    value: ShippingFeeMethod.WEIGHT,
-    description: 'WEIGHT (Fees calculated based on product weight)',
+    value: ShippingFeeMethod.ITEM,
+    // description: 'ITEM (Fees calculated based on number of products.)',
+    description: 'تعداد: پست براساس تعداد محصول',
   },
   {
     value: ShippingFeeMethod.FIXED,
-    description: 'FIXED (Fees are fixed.)',
+    description: 'ثابت: پست با کرایه ثابت',
+    // description: 'FIXED (Fees are fixed.)',
   },
 ]
 
@@ -276,7 +279,7 @@ const ProductDetails: FC<ProductFormProps> = ({
               </div>
 
               {/* Name   */}
-              <InputFieldset label="نام">
+              <InputFieldset label="نام" isMandatory>
                 <div className="flex flex-col lg:flex-row gap-4">
                   <FormField
                     disabled={isPending}
@@ -295,6 +298,7 @@ const ProductDetails: FC<ProductFormProps> = ({
               </InputFieldset>
               {/* Product and variant description editors (tabs) */}
               <InputFieldset
+                isMandatory
                 label="توضحیات"
                 description={
                   'توجه: قسمت توضیحات، توضیحات اصلی محصول در صفحه محصول است و باید کامل باشد.'
@@ -353,6 +357,7 @@ const ProductDetails: FC<ProductFormProps> = ({
                     initialDetailSchema={{ color: '' }}
                     header="رنگها"
                     colorPicker
+                    isMandatory
                   />
                   {form.formState.errors.colors && (
                     <span className="text-sm font-medium text-destructive">
@@ -407,6 +412,7 @@ const ProductDetails: FC<ProductFormProps> = ({
                     width: 'عرض',
                     height: 'ارتفاع',
                   }}
+                  isMandatory
                 />
                 {form.formState.errors.sizes && (
                   <span className="text-sm font-medium text-destructive">
@@ -416,7 +422,7 @@ const ProductDetails: FC<ProductFormProps> = ({
                 )}
               </InputFieldset>
 
-              <InputFieldset label="دسته‌بندی">
+              <InputFieldset label="دسته‌بندی" isMandatory>
                 <div className="flex gap-4">
                   <FormField
                     disabled={isPending}
@@ -574,7 +580,9 @@ const ProductDetails: FC<ProductFormProps> = ({
                     name="weight"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>وزن (kg)</FormLabel>
+                        <FormLabel>
+                          وزن (kg) <span className="text-rose-500">*</span>
+                        </FormLabel>
                         <FormControl>
                           <NumberInput
                             defaultValue={field.value}
@@ -585,13 +593,21 @@ const ProductDetails: FC<ProductFormProps> = ({
                             className="!shadow-none rounded-md !text-sm"
                           />
                         </FormControl>
+                        <FormDescription>
+                          وزن برحسب کیلوگرم است و برای محاسبه دقیق هزینه پست
+                          الزامی است.
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
               </InputFieldset>
-              <InputFieldset label="کلمات کلیدی">
+              <InputFieldset
+                label="کلمات کلیدی"
+                isMandatory
+                description="کلمه را وارد کرده، سپس اینتر &crarr; بزنید."
+              >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -604,7 +620,7 @@ const ProductDetails: FC<ProductFormProps> = ({
                             maxItems={10}
                             value={field?.value || []}
                             onValueChange={field.onChange}
-                            placeholder=""
+                            placeholder="چرم گاوی"
                           />
                         </FormControl>
                       </FormItem>
@@ -628,7 +644,7 @@ const ProductDetails: FC<ProductFormProps> = ({
                     containerClassName="flex-1"
                     inputClassName="w-full"
                     labels={{
-                      name: 'نام',
+                      name: 'عنوان',
                       value: 'مقدار',
                     }}
                   />
@@ -678,7 +694,11 @@ const ProductDetails: FC<ProductFormProps> = ({
 
               {/* Shipping fee method */}
 
-              <InputFieldset label="متد پست محصول">
+              <InputFieldset
+                label="متد پست محصول"
+                description="پست چرم داخلی با وزن است."
+                isMandatory
+              >
                 <FormField
                   disabled={isPending}
                   control={form.control}
@@ -741,10 +761,15 @@ const ProductDetails: FC<ProductFormProps> = ({
                   />
                   <>
                     {form.getValues('isSale') ? (
-                      <DateTimePicker
-                        name="saleEndDate"
-                        label="تاریخ اتمام فروش ویژه"
-                      />
+                      <>
+                        <DateTimePicker
+                          name="saleEndDate"
+                          label="تاریخ اتمام فروش ویژه"
+                        />
+                        <FormDescription className="text-red-500">
+                          انتخاب دقیق ساعت پایان فروش الزامی است!
+                        </FormDescription>
+                      </>
                     ) : null}
                   </>
                 </div>

@@ -39,6 +39,7 @@ export default function DiscoverMoreCarousel({
               ]
             : []
         }
+        ref={carouselRef}
         dir="rtl"
         className="w-full"
       >

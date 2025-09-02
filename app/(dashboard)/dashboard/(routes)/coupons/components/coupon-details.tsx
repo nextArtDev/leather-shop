@@ -50,24 +50,6 @@ const CouponDetails = () => {
   })
 
   const handleSubmit = async (data: z.infer<typeof CouponFormSchema>) => {
-    // const formData = new FormData()
-
-    // console.log({ data })
-    // const startDate =
-    //   data?.startDate || new Date(new Date().setHours(0, 0, 0, 0))
-
-    // const startDateString =
-    //   startDate instanceof Date ? startDate.toISOString() : startDate
-    // const endDate = data?.endDate || new Date(new Date().setHours(0, 0, 0, 0))
-
-    // const endDateString =
-    //   endDate instanceof Date ? endDate.toISOString() : endDate
-
-    // formData.append('code', data.code)
-    // formData.append('discount', String(data.discount))
-    // formData.append('startDate', startDateString)
-    // formData.append('endDate', endDateString)
-
     startTransition(async () => {
       try {
         const res = await createCoupon(data, path)
@@ -99,7 +81,9 @@ const CouponDetails = () => {
                 name="code"
                 render={({ field }) => (
                   <FormItem className="flex-1">
-                    <FormLabel>کد کوپن</FormLabel>
+                    <FormLabel>
+                      کد کوپن <span className="text-rose-500">*</span>
+                    </FormLabel>
                     <FormControl>
                       <Input placeholder="کد" {...field} />
                     </FormControl>
@@ -112,7 +96,9 @@ const CouponDetails = () => {
                 name="discount"
                 render={({ field }) => (
                   <FormItem className="flex-1">
-                    <FormLabel>تخفیف کوپن</FormLabel>
+                    <FormLabel>
+                      تخفیف کوپن <span className="text-rose-500">*</span>
+                    </FormLabel>
                     <FormControl>
                       <NumberInput
                         defaultValue={field.value}

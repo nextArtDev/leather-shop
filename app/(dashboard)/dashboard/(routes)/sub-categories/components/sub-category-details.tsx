@@ -140,7 +140,10 @@ const SubCategoryDetails: FC<SubCategoryDetailsProps> = ({
                   name="name"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>نام زیردسته‌بندی</FormLabel>
+                      <FormLabel>
+                        نام زیردسته‌بندی{' '}
+                        <span className="text-rose-500">*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input placeholder="نام زیردسته‌بندی" {...field} />
                       </FormControl>
@@ -155,7 +158,10 @@ const SubCategoryDetails: FC<SubCategoryDetailsProps> = ({
                   name="url"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>url زیردسته‌بندی</FormLabel>
+                      <FormLabel>
+                        url زیردسته‌بندی{' '}
+                        <span className="text-rose-500">*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input
                           placeholder=" بصورت خودکار ساخته می‌شود"
@@ -186,7 +192,10 @@ const SubCategoryDetails: FC<SubCategoryDetailsProps> = ({
                           value={field.value}
                           defaultValue={field.value}
                         >
-                          <FormLabel>انتخاب دسته‌بندی</FormLabel>
+                          <FormLabel>
+                            انتخاب دسته‌بندی{' '}
+                            <span className="text-rose-500">*</span>
+                          </FormLabel>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue

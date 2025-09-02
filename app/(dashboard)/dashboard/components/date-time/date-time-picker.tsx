@@ -31,12 +31,14 @@ interface DateTimePickerProps {
   label?: string
   description?: string
   className?: string
+  isMandatory?: boolean
   // initialDataTime?: Partial<Date>[] | null
 }
 export function DateTimePicker({
   name,
   label = name,
   className,
+  isMandatory = true,
 }: //   initialDataTime,
 //   description,
 DateTimePickerProps) {
@@ -48,7 +50,9 @@ DateTimePickerProps) {
       name={name}
       render={({ field }) => (
         <FormItem className={cn('flex flex-col', className)}>
-          <FormLabel className="text-left">{label}</FormLabel>
+          <FormLabel className="text-left">
+            {label} {isMandatory && <span className="text-rose-500">*</span>}
+          </FormLabel>
           <Popover>
             <FormControl>
               <PopoverTrigger asChild>

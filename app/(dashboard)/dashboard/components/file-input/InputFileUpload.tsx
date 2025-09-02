@@ -42,6 +42,7 @@ const InputFileUpload = ({
   multiple = true,
   initialDataImages,
   unoptimized = false,
+  isMandatory = true,
 }: {
   name: string
   label?: string
@@ -49,6 +50,7 @@ const InputFileUpload = ({
   multiple?: boolean
   initialDataImages?: Partial<Image>[] | null
   unoptimized?: boolean
+  isMandatory?: boolean
 }) => {
   const form = useFormContext()
   const { setValue, getValues } = form
@@ -136,7 +138,10 @@ const InputFileUpload = ({
         name={name}
         render={() => (
           <FormItem>
-            <FormLabel>{label}</FormLabel>
+            <FormLabel>
+              {label}
+              {isMandatory && <span className="text-rose-500">*</span>}
+            </FormLabel>
             <FormControl>
               <div className="relative">
                 <FileUploader

@@ -47,7 +47,6 @@ interface CategoryDetailsProps {
 
 const CategoryDetails: FC<CategoryDetailsProps> = ({ initialData }) => {
   // Initializing necessary hooks
-
   // const router = useRouter() // Hook for routing
   const path = usePathname()
   const [isPending, startTransition] = useTransition()
@@ -70,35 +69,6 @@ const CategoryDetails: FC<CategoryDetailsProps> = ({ initialData }) => {
   const handleSubmit = (data: z.infer<typeof CategoryFormSchema>) => {
     startTransition(async () => {
       try {
-        // const formData = new FormData()
-
-        // formData.append('name', data.name)
-        // formData.append('url', data.url)
-        // formData.append('featured', String(data.featured))
-        // if (!initialData) {
-        //   if (data.featured) {
-        //     formData.append('featured', 'true')
-        //   } else {
-        //     formData.append('featured', 'false')
-        //   }
-        // } else {
-        //   if (data.featured) {
-        //     formData.append('featured', true.toString())
-        //   } else {
-        //     formData.append('featured', false.toString())
-        //   }
-        // }
-
-        // if (data.images && data.images.length > 0) {
-        //   for (let i = 0; i < data.images.length; i++) {
-        //     formData.append('images', data.images[i] as string | Blob)
-        //   }
-        // }
-        // data.images?.forEach((image) => {
-        //   if (image instanceof File) {
-        //     formData.append('images', image)
-        //   }
-        // })
         if (initialData) {
           const res = await editCategory(data, initialData.id, path)
           if (res?.errors) handleServerErrors(res.errors, form.setError)
@@ -116,90 +86,6 @@ const CategoryDetails: FC<CategoryDetailsProps> = ({ initialData }) => {
         toast.error('مشکلی پیش آمده، لطفا دوباره امتحان کنید!')
       }
     })
-    // try {
-    //   if (initialData) {
-    //     startTransition(async () => {
-    //       try {
-    //         const res = await editCategory(
-    //           formData,
-    //           initialData.id as string,
-    //           path
-    //         )
-
-    //         if (res?.errors?.name) {
-    //           form.setError('name', {
-    //             type: 'custom',
-    //             message: res?.errors.name?.join(' و '),
-    //           })
-    //         } else if (res?.errors?.images) {
-    //           form.setError('images', {
-    //             type: 'custom',
-    //             message: res?.errors.images?.join(' و '),
-    //           })
-    //         } else if (res?.errors?.featured) {
-    //           form.setError('featured', {
-    //             type: 'custom',
-    //             message: res?.errors.featured?.join(' و '),
-    //           })
-    //         } else if (res?.errors?._form) {
-    //           toast.error(res?.errors._form?.join(' و '))
-    //         }
-    //       } catch (error) {
-    //         // This will catch the NEXT_REDIRECT error, which is expected
-    //         // when the redirect happens
-    //         if (
-    //           !(
-    //             error instanceof Error &&
-    //             error.message.includes('NEXT_REDIRECT')
-    //           )
-    //         ) {
-    //           toast.error('مشکلی پیش آمده.')
-    //         }
-    //       }
-    //     })
-    //   } else {
-    //     startTransition(async () => {
-    //       try {
-    //         const res = await createCategory(formData, path)
-    //         if (res?.errors?.name) {
-    //           form.setError('name', {
-    //             type: 'custom',
-    //             message: res?.errors.name?.join(' و '),
-    //           })
-    //         } else if (res?.errors?.images) {
-    //           form.setError('images', {
-    //             type: 'custom',
-    //             message: res?.errors.images?.join(' و '),
-    //           })
-    //         } else if (res?.errors?.url) {
-    //           form.setError('url', {
-    //             type: 'custom',
-    //             message: res?.errors.url?.join(' و '),
-    //           })
-    //         } else if (res?.errors?.featured) {
-    //           form.setError('featured', {
-    //             type: 'custom',
-    //             message: res?.errors.featured?.join(' و '),
-    //           })
-    //         } else if (res?.errors?._form) {
-    //           toast.error(res?.errors._form?.join(' و '))
-    //         }
-    //       } catch (error) {
-    //         // This will catch the NEXT_REDIRECT error, which is expected when the redirect happens
-    //         if (
-    //           !(
-    //             error instanceof Error &&
-    //             error.message.includes('NEXT_REDIRECT')
-    //           )
-    //         ) {
-    //           toast.error('مشکلی پیش آمده.')
-    //         }
-    //       }
-    //     })
-    //   }
-    // } catch {
-    //   toast.error('مشکلی پیش آمده، لطفا دوباره امتحان کنید!')
-    // }
   }
 
   const [isUrlManuallyEdited, setIsUrlManuallyEdited] = useState(
@@ -250,7 +136,9 @@ const CategoryDetails: FC<CategoryDetailsProps> = ({ initialData }) => {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>نام دسته‌بندی</FormLabel>
+                      <FormLabel>
+                        نام دسته‌بندی <span className="text-rose-500">*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input placeholder="مثلا: محصولات مردانه" {...field} />
                       </FormControl>
@@ -265,7 +153,9 @@ const CategoryDetails: FC<CategoryDetailsProps> = ({ initialData }) => {
                   name="url"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>URL دسته‌بندی</FormLabel>
+                      <FormLabel>
+                        URL دسته‌بندی <span className="text-rose-500">*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input
                           placeholder=" بصورت خودکار ساخته می‌شود"

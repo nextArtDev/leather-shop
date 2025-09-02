@@ -40,6 +40,7 @@ interface ClickToAddInputsRHFProps {
   inputClassName?: string
   // Add a labels prop to accept a map of field keys to custom label strings
   labels?: Record<string, string>
+  isMandatory?: boolean
 }
 
 // --- Component Implementation ---
@@ -57,6 +58,7 @@ const ClickToAddInputsRHF: React.FC<ClickToAddInputsRHFProps> = ({
   containerClassName,
   inputClassName,
   labels, // Destructure the new labels prop
+  isMandatory = false,
 }) => {
   const handleAddDetail = () => {
     onAppend(initialDetailSchema)
@@ -100,6 +102,7 @@ const ClickToAddInputsRHF: React.FC<ClickToAddInputsRHFProps> = ({
                     className="text-xs text-muted-foreground"
                   >
                     {labels?.[propertyKey] || propertyKey}
+                    {isMandatory && <span className="text-rose-500">*</span>}
                   </Label>
                   {propertyKey === 'color' && colorPicker ? (
                     <div className="flex items-center gap-x-2">

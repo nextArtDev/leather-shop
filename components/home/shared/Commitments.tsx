@@ -11,6 +11,7 @@ import Image from 'next/image'
 import React, { useRef } from 'react'
 import { useInView } from 'framer-motion'
 import Autoplay from 'embla-carousel-autoplay'
+import { RevealText } from '@/components/shared/reveal-text'
 
 // const items = [
 //   {
@@ -78,6 +79,7 @@ export default function Commitments() {
             ]
           : []
       }
+      ref={carouselRef}
       dir="rtl"
       className="w-full "
     >
@@ -105,8 +107,20 @@ export default function Commitments() {
                   />
                 </figure>
                 <article className="flex flex-col gap-3 justify-evenly py-3 px-2 text-pretty text-xs md:text-sm lg:text-base  text-right">
-                  <p className="font-bold text-lg">{item.title}</p>
-                  <p className="text-sm text-justify">{item.description}</p>
+                  <RevealText
+                    text={item.title}
+                    id={item.title}
+                    className="font-bold text-lg"
+                    staggerAmount={0.2}
+                    duration={0.8}
+                  />
+                  {/* <p className="font-bold text-lg">{item.title}</p> */}
+                  <FadeIn
+                    className=" translate-y-4 "
+                    vars={{ delay: 0.6, duration: 0.6 }}
+                  >
+                    <p className="text-sm text-justify">{item.description}</p>
+                  </FadeIn>
                 </article>
               </div>
             </FadeIn>
