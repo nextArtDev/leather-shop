@@ -59,7 +59,7 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: 'Your Store Name',
       images: [
         {
-          url: '/og-home.jpg', // Your home page OG image
+          url: '/hero-image.webp', // Your home page OG image
           width: 1200,
           height: 630,
           alt: 'Your Store Name - Premium Products',
@@ -114,14 +114,21 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 export default async function Home() {
-  const [products, bestSellers, categories, subCategories, reviews] =
-    await Promise.all([
-      getHomepageProducts(),
-      getBestSellers(),
-      getCategoriesWithStats(),
-      getSubCategories(),
-      getHomePageReviews(),
-    ])
+  // const [products, bestSellers, categories, subCategories, reviews] =
+  //   await Promise.all([
+  //     getHomepageProducts(),
+  //     getBestSellers(),
+  //     getCategoriesWithStats(),
+  //     getSubCategories(),
+  //     getHomePageReviews(),
+  //   ])
+  const [products, bestSellers, subCategories, reviews] = await Promise.all([
+    getHomepageProducts(),
+    getBestSellers(),
+    // getCategoriesWithStats(),
+    getSubCategories(),
+    getHomePageReviews(),
+  ])
 
   const organizationData = {
     '@context': 'https://schema.org',

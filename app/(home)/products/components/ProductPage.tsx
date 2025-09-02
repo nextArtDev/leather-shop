@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils'
 import FAQItem from '../../faq/components/FAQItem'
 import { Badge } from '@/components/ui/badge'
 import RelatedProductCarousel from '@/components/product/related-products-carousel'
+import Countdown from './count-down'
 
 type ProductPageProp = {
   data: NonNullable<ProductDetails>
@@ -59,12 +60,12 @@ const ProductPage: FC<ProductPageProp> = ({
     questions,
     specs,
     keywords,
+    isSale,
+    saleEndDate,
     // rating,
     // sales,
     // views,
     // isFeatured,
-    // isSale,
-    // saleEndDate,
     // createdAt,
     // updatedAt,
     // category,
@@ -92,7 +93,9 @@ const ProductPage: FC<ProductPageProp> = ({
   return (
     <section className="pb-24 w-full h-full">
       <div className="max-w-2xl px-4 mx-auto  flex flex-col gap-4">
-        <ProductDetailCarousel images={[...images, ...variantImages]} />
+        <article className=" ">
+          <ProductDetailCarousel images={[...images, ...variantImages]} />
+        </article>
 
         {/* <ProductDetails /> */}
         <article className="grid grid-row-5 gap-4">
@@ -158,6 +161,13 @@ const ProductPage: FC<ProductPageProp> = ({
             ))}
           </ul>
         </article>
+        <article>
+          {isSale && saleEndDate && (
+            <div className="mt-4 pb-2">
+              <Countdown targetDate={saleEndDate} />
+            </div>
+          )}
+        </article>
         <span className="text-green-600 flex gap-1 text-sm items-center">
           <span
             className={cn(
@@ -175,23 +185,25 @@ const ProductPage: FC<ProductPageProp> = ({
             </span>
           )}
         </span>
-        {!!sizes.length && currentSize && currentSize.quantity > 0 && (
-          <AddToCardBtn
-            sizeId={sizeId}
-            weight={weight}
-            size={currentSize.size}
-            discount={currentSize.discount}
-            price={currentSize.price}
-            stockQuantity={currentSize.quantity}
-            productId={id}
-            slug={slug}
-            name={name}
-            qty={1}
-            shippingFeeMethod={shippingFeeMethod}
-            // stock={stock}
-            image={images.map((image) => image.url)[0]}
-          />
-        )}
+        <article className="sticky top-2">
+          {!!sizes.length && currentSize && currentSize.quantity > 0 && (
+            <AddToCardBtn
+              sizeId={sizeId}
+              weight={weight}
+              size={currentSize.size}
+              discount={currentSize.discount}
+              price={currentSize.price}
+              stockQuantity={currentSize.quantity}
+              productId={id}
+              slug={slug}
+              name={name}
+              qty={1}
+              shippingFeeMethod={shippingFeeMethod}
+              // stock={stock}
+              image={images.map((image) => image.url)[0]}
+            />
+          )}
+        </article>
 
         {currentSize && currentSize.quantity <= 0 && (
           <div className="bg-red-50 border border-red-200 rounded-md p-4 text-center">
