@@ -9,10 +9,10 @@ import {
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
 import Autoplay from 'embla-carousel-autoplay'
+import { ImageZoom } from '@/app/(home)/products/components/ProductZoom'
 
 type Props = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  images: any[]
+  images: { url: string }[] | null
 }
 
 const ProductDetailCarousel = ({ images }: Props) => {
@@ -43,19 +43,27 @@ const ProductDetailCarousel = ({ images }: Props) => {
         className="relative max-w-xs my-14 mx-auto"
       >
         <CarouselContent className="  -mt-1 h-[384px] aspect-square mx-auto ">
-          {images.map((image) => (
+          {images?.map((image) => (
             <CarouselItem
-              key={image.id}
+              key={image.url}
               className="flex items-center justify-center  w-full h-full   "
             >
-              <figure className=" border-none relative h-full w-full   bg-[#eceae8]  ">
-                <Image
-                  src={image.url}
-                  fill
-                  alt=""
-                  // className="object-cover mix-blend-darken"
-                  className="object-cover "
-                />
+              <figure className=" border-none relative h-full w-full bg-[#eceae8]  ">
+                <ImageZoom
+                  className="h-full w-full"
+                  zoomMargin={20}
+                  backdropClassName={cn(
+                    '[&_[data-rmiz-modal-overlay="visible"]]:bg-background/80'
+                  )}
+                >
+                  <Image
+                    src={image.url}
+                    fill
+                    alt=""
+                    // className="object-cover mix-blend-darken"
+                    className="object-cover "
+                  />
+                </ImageZoom>
               </figure>
             </CarouselItem>
           ))}
