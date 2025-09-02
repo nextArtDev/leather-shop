@@ -17,6 +17,7 @@ import { SingleStarRating } from '@/components/home/testemonial/SingleStartRatin
 // import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
+import FAQItem from '../../faq/components/FAQItem'
 
 // const images = [
 //   { id: '1', url: bag },
@@ -97,17 +98,17 @@ const ProductPage: FC<ProductPageProp> = ({
     slug,
     weight,
     shippingFeeMethod,
-    // specs,
+    questions,
+    specs,
+    // keywords,
     // rating,
     // sales,
     // views,
     // isFeatured,
     // isSale,
     // saleEndDate,
-    // keywords,
     // createdAt,
     // updatedAt,
-    // questions,
     // category,
     // offerTag,
     // freeShipping,
@@ -264,29 +265,72 @@ const ProductPage: FC<ProductPageProp> = ({
               SKU:{sku}
             </p>
           </div>
-          <div
-            dir="lrt"
-            className="flex flex-end flex-col gap-4 text-sm md:text-base"
-          >
-            <p className="font-semibold">Dimensions</p>
-            {/* <article className="flex gap-4 justify-between">
-              <span className="flex gap-2">
-                <strong>Width</strong>{' '}
-                {specs.map((spec: ProductSpec) => spec.value)[0].split('*')[0]}{' '}
-                cm
-              </span>
-              <span className="flex gap-2">
-                <strong>Height</strong>{' '}
-                {specs.map((spec: ProductSpec) => spec.value)[0].split('*')[1]}{' '}
-                cm
-              </span>
-              <span className="flex gap-2">
-                {' '}
-                <strong>Depth</strong>{' '}
-                {specs.map((spec: ProductSpec) => spec.value)[0].split('*')[2]}{' '}
-                cm
-              </span>
-            </article> */}
+
+          <div className="w-full h-full flex  flex-wrap gap-2  items-start  ">
+            {!!sizes.length && (
+              <article className="mx-auto px-4 py-8 w-fit max-w-sm">
+                <h1 className="text-xl font-bold w-full text-center">ابعاد</h1>
+                <Separator className="my-1" />
+                <div className=" my-2">
+                  {sizes.map((size, i) => (
+                    <div
+                      key={i}
+                      className="grid grid-cols-32 gap-1 place-content-center place-items-center w-full h-full py-1"
+                    >
+                      <span className="col-span-10 place-self-right text-center  ">
+                        <p className="font-semibold">عرض</p>
+                        {size.width}
+                      </span>
+                      <Separator
+                        orientation="vertical"
+                        className="col-span-1 h-2 place-self-right "
+                      />
+                      <span className="col-span-10 grid-flow-dense text-center">
+                        <p className="font-semibold">ارتفاع</p>
+                        {size.height}
+                      </span>
+                      <Separator
+                        orientation="vertical"
+                        className="col-span-1 h-2 place-self-right "
+                      />
+                      <span className="col-span-10 grid-flow-dense text-center">
+                        <p className="font-semibold">طول</p>
+                        {size.length}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </article>
+            )}
+            {/* specs */}
+
+            {!!specs.length && (
+              <article className="mx-auto py-8 w-fit max-w-md">
+                <h1 className="text-xl font-bold w-full text-center">
+                  خصوصیات
+                </h1>
+                <Separator className="my-1" />
+                <div className=" my-2">
+                  {specs.map((spec, i) => (
+                    <div
+                      key={i}
+                      className="grid grid-cols-21 gap-1 place-content-center place-items-center w-full h-full py-1"
+                    >
+                      <span className="col-span-10 place-self-right text-right font-semibold">
+                        {spec.name}
+                      </span>
+                      <Separator
+                        orientation="vertical"
+                        className="col-span-1 h-2 place-self-right "
+                      />
+                      <span className="col-span-10 w-full min-w-[70px]">
+                        {spec.value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </article>
+            )}
           </div>
         </article>
         <ProductStatements />
@@ -299,6 +343,18 @@ const ProductPage: FC<ProductPageProp> = ({
           userReview={userReview}
         />
         <Separator />
+        {!!questions.length && (
+          <div className="mx-auto max-w-2xl space-y-2">
+            {questions.map((faq, index) => (
+              <FAQItem
+                key={index}
+                {...faq}
+                index={index}
+                className="rounded-sm"
+              />
+            ))}
+          </div>
+        )}
       </div>
       <section className="  flex gap-6 flex-col justify-center items-center py-8">
         <h2 className="font-bold text-2xl ">You may also like</h2>

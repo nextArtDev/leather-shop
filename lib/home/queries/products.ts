@@ -470,6 +470,9 @@ export async function getProductDetails(slug: string): Promise<ProductDetails> {
           price: true,
           discount: true,
           quantity: true,
+          width: true,
+          height: true,
+          length: true,
         },
         orderBy: {
           price: 'asc',

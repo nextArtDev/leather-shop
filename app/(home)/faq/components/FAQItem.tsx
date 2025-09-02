@@ -8,9 +8,15 @@ interface FAQItemProps {
   question: string
   answer: string
   index: number
+  className?: string
 }
 
-export default function FAQItem({ question, answer, index }: FAQItemProps) {
+export default function FAQItem({
+  question,
+  answer,
+  index,
+  className,
+}: FAQItemProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -25,7 +31,8 @@ export default function FAQItem({ question, answer, index }: FAQItemProps) {
       className={cn(
         'group border-border/60 rounded-lg border',
         'transition-all duration-200 ease-in-out',
-        isOpen ? 'bg-card/30 shadow-sm' : 'hover:bg-card/50'
+        isOpen ? 'bg-card/30 shadow-sm' : 'hover:bg-card/50',
+        className
       )}
     >
       <button

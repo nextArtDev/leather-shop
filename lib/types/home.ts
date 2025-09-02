@@ -18,6 +18,9 @@ export type ProductSize = {
   price: number
   discount: number
   quantity: number
+  length: number
+  width: number
+  height: number
 }
 
 export type BasicProductSize = {
