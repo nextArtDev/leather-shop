@@ -1,4 +1,4 @@
-import { Prisma } from '@/lib/generated/prisma'
+import { Prisma, Review } from '@/lib/generated/prisma'
 import prisma from '@/lib/prisma'
 import {
   CategoryWithStats,
@@ -76,6 +76,7 @@ export async function getBestSellers(limit: number = 8) {
       slug: true,
       rating: true,
       sales: true,
+      description: true,
       images: {
         take: 1,
         select: {
@@ -878,6 +879,27 @@ export async function getSubCategoryBySlug({ slug }: { slug: string }) {
   })
 }
 
+export const getHomePageReviews = async (): Promise<
+  | (Review & {
+      user: {
+        name: string | null
+      }
+    })[]
+  | null
+> => {
+  return await prisma.review.findMany({
+    where: {},
+    include: {
+      user: {
+        select: { name: true },
+      },
+    },
+    orderBy: {
+      rating: 'desc',
+    },
+    take: 8,
+  })
+}
 // export async function getBestSellers(limit: number = 8) {
 //   const bestSellersByQuantity = await prisma.orderItem.groupBy({
 //     by: ['productId'],

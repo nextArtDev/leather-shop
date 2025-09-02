@@ -65,7 +65,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const doctorEntries: MetadataRoute.Sitemap = products.map((product) => ({
         url: `${baseUrl}/products/${product.slug}`,
         lastModified: new Date(product.updatedAt),
-        changeFrequency: 'monthly' as const,
+        changeFrequency: 'daily' as const,
         priority: 0.8,
       }))
       allEntries = [...allEntries, ...doctorEntries]
@@ -77,7 +77,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         (category) => ({
           url: `${baseUrl}/categories/${category.url}`,
           lastModified: new Date(category.updatedAt),
-          changeFrequency: 'monthly' as const,
+          changeFrequency: 'weekly' as const,
           priority: 0.7,
         })
       )
@@ -90,7 +90,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         (sub) => ({
           url: `${baseUrl}/sub-categories/${sub.id}`,
           lastModified: new Date(sub.updatedAt),
-          changeFrequency: 'monthly' as const,
+          changeFrequency: 'weekly' as const,
           priority: 0.6,
         })
       )

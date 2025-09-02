@@ -87,7 +87,7 @@ export default function MainPageCarousel({ items }: MainPageCarousel) {
                   ></p> */}
                   <p className="font-bold">{item.name}</p>
                   {!!item.sizes && (
-                    <p>
+                    <>
                       {item.sizes.map((size, i) => (
                         <div key={i} className="flex items-center gap-1">
                           {!!size.discount && (
@@ -103,7 +103,7 @@ export default function MainPageCarousel({ items }: MainPageCarousel) {
                           </p>
                         </div>
                       ))}
-                    </p>
+                    </>
                   )}
                   {/* <p>
                     {item.sizes.map((size) =>
