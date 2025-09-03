@@ -102,6 +102,7 @@ const ProductCard = ({ product }: Props) => {
                     <Card className="h-full w-full border-none rounded-none bg-[#eceae8] p-0">
                       <CardContent className="relative flex aspect-square items-center justify-center p-0 h-full">
                         <Image
+                          unoptimized
                           src={url}
                           alt={product.name}
                           fill

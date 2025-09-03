@@ -365,6 +365,7 @@ const OrderItemsCard = ({ orderItems }: { orderItems: OrderItem[] }) => (
                     className="flex items-center hover:opacity-80 transition-opacity"
                   >
                     <Image
+                      unoptimized
                       src={item.image}
                       alt={item.name}
                       width={50}

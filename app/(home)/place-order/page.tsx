@@ -112,6 +112,7 @@ const PlaceOrderPage = async () => {
                           className="flex items-center"
                         >
                           <Image
+                            unoptimized
                             src={item?.image || ''}
                             alt={item.name}
                             width={50}

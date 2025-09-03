@@ -76,6 +76,7 @@ export default function Commitments() {
               {/* Moved gap-4 here to space image and text */}
               <Steel className="relative w-[90%] h-full pt-2 md:pt-4 mx-auto aspect-square px-1">
                 <Image
+                  unoptimized
                   src={item.url}
                   fill
                   alt={item.title}

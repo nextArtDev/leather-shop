@@ -61,6 +61,7 @@ export const columns: ColumnDef<OrderTypeColumn>[] = [
         <div className="flex flex-wrap gap-1">
           {images.map((img, i) => (
             <Image
+              unoptimized
               key={`${img}-${i}`}
               src={img}
               alt=""

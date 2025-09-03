@@ -20,7 +20,13 @@ const page = async () => {
       aria-label="sign-in"
       className="relative w-full h-full min-h-screen"
     >
-      <Image fill src={heroImage} alt="Store Logo" className="  object-cover" />
+      <Image
+        unoptimized
+        fill
+        src={heroImage}
+        alt="Store Logo"
+        className="  object-cover"
+      />
       <div className="absolute inset-0 bg-background/5 backdrop-blur-xs" />
       <Link
         href={'/'}

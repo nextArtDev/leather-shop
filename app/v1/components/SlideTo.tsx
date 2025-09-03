@@ -94,6 +94,7 @@ const SlideTop = () => {
               {panel.content}
               </h2> */}
               <Image
+                unoptimized
                 src={panel.imgSrc}
                 fill
                 alt=""

@@ -109,6 +109,7 @@ const StoreOrderSummary: FC<Props> = ({ order }) => {
             {/* Product image  */}
             <div className="w-full h-full">
               <Image
+                unoptimized
                 src={product.image}
                 alt=""
                 width={200}

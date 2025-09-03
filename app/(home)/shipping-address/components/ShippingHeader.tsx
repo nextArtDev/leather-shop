@@ -11,7 +11,7 @@ const ShippingHeader = () => {
             <span className="sr-only">Your Company</span>
             <div className="relative h-8 w-auto">
               <Image
-                alt=""
+                alt="logo"
                 fill
                 src="/images/logo.svg"
                 className="h-8 aspect-square w-auto lg:hidden"
@@ -19,7 +19,7 @@ const ShippingHeader = () => {
             </div>
             <div className="relative h-8 w-auto">
               <Image
-                alt=""
+                alt="shipping"
                 fill
                 src="/images/logo.svg"
                 className="hidden aspect-square h-8 w-auto lg:block"

@@ -112,6 +112,7 @@ const SideUp = () => {
               >
                 {/* {panel.id} */}
                 <Image
+                  unoptimized
                   src={panel.imgSrc}
                   fill
                   alt=""

@@ -104,6 +104,7 @@ const DesktopNav = ({ navigation }: { navigation: NavigationData }) => (
                 <ListItem key={item.name} title={item.name} href={item.href}>
                   <div className="aspect-square w-full overflow-hidden rounded-md group-hover:opacity-75">
                     <Image
+                      unoptimized
                       src={item.imageSrc}
                       alt={item.imageAlt}
                       width={200}

@@ -203,6 +203,7 @@ const SubcategoryDetailsPage = async ({ params }: SubcategoryPageProps) => {
             className=" absolute inset-0 pt-12 max-h-svh origin-top lg:h-screen motion-safe:scale-125 motion-reduce:opacity-50 "
           >
             <Image
+              unoptimized
               src={subcategory.images.map((s) => s.url)[0]}
               priority
               fetchPriority="high"

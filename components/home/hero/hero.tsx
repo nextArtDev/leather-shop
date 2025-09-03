@@ -23,6 +23,7 @@ const Hero = ({
         className=" absolute inset-0 pt-12 min-h-svh origin-top lg:h-svh motion-safe:scale-125 motion-reduce:opacity-50 "
       >
         <Image
+          unoptimized
           src={heroImage}
           priority
           fetchPriority="high"

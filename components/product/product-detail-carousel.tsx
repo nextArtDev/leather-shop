@@ -57,9 +57,10 @@ const ProductDetailCarousel = ({ images }: Props) => {
                   )}
                 >
                   <Image
+                    unoptimized
                     src={image.url}
                     fill
-                    alt=""
+                    alt="product"
                     // className="object-cover mix-blend-darken"
                     className="object-cover "
                   />

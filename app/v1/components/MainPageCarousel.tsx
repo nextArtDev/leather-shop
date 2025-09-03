@@ -71,6 +71,7 @@ export default function MainPageCarousel({ items }: MainPageCarousel) {
               />
               <Steel className="relative w-[90%] h-full pt-2 md:pt-4 mx-auto aspect-square">
                 <Image
+                  unoptimized
                   // src={item.images.map((img) => img.url)[0]}
                   src={item.images?.[0]}
                   fill

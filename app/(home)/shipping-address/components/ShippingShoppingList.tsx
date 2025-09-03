@@ -20,6 +20,7 @@ const ShippingShoppingList = ({ cartItems }: Props) => {
         <li key={item.productSlug} className={cn(' flex py-6 sm:py-10')}>
           <div className="relative shrink-0 size-20 sm:size:32">
             <Image
+              unoptimized
               fill
               alt={item.name}
               src={item.image || ''}

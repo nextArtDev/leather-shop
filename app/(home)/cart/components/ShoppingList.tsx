@@ -27,6 +27,7 @@ const ShoppingList = ({ cartItems, mutable = false }: Props) => {
             <div className="relative shrink-0 mx-auto sm:mx-0">
               <div className="relative w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 overflow-hidden rounded-xl border border-border shadow-sm">
                 <Image
+                  unoptimized
                   fill
                   alt={item.name}
                   // src={item.image || '/placeholder-image.jpg'}

@@ -100,6 +100,7 @@ export default function Commitments() {
                 <figure className="relative w-full aspect-square bg-[#eceae8] border-none rounded-none">
                   {/* Changed to figure for semantic; simplified, removed min-h to let aspect-square handle */}
                   <Image
+                    unoptimized
                     src={item.url}
                     fill
                     alt={item.title}

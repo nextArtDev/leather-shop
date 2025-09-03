@@ -70,6 +70,7 @@ export default function RelatedProductCarousel({
               >
                 <figure className="relative w-full aspect-square bg-[#eceae8] border-none rounded-none">
                   <Image
+                    unoptimized
                     src={item.images.map((img) => img.url)[0]}
                     fill
                     alt={item.name}
