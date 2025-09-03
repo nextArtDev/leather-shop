@@ -25,7 +25,7 @@ export const columns: ColumnDef<SubCategoryColumn>[] = [
       return (
         <div className="relative w-20 aspect-square min-w-20 rounded-2xl overflow-hidden">
           <NextImage
-            src={row.original?.images?.[0].url}
+            src={row.original?.images?.[0]?.url || ''}
             alt={row.original.name}
             fill
             className="rounded-2xl object-cover shadow-2xl"
@@ -56,7 +56,7 @@ export const columns: ColumnDef<SubCategoryColumn>[] = [
     accessorKey: 'url',
     header: 'URL',
     cell: ({ row }) => {
-      return <span>/{row.original.url}</span>
+      return <span>/{row.original?.url}</span>
     },
   },
   {

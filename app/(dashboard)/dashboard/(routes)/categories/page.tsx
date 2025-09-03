@@ -71,8 +71,8 @@ export default async function CategoriesPage({
     <div className="flex-col">
       <div className="flex-1 flex items-center justify-between space-y-4 p-8 pt-6">
         <Heading
-          title={`زیردسته‌بندی (${formattedCategory?.length})`}
-          description="زیردسته‌بندی را مدیریت کنید."
+          title={`دسته‌بندی (${formattedCategory?.length})`}
+          description="دسته‌بندی را مدیریت کنید."
         />
         <Link
           href={`/dashboard/categories/new`}

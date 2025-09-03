@@ -1,8 +1,8 @@
 
 {
-  "name": "Your Store Name",
-  "short_name": "YourStore",
-  "description": "Premium quality products online",
+  "name": "کارگاه چرم خارَک",
+  "short_name": "خارَک",
+  "description": "فروش محصولات چرمی دست‌ساز",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

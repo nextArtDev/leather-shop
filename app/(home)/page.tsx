@@ -37,7 +37,7 @@ export async function generateMetadata(): Promise<Metadata> {
   } Fast shipping, quality products, and excellent customer service.`
 
   return {
-    title: 'Your Store Name - Premium Quality Products Online',
+    title: 'کارگاه چرم خارَک - چرم طبیعی دست‌ساز',
     description,
     keywords: [
       ...categoryNames.map((name) => name.toLowerCase()),
@@ -53,16 +53,16 @@ export async function generateMetadata(): Promise<Metadata> {
     // Open Graph for social sharing
     openGraph: {
       type: 'website',
-      title: 'Your Store Name - Premium Quality Products',
+      title: 'کارگاه چرم خارَک - چرم طبیعی دست‌ساز',
       description,
       url: process.env.NEXT_PUBLIC_SITE_URL,
-      siteName: 'Your Store Name',
+      siteName: 'کارگاه چرم خارَک',
       images: [
         {
           url: '/hero-image.webp', // Your home page OG image
           width: 1200,
           height: 630,
-          alt: 'Your Store Name - Premium Products',
+          alt: 'کارگاه چرم خارَک - چرم طبیعی دست‌ساز',
         },
       ],
       locale: 'en_US',
@@ -71,7 +71,7 @@ export async function generateMetadata(): Promise<Metadata> {
     // Twitter Card
     twitter: {
       card: 'summary_large_image',
-      title: 'Your Store Name - Premium Quality Products',
+      title: 'کارگاه چرم خارَک - چرم طبیعی دست‌ساز',
       description,
       images: ['/twitter-home.jpg'],
       creator: '@yourstorehandle',
@@ -133,7 +133,7 @@ export default async function Home() {
   const organizationData = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Your Store Name',
+    name: 'کارگاه چرم خارَک',
     url: process.env.NEXT_PUBLIC_SITE_URL,
     logo: `${process.env.NEXT_PUBLIC_SITE_URL}/logo.png`,
     description:
@@ -163,7 +163,7 @@ export default async function Home() {
   const websiteData = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'Your Store Name',
+    name: 'کارگاه چرم خارَک',
     url: process.env.NEXT_PUBLIC_SITE_URL,
     potentialAction: {
       '@type': 'SearchAction',
@@ -182,7 +182,7 @@ export default async function Home() {
         '@type': 'AggregateRating',
         itemReviewed: {
           '@type': 'Organization',
-          name: 'Your Store Name',
+          name: 'کارگاه چرم خارَک',
           url: process.env.NEXT_PUBLIC_SITE_URL,
         },
         ratingValue: (

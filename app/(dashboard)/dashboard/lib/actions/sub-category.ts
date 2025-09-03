@@ -330,21 +330,31 @@ export async function deleteSubCategory(
     if (!isExisting) {
       return {
         errors: {
-          _form: ['دسته‌بندی حذف شده است!'],
+          _form: ['زیر دسته‌بندی حذف شده است!'],
         },
       }
     }
+    const productWithSubcategory = await prisma.product.count({
+      where: { subCategoryId: isExisting.id },
+    })
 
-    if (isExisting.images && isExisting.images?.length > 0) {
+    if (productWithSubcategory > 0) {
+      return {
+        errors: {
+          _form: ['نمی‌توان زیردسته را حذف کرد زیرا در آن محصولات موجود است!'],
+        },
+      }
+    }
+    if (isExisting?.images && isExisting?.images?.length > 0) {
       const oldImageKeys = isExisting.images.map((img) => img.key)
 
       await Promise.all(oldImageKeys.map((key) => deleteFileFromS3(key)))
-      await prisma.subCategory.delete({
-        where: {
-          id: subCategoryId,
-        },
-      })
     }
+    await prisma.subCategory.delete({
+      where: {
+        id: subCategoryId,
+      },
+    })
   } catch (err: unknown) {
     if (err instanceof Error) {
       return {

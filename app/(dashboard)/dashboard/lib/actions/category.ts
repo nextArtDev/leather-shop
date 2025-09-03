@@ -318,7 +318,19 @@ export async function deleteCategory(
         },
       }
     }
+    const subWithCategory = await prisma.subCategory.count({
+      where: { categoryId: isExisting.id },
+    })
 
+    if (subWithCategory > 0) {
+      return {
+        errors: {
+          _form: [
+            'نمی‌توان دسته‌بندی را حذف کرد زیرا در آن زیردسته موجود است!',
+          ],
+        },
+      }
+    }
     if (isExisting.images && isExisting.images?.length > 0) {
       const oldImageKeys = isExisting.images.map((img) => img.key)
 

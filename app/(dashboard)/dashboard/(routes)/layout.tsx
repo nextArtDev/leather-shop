@@ -1,6 +1,7 @@
 import ModalProvider from '@/providers/modal-provider'
 
 import { ReactNode } from 'react'
+import { Toaster } from 'sonner'
 
 export default async function DashboardLayout({
   children,
@@ -9,7 +10,11 @@ export default async function DashboardLayout({
 }) {
   return (
     <div>
-      <ModalProvider>{children}</ModalProvider>
+      <ModalProvider>
+        {children}
+
+        <Toaster />
+      </ModalProvider>
     </div>
   )
 }

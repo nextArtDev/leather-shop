@@ -1,3 +1,4 @@
+'use client'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,10 +22,11 @@ import {
 import { Edit, MoreHorizontal, Trash } from 'lucide-react'
 
 import { usePathname } from 'next/navigation'
-import { useActionState } from 'react'
+import { useActionState, useEffect } from 'react'
 
 import Link from 'next/link'
 import { deleteCategory } from '../../../lib/actions/category'
+import { toast } from 'sonner'
 
 interface CellActionsProps {
   categoryId: string
@@ -33,14 +35,18 @@ interface CellActionsProps {
 export const CellActions: React.FC<CellActionsProps> = ({ categoryId }) => {
   const path = usePathname()
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_, deleteAction, pending] = useActionState(
+  const [formState, deleteAction, pending] = useActionState(
     deleteCategory.bind(null, path, categoryId as string),
     {
       errors: {},
     }
   )
-
+  useEffect(() => {
+    if (formState.errors._form && formState.errors._form.length > 0) {
+      // Show error toast
+      toast.error(formState.errors._form[0])
+    }
+  }, [formState.errors])
   if (!categoryId) return null
 
   return (

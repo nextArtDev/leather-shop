@@ -23,11 +23,12 @@ import {
 import { Edit, MoreHorizontal, Trash } from 'lucide-react'
 
 import { usePathname } from 'next/navigation'
-import { useActionState } from 'react'
+import { useActionState, useEffect } from 'react'
 // import { toast } from 'sonner'
 import { deleteSubCategory } from '../../../lib/actions/sub-category'
 
 import Link from 'next/link'
+import { toast } from 'sonner'
 
 interface CellActionsProps {
   subCategoryId: string
@@ -36,13 +37,18 @@ interface CellActionsProps {
 export const CellActions: React.FC<CellActionsProps> = ({ subCategoryId }) => {
   const path = usePathname()
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_, deleteAction, pending] = useActionState(
+  const [formState, deleteAction, pending] = useActionState(
     deleteSubCategory.bind(null, path, subCategoryId as string),
     {
       errors: {},
     }
   )
+  useEffect(() => {
+    if (formState.errors._form && formState.errors._form.length > 0) {
+      // Show error toast
+      toast.error(formState.errors._form[0])
+    }
+  }, [formState.errors])
   // Return null if rowData or subCategoryId don't exist
   if (!subCategoryId) return null
 

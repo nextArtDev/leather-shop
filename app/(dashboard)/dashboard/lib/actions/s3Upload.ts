@@ -84,9 +84,6 @@ export async function deleteFileFromS3(key: string) {
       },
     })
 
-    // console.log(response)
-
-    // console.log('File uploaded successfully:', response)
     return {
       success: true,
     }

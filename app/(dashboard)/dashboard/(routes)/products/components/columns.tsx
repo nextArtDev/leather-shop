@@ -41,8 +41,9 @@ import {
 import NextImage from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useActionState } from 'react'
+import { useActionState, useEffect } from 'react'
 import { deleteProduct } from '../../../lib/actions/products'
+import { toast } from 'sonner'
 
 export type ProductColumn = {
   id: string
@@ -179,17 +180,18 @@ const CellActions: React.FC<CellActionsProps> = ({ productId }) => {
   // const [loading, setLoading] = useState(false)
   const path = usePathname()
 
-  // const router = useRouter()
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_, deleteAction, pending] = useActionState(
+  const [formState, deleteAction, pending] = useActionState(
     deleteProduct.bind(null, path, productId as string),
     {
       errors: {},
     }
   )
+  useEffect(() => {
+    if (formState.errors._form && formState.errors._form.length > 0) {
+      toast.error(formState.errors._form[0])
+    }
+  }, [formState.errors])
   if (!productId) return null
-
-  // Return null if rowData or rowData.id don't exist
 
   return (
     <AlertDialog>
@@ -226,10 +228,10 @@ const CellActions: React.FC<CellActionsProps> = ({ productId }) => {
       </DropdownMenu>
       <AlertDialogContent className="max-w-lg">
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-left">
+          <AlertDialogTitle className="text-right">
             از حذف محصول مطمئن هستید؟
           </AlertDialogTitle>
-          <AlertDialogDescription className="text-left">
+          <AlertDialogDescription className="text-right">
             این عملیات برگشت‌پذیر نیست و تمام محصول و محصولاتش حذف خواهند شد!
           </AlertDialogDescription>
         </AlertDialogHeader>

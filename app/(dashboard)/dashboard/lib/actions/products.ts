@@ -869,7 +869,7 @@ export async function deleteProduct(
 
   try {
     const isExisting:
-      | (Product & { variantImages: Image[] | null } & {
+      | (Product & { variantImages: Image[] } & {
           images: Image[] | null
         })
       | null = await prisma.product.findFirst({
@@ -883,14 +883,34 @@ export async function deleteProduct(
     if (!isExisting) {
       return {
         errors: {
-          _form: ['دسته‌بندی حذف شده است!'],
+          _form: ['محصول حذف شده است!'],
         },
       }
     }
+    const ordersWithProduct = await prisma.orderItem.count({
+      where: { productId: productId },
+    })
 
-    if (isExisting.images && isExisting.images?.length > 0) {
+    if (ordersWithProduct > 0) {
+      return {
+        errors: {
+          _form: ['نمی‌توان محصول را حذف کرد زیرا در سفارشات موجود است!'],
+        },
+      }
+    }
+    const deletePromises: Promise<unknown>[] = []
+
+    if (isExisting?.images && isExisting?.images?.length > 0) {
       const oldImageKeys = isExisting.images.map((img) => img.key)
       await Promise.all(oldImageKeys.map((key) => deleteFileFromS3(key)))
+    }
+
+    if (isExisting?.variantImages && isExisting?.variantImages?.length > 0) {
+      const oldImageKeys = isExisting.variantImages.map((img) => img.key)
+      await Promise.all(oldImageKeys.map((key) => deleteFileFromS3(key)))
+    }
+    if (deletePromises.length > 0) {
+      await Promise.allSettled(deletePromises) // Use allSettled to continue even if some fail
     }
 
     await prisma.product.delete({
