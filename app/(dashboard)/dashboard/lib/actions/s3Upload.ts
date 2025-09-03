@@ -13,7 +13,7 @@ import { randomUUID } from 'crypto'
 const s3Client = new S3Client({
   region: process.env.NEXT_AWS_S3_REGION!,
   //   endpoint: process.env.LIARA_ENDPOINT!,
-  endpoint: 'https://storage.iran.liara.space',
+  endpoint: 'https://storage.c2.liara.space',
   //   endpoint: 'https://ams3.digitaloceanspaces.com',
   //   endpointProvider: process.env.LIARA_ENDPOINT!,
 
@@ -34,7 +34,7 @@ export async function uploadFileToS3(file: Buffer, fileName: string) {
 
   const validFileName = getValidFileName(fileName)
   const Key = `${validFileName}.${randomUUID()}`
-  const url = `https://mye-commerce.storage.iran.liara.space/${Key}`
+  const url = `https://mye-commerce.storage.c2.liara.space/${Key}`
 
   const params = {
     Bucket: process.env.NEXT_AWS_S3_BUCKET_NAME,

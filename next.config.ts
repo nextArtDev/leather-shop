@@ -11,13 +11,13 @@ import type { NextConfig } from 'next'
 //       // --- FIX IS HERE ---
 //       // We are adding 'data:' to connect-src to allow the cropper's fetch() call.
 //       // It's also better to be specific rather than using '*', so we list your trusted domains.
-//       "connect-src 'self' mye-commerce.storage.iran.liara.space data:;",
+//       "connect-src 'self'kharak.storage.c2.liara.space data:;",
 //       // --- END FIX ---
 
 //       "style-src 'self' 'unsafe-inline';",
 //       "font-src 'self';",
-//       "img-src 'self' data: blob: mye-commerce.storage.iran.liara.space;",
-//       "media-src 'self' blob: mye-commerce.storage.iran.liara.space;",
+//       "img-src 'self' data: blob:kharak.storage.c2.liara.space;",
+//       "media-src 'self' blob:kharak.storage.c2.liara.space;",
 //       "frame-ancestors 'none';",
 
 //       // --- PROACTIVE ADDITION HERE ---
@@ -74,7 +74,7 @@ const getAllowedDomains = () => {
   const envDomains = process.env.ALLOWED_DOMAINS?.split(',') || []
 
   const baseDomains = [
-    'mye-commerce.storage.iran.liara.space',
+    'mye-commerce.storage.c2.liara.space',
     'https://*.zarinpal.com',
     'https://*.better-auth.com',
     'https://api.github.com',
@@ -118,8 +118,8 @@ const securityHeaders = [
       `connect-src 'self' ${getAllowedDomains().join(' ')};`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
       "font-src 'self' https://fonts.gstatic.com data:;",
-      "img-src 'self' data: blob: mye-commerce.storage.iran.liara.space https://*.zarinpal.com;",
-      "media-src 'self' blob: mye-commerce.storage.iran.liara.space;",
+      "img-src 'self' data: blob:kharak.storage.c2.liara.space https://*.zarinpal.com;",
+      "media-src 'self' blob:kharak.storage.c2.liara.space;",
       "frame-src 'self' https://*.zarinpal.com;",
       "frame-ancestors 'none';",
       "worker-src 'self' blob:;",
@@ -175,7 +175,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'mye-commerce.storage.iran.liara.space',
+        hostname: 'mye-commerce.storage.c2.liara.space',
         pathname: '/**',
       },
     ],
@@ -196,8 +196,8 @@ const nextConfig: NextConfig = {
               `connect-src 'self' ${getAllowedDomains().join(' ')};`,
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
               "font-src 'self' https://fonts.gstatic.com data:;",
-              "img-src 'self' data: blob: mye-commerce.storage.iran.liara.space https://*.zarinpal.com;",
-              "media-src 'self' blob: mye-commerce.storage.iran.liara.space;",
+              "img-src 'self' data: blob:kharak.storage.c2.liara.space https://*.zarinpal.com;",
+              "media-src 'self' blob:kharak.storage.c2.liara.space;",
               "frame-src 'self' https://*.zarinpal.com;",
               "frame-ancestors 'none';",
               "worker-src 'self' blob:;",
@@ -232,13 +232,13 @@ const nextConfig: NextConfig = {
             value: [
               "default-src 'self';",
               "script-src 'self' 'unsafe-eval' 'unsafe-inline';",
-              `connect-src 'self' mye-commerce.storage.iran.liara.space data: ${getAllowedDomains().join(
+              `connect-src 'self'kharak.storage.c2.liara.space data: ${getAllowedDomains().join(
                 ' '
               )};`,
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
               "font-src 'self' https://fonts.gstatic.com data:;",
-              "img-src 'self' data: blob: mye-commerce.storage.iran.liara.space https://*.zarinpal.com;",
-              "media-src 'self' blob: mye-commerce.storage.iran.liara.space;",
+              "img-src 'self' data: blob:kharak.storage.c2.liara.space https://*.zarinpal.com;",
+              "media-src 'self' blob:kharak.storage.c2.liara.space;",
               "frame-src 'self' https://*.zarinpal.com;",
               "frame-ancestors 'none';",
               "worker-src 'self' blob:;",
@@ -344,7 +344,7 @@ export default nextConfig
 //   },
 //   images: {
 //     remotePatterns: [
-//       new URL('https://mye-commerce.storage.iran.liara.space/**'),
+//       new URL('https://mye-commerce.storage.c2.liara.space/**'),
 //     ],
 //   },
 //   async headers() {

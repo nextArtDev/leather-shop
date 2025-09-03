@@ -5,14 +5,13 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 enum Role {
   USER
   ADMIN
-  DOCTOR
 }
 
 model User {
@@ -168,7 +167,7 @@ enum ShippingFeeMethod {
 model Product {
   id                String            @id @default(uuid())
   name              String
-  description       String            @db.LongText
+  description       String
   slug              String            @unique
   brand             String
   rating            Float             @default(0)

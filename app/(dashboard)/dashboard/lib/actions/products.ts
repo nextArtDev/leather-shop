@@ -898,6 +898,7 @@ export async function deleteProduct(
         },
       }
     }
+
     const deletePromises: Promise<unknown>[] = []
 
     if (isExisting?.images && isExisting?.images?.length > 0) {

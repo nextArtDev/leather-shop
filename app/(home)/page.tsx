@@ -22,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
     getHomePageReviews(),
   ])
 
-  const categoryNames = categories.map((cat) => cat.name).slice(0, 5)
+  const categoryNames = categories?.map((cat) => cat.name).slice(0, 5)
   const avgRating = !!reviews?.length
     ? (
         reviews?.reduce((sum, review) => sum + review.rating, 0) /
@@ -40,7 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: 'کارگاه چرم خارَک - چرم طبیعی دست‌ساز',
     description,
     keywords: [
-      ...categoryNames.map((name) => name.toLowerCase()),
+      ...categoryNames?.map((name) => name.toLowerCase()),
       'online store',
       'premium products',
       'fast shipping',
@@ -204,7 +204,7 @@ export default async function Home() {
           name: 'Best Sellers',
           description: 'Our most popular products',
           numberOfItems: bestSellers.length,
-          itemListElement: bestSellers.slice(0, 10).map((product, index) => ({
+          itemListElement: bestSellers.slice(0, 10)?.map((product, index) => ({
             '@type': 'ListItem',
             position: index + 1,
             item: {
@@ -213,10 +213,10 @@ export default async function Home() {
               description: product.description,
               image: product.images?.[0]?.url,
               url: `${process.env.NEXT_PUBLIC_SITE_URL}/products/${product.slug}`,
-              ...(product.sizes.map((s) => s.price) && {
+              ...(product.sizes?.map((s) => s.price) && {
                 offers: {
                   '@type': 'Offer',
-                  price: product.sizes.map((s) => s.price)[0],
+                  price: product.sizes?.map((s) => s.price)[0],
                   priceCurrency: 'USD',
                   availability: 'https://schema.org/InStock',
                 },
@@ -235,7 +235,7 @@ export default async function Home() {
           name: 'New Arrivals',
           description: 'Latest products in our collection',
           numberOfItems: products.length,
-          itemListElement: products.slice(0, 10).map((product, index) => ({
+          itemListElement: products.slice(0, 10)?.map((product, index) => ({
             '@type': 'ListItem',
             position: index + 1,
             item: {
@@ -244,10 +244,10 @@ export default async function Home() {
               description: product.description,
               image: product.images?.[0]?.url,
               url: `${process.env.NEXT_PUBLIC_SITE_URL}/products/${product.slug}`,
-              ...(product.sizes.map((s) => s.price) && {
+              ...(product.sizes?.map((s) => s.price) && {
                 offers: {
                   '@type': 'Offer',
-                  price: product.sizes.map((s) => s.price)[0],
+                  price: product.sizes?.map((s) => s.price)[0],
                   priceCurrency: 'USD',
                   availability: 'https://schema.org/InStock',
                 },
@@ -350,7 +350,7 @@ export default async function Home() {
 
       {!!reviews && (
         <TestimonialCarousel
-          testimonials={reviews.map((review) => {
+          testimonials={reviews?.map((review) => {
             const { title, description, user, createdAt, rating } = review
             return {
               title,
