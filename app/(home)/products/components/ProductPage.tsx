@@ -22,6 +22,7 @@ import FAQItem from '../../faq/components/FAQItem'
 import { Badge } from '@/components/ui/badge'
 import RelatedProductCarousel from '@/components/product/related-products-carousel'
 import Countdown from './count-down'
+import ProductProperties from './ProductProperties'
 
 type ProductPageProp = {
   data: NonNullable<ProductDetails>
@@ -51,7 +52,7 @@ const ProductPage: FC<ProductPageProp> = ({
     sizes,
     colors,
     brand,
-    subCategory,
+    // subCategory,
     id,
     name,
     slug,
@@ -110,57 +111,64 @@ const ProductPage: FC<ProductPageProp> = ({
               </>
             )}
           </div>
-          <p className="text-sm font-semibold">{subCategory.name}</p>
+          <p className="text-sm font-semibold">{brand}</p>
           <p className="text-base font-bold">
             {/* medium handbag with double flap in grained leather */}
-            {brand}
+            {name}
           </p>
 
           <Separator />
-
-          <p className="text-sm font-semibold">رنگها</p>
-          <div className="flex gap-1">
-            {colors.map((clr: ProductColor) => (
-              <Button
-                size={'icon'}
-                key={clr.id}
-                style={{ background: clr.name }}
-                className={`rounded-none size-8 cursor-pointer`}
-              />
-            ))}
-          </div>
-          <Separator />
-
-          <p className="text-sm font-semibold">سایزها</p>
-          <ul className="flex gap-1">
-            {sizes.map((size: ProductSize) => (
-              <li key={size.id}>
-                <Link
-                  // href={`/products/${slug}/?sizeId=${size.id}`}
-                  href={{
-                    pathname: `/products/${slug}`,
-                    query: { sizeId: `${size.id}` },
-                  }}
-                  replace
-                  scroll={false}
-                  className={cn(
-                    'rounded-sm  cursor-pointer',
-                    buttonVariants({
-                      variant: size.id === sizeId ? 'default' : 'outline',
-                    }),
-                    size.quantity <= 0 &&
-                      'opacity-50 cursor-not-allowed pointer-events-none'
-                  )}
-                >
-                  {size.size}
-                  {size.quantity <= 0 && (
-                    <span className="ml-1 text-xs text-red-500">ناموجود</span>
-                  )}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <article className="flex items-center justify-evenly">
+            <div className="flex-1 flex flex-col gap-2 items-start">
+              <p className="text-sm font-semibold">رنگ</p>
+              <div className="flex gap-1">
+                {colors.map((clr: ProductColor) => (
+                  <Button
+                    size={'icon'}
+                    key={clr.id}
+                    style={{ background: clr.name }}
+                    className={`rounded-none size-8 cursor-pointer`}
+                  />
+                ))}
+              </div>
+            </div>
+            <Separator orientation="vertical" className="self-center mx-2" />
+            <div className="flex-1 flex flex-col gap-2 items-start">
+              <p className="text-sm font-semibold">سایز</p>
+              <ul className="flex flex-wrap gap-1">
+                {sizes.map((size: ProductSize) => (
+                  <li key={size.id}>
+                    <Link
+                      // href={`/products/${slug}/?sizeId=${size.id}`}
+                      href={{
+                        pathname: `/products/${slug}`,
+                        query: { sizeId: `${size.id}` },
+                      }}
+                      replace
+                      scroll={false}
+                      className={cn(
+                        'rounded-sm  cursor-pointer',
+                        buttonVariants({
+                          variant: size.id === sizeId ? 'default' : 'outline',
+                        }),
+                        size.quantity <= 0 &&
+                          'opacity-50 cursor-not-allowed pointer-events-none'
+                      )}
+                    >
+                      {size.size}
+                      {size.quantity <= 0 && (
+                        <span className="ml-1 text-xs text-red-500">
+                          ناموجود
+                        </span>
+                      )}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </article>
         </article>
+        <Separator />
         <article>
           {isSale && saleEndDate && (
             <div className="mt-4 pb-2">
@@ -222,7 +230,7 @@ const ProductPage: FC<ProductPageProp> = ({
         >
           سبد خرید
         </Link>
-
+        <Separator />
         <article className="flex flex-col gap-6 items-start py-12">
           <div className="flex flex-col gap-4 justify-around">
             {/* <p className="text-sm">{name}</p> */}
@@ -252,75 +260,26 @@ const ProductPage: FC<ProductPageProp> = ({
               </div>
             )}
           </div>
+          <Separator />
+          <div className="w-full h-full flex  flex-col gap-4  ">
+            <h1 className="font-semibold">ویژگی‌ها و ابعاد:</h1>
 
-          <div className="w-full h-full flex  flex-wrap gap-2  items-start  ">
-            {!!sizes.length && (
-              <article className="mx-auto px-4 py-8 w-fit max-w-sm">
-                <h1 className="text-xl font-bold w-full text-center">ابعاد</h1>
-                <Separator className="my-1" />
-                <div className=" my-2">
-                  {sizes.map((size, i) => (
-                    <div
-                      key={i}
-                      className="grid grid-cols-32 gap-1 place-content-center place-items-center w-full h-full py-1"
-                    >
-                      <span className="col-span-10 place-self-right text-center  ">
-                        <p className="font-semibold">عرض</p>
-                        {size.width}
-                      </span>
-                      <Separator
-                        orientation="vertical"
-                        className="col-span-1 h-2 place-self-right "
-                      />
-                      <span className="col-span-10 grid-flow-dense text-center">
-                        <p className="font-semibold">ارتفاع</p>
-                        {size.height}
-                      </span>
-                      <Separator
-                        orientation="vertical"
-                        className="col-span-1 h-2 place-self-right "
-                      />
-                      <span className="col-span-10 grid-flow-dense text-center">
-                        <p className="font-semibold">طول</p>
-                        {size.length}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </article>
-            )}
-            {/* specs */}
-
-            {!!specs.filter((s) => s.name.trim().length > 0).length && (
-              <article className="mx-auto py-8 w-fit max-w-md">
-                <h1 className="text-xl font-bold w-full text-center">
-                  خصوصیات
-                </h1>
-                <Separator className="my-1" />
-                <div className=" my-2">
-                  {specs.map((spec, i) => (
-                    <div
-                      key={i}
-                      className="grid grid-cols-21 gap-1 place-content-center place-items-center w-full h-full py-1"
-                    >
-                      <span className="col-span-10 place-self-right text-right font-semibold">
-                        {spec.name}
-                      </span>
-                      <Separator
-                        orientation="vertical"
-                        className="col-span-1 h-2 place-self-right "
-                      />
-                      <span className="col-span-10 w-full min-w-[70px]">
-                        {spec.value}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </article>
+            {currentSize && (
+              <ProductProperties
+                size={currentSize}
+                weight={weight ? weight : undefined}
+                specs={
+                  !!specs.filter((s) => s.name.trim().length > 0).length
+                    ? specs
+                    : undefined
+                }
+              />
             )}
           </div>
         </article>
+        <Separator />
         <ProductStatements />
+        <Separator />
         <ReviewList
           reviews={reviews}
           productId={id}
@@ -331,19 +290,21 @@ const ProductPage: FC<ProductPageProp> = ({
         />
 
         <Separator />
+
         {!!questions.filter((q) => q.question.trim().length > 0).length && (
-          <div className="mx-auto max-w-2xl space-y-2">
+          <div className="flex items-start w-full mx-auto max-w-2xl space-y-2">
             {questions.map((faq, index) => (
               <FAQItem
                 key={index}
                 {...faq}
                 index={index}
-                className="rounded-sm"
+                className="rounded-sm w-full"
               />
             ))}
           </div>
         )}
       </div>
+      <Separator />
       {!!relatedProducts?.length && (
         <section className="  flex gap-6 flex-col justify-center items-center py-8">
           <h2 className="font-bold text-2xl ">محصولات مرتبط</h2>

@@ -1,8 +1,8 @@
 import type { NextConfig } from 'next'
 
 const isDev = process.env.NODE_ENV === 'development'
+const isLiara = process.env.PLATFORM === 'liara'
 
-// Get allowed domains from environment variables
 const getAllowedDomains = () => {
   const envDomains = process.env.ALLOWED_DOMAINS?.split(',') || []
 
@@ -13,66 +13,29 @@ const getAllowedDomains = () => {
     'https://api.github.com',
     'https://accounts.google.com',
     'https://kharak.liara.run',
-    // SMS service domains for Better-Auth phone plugin
     'https://api.twilio.com',
     'https://*.twilio.com',
     'https://api.kavenegar.com',
     'https://*.kavenegar.com',
-    'https://api.smsir.io',
-    'https://api.ghasedaksms.com',
   ]
 
   if (isDev) {
-    return [
-      ...baseDomains,
-      ...envDomains,
-      'data:', // Important for development
-    ]
+    return [...baseDomains, ...envDomains, 'data:']
   }
 
   return [...baseDomains, ...envDomains]
 }
 
-// Get CORS origins for API routes
 const getCorsOrigins = () => {
   if (isDev) {
     return [
       'http://localhost:3000',
       'http://192.168.1.159:3000',
       'http://127.0.0.1:3000',
-      // Add other local IPs if needed
     ]
   }
-
-  return [
-    'https://kharak.liara.run', // Replace with your actual domain
-    // Add other production origins if needed
-  ]
+  return ['https://kharak.liara.run']
 }
-
-// Base security headers
-const baseSecurityHeaders = [
-  {
-    key: 'Strict-Transport-Security',
-    value: 'max-age=63072000; includeSubDomains; preload',
-  },
-  {
-    key: 'X-Frame-Options',
-    value: 'SAMEORIGIN',
-  },
-  {
-    key: 'X-Content-Type-Options',
-    value: 'nosniff',
-  },
-  {
-    key: 'Referrer-Policy',
-    value: 'strict-origin-when-cross-origin',
-  },
-  {
-    key: 'Expect-CT',
-    value: 'max-age=0',
-  },
-]
 
 const nextConfig: NextConfig = {
   output: 'standalone',
@@ -81,7 +44,9 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '5mb',
     },
   },
+
   images: {
+    unoptimized: isLiara || process.env.DISABLE_IMAGE_OPTIMIZATION === 'true',
     remotePatterns: [
       {
         protocol: 'https',
@@ -89,15 +54,15 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
-    // Optimize for your use case
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
   },
+
   async headers() {
     const corsOrigins = getCorsOrigins()
 
     return [
-      // Public pages - Strict security
+      // Public pages - RELAXED COEP for image compatibility
       {
         source: '/((?!dashboard|api).*)',
         headers: [
@@ -119,7 +84,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Cross-Origin-Embedder-Policy',
-            value: 'require-corp',
+            value: 'unsafe-none', // Changed from require-corp
           },
           {
             key: 'Cross-Origin-Opener-Policy',
@@ -127,17 +92,32 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Cross-Origin-Resource-Policy',
-            value: 'same-origin',
+            value: 'cross-origin', // Allow cross-origin resources
           },
           {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=()',
           },
-          ...baseSecurityHeaders,
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=63072000; includeSubDomains; preload',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
         ],
       },
 
-      // Dashboard - More permissive for admin functionality
+      // Dashboard - More permissive
       {
         source: '/dashboard/(.*)',
         headers: [
@@ -176,11 +156,26 @@ const nextConfig: NextConfig = {
             value:
               'camera=(self), microphone=(), geolocation=(), payment=(self)',
           },
-          ...baseSecurityHeaders,
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=63072000; includeSubDomains; preload',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
         ],
       },
 
-      // API routes - CORS enabled
+      // API routes
       {
         source: '/api/(.*)',
         headers: [
@@ -195,15 +190,11 @@ const nextConfig: NextConfig = {
           {
             key: 'Access-Control-Allow-Headers',
             value:
-              'Content-Type, Authorization, X-Requested-With, X-CSRF-Token, Accept, Origin, User-Agent',
+              'Content-Type, Authorization, X-Requested-With, X-CSRF-Token',
           },
           {
             key: 'Access-Control-Allow-Credentials',
             value: 'true',
-          },
-          {
-            key: 'Access-Control-Max-Age',
-            value: '86400', // 24 hours
           },
           {
             key: 'Cross-Origin-Resource-Policy',
@@ -216,7 +207,7 @@ const nextConfig: NextConfig = {
         ],
       },
 
-      // Better-Auth specific endpoints - Most permissive for auth flows
+      // Better-Auth endpoints
       {
         source: '/api/auth/(.*)',
         headers: [
@@ -231,15 +222,11 @@ const nextConfig: NextConfig = {
           {
             key: 'Access-Control-Allow-Headers',
             value:
-              'Content-Type, Authorization, X-Requested-With, X-CSRF-Token, Accept, Origin, User-Agent, Cache-Control, Pragma',
+              'Content-Type, Authorization, X-Requested-With, X-CSRF-Token',
           },
           {
             key: 'Access-Control-Allow-Credentials',
             value: 'true',
-          },
-          {
-            key: 'Access-Control-Max-Age',
-            value: '86400',
           },
           {
             key: 'Cross-Origin-Opener-Policy',
@@ -252,73 +239,6 @@ const nextConfig: NextConfig = {
           {
             key: 'Cross-Origin-Resource-Policy',
             value: 'cross-origin',
-          },
-          // Important for Better-Auth phone plugin
-          {
-            key: 'Cache-Control',
-            value: 'no-cache, no-store, must-revalidate',
-          },
-        ],
-      },
-
-      // Phone/SMS specific routes for Better-Auth
-      {
-        source: '/api/auth/send-sms',
-        headers: [
-          {
-            key: 'Access-Control-Allow-Origin',
-            value: isDev ? '*' : corsOrigins.join(','),
-          },
-          {
-            key: 'Access-Control-Allow-Methods',
-            value: 'POST, OPTIONS',
-          },
-          {
-            key: 'Access-Control-Allow-Headers',
-            value:
-              'Content-Type, Authorization, X-Requested-With, X-CSRF-Token',
-          },
-          {
-            key: 'Access-Control-Allow-Credentials',
-            value: 'true',
-          },
-          {
-            key: 'Cross-Origin-Resource-Policy',
-            value: 'cross-origin',
-          },
-          {
-            key: 'Cross-Origin-Embedder-Policy',
-            value: 'unsafe-none',
-          },
-        ],
-      },
-      {
-        source: '/api/auth/verify-phone',
-        headers: [
-          {
-            key: 'Access-Control-Allow-Origin',
-            value: isDev ? '*' : corsOrigins.join(','),
-          },
-          {
-            key: 'Access-Control-Allow-Methods',
-            value: 'POST, OPTIONS',
-          },
-          {
-            key: 'Access-Control-Allow-Headers',
-            value:
-              'Content-Type, Authorization, X-Requested-With, X-CSRF-Token',
-          },
-          {
-            key: 'Access-Control-Allow-Credentials',
-            value: 'true',
-          },
-          {
-            key: 'Cross-Origin-Resource-Policy',
-            value: 'cross-origin',
-          },
-          {
-            key: 'Cross-Origin-Embedder-Policy',
-            value: 'unsafe-none',
           },
         ],
       },

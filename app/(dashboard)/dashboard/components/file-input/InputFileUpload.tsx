@@ -267,7 +267,7 @@ export const ImageCropperDialog = ({
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Crop Your Image</DialogTitle>
+          <DialogTitle>تنظیم عکس</DialogTitle>
         </DialogHeader>
         {file && (
           <ImageCrop
@@ -315,7 +315,7 @@ import {
 } from 'react'
 import ReactCrop, {
   centerCrop,
-  makeAspectCrop,
+  // makeAspectCrop,
   type PercentCrop,
   type PixelCrop,
   type ReactCropProps,
@@ -328,28 +328,43 @@ const centerAspectCrop = (
   mediaWidth: number,
   mediaHeight: number,
   aspect: number | undefined
-): PercentCrop =>
-  centerCrop(
-    aspect
-      ? makeAspectCrop(
-          {
-            unit: '%',
-            width: 90,
-          },
-          aspect,
-          mediaWidth,
-          mediaHeight
-        )
-      : { x: 0, y: 0, width: 90, height: 90, unit: '%' },
+): PercentCrop => {
+  if (!aspect) {
+    return { x: 5, y: 5, width: 90, height: 90, unit: '%' }
+  }
+
+  const mediaAspect = mediaWidth / mediaHeight
+  let cropWidth: number
+  let cropHeight: number
+
+  if (mediaAspect > aspect) {
+    // Image is wider than desired aspect ratio
+    cropHeight = 90 // Use most of the height
+    cropWidth = (cropHeight * aspect * mediaHeight) / mediaWidth
+  } else {
+    // Image is taller than desired aspect ratio
+    cropWidth = 90 // Use most of the width
+    cropHeight = (cropWidth * mediaWidth) / (aspect * mediaHeight)
+  }
+
+  return centerCrop(
+    {
+      unit: '%',
+      width: Math.min(cropWidth, 90),
+      height: Math.min(cropHeight, 90),
+    },
     mediaWidth,
     mediaHeight
   )
+}
+// const getCroppedPngImage = async (
 
 const getCroppedPngImage = async (
   imageSrc: HTMLImageElement,
-  scaleFactor: number,
   pixelCrop: PixelCrop,
-  maxImageSize: number
+  maxImageSize: number,
+  outputFormat: 'image/jpeg' | 'image/png' | 'image/webp' = 'image/jpeg',
+  quality: number = 0.92
 ): Promise<string> => {
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d')
@@ -358,36 +373,54 @@ const getCroppedPngImage = async (
     throw new Error('Context is null, this should never happen.')
   }
 
+  // Calculate scale factors properly
   const scaleX = imageSrc.naturalWidth / imageSrc.width
   const scaleY = imageSrc.naturalHeight / imageSrc.height
 
-  ctx.imageSmoothingEnabled = false
-  canvas.width = pixelCrop.width
-  canvas.height = pixelCrop.height
+  // Set canvas size to the actual crop dimensions in natural image coordinates
+  canvas.width = Math.round(pixelCrop.width * scaleX)
+  canvas.height = Math.round(pixelCrop.height * scaleY)
 
+  // Enable high-quality image smoothing
+  ctx.imageSmoothingEnabled = true
+  ctx.imageSmoothingQuality = 'high'
+
+  // Draw the cropped portion at full resolution
   ctx.drawImage(
     imageSrc,
-    pixelCrop.x * scaleX,
-    pixelCrop.y * scaleY,
-    pixelCrop.width * scaleX,
-    pixelCrop.height * scaleY,
-    0,
-    0,
-    canvas.width,
-    canvas.height
+    Math.round(pixelCrop.x * scaleX), // source x
+    Math.round(pixelCrop.y * scaleY), // source y
+    Math.round(pixelCrop.width * scaleX), // source width
+    Math.round(pixelCrop.height * scaleY), // source height
+    0, // destination x
+    0, // destination y
+    canvas.width, // destination width
+    canvas.height // destination height
   )
 
-  const croppedImageUrl = canvas.toDataURL('image/')
-  const response = await fetch(croppedImageUrl)
-  const blob = await response.blob()
+  // Try different quality settings if file is too large
+  let currentQuality = quality
+  let croppedImageUrl = ''
+  let blob: Blob | null = null
 
-  if (blob.size > maxImageSize) {
-    return await getCroppedPngImage(
-      imageSrc,
-      scaleFactor * 0.9,
-      pixelCrop,
-      maxImageSize
-    )
+  do {
+    croppedImageUrl = canvas.toDataURL(outputFormat, currentQuality)
+    const response = await fetch(croppedImageUrl)
+    blob = await response.blob()
+
+    if (blob.size <= maxImageSize) {
+      break
+    }
+
+    // Reduce quality incrementally
+    currentQuality -= 0.1
+  } while (currentQuality > 0.1)
+
+  // If still too large, try PNG compression
+  if (blob && blob.size > maxImageSize && outputFormat !== 'image/png') {
+    croppedImageUrl = canvas.toDataURL('image/png')
+    const response = await fetch(croppedImageUrl)
+    blob = await response.blob()
   }
 
   return croppedImageUrl
@@ -485,9 +518,10 @@ export const ImageCrop = ({
 
     const croppedImage = await getCroppedPngImage(
       imgRef.current,
-      1,
       completedCrop,
-      maxImageSize
+      maxImageSize,
+      'image/webp', // or 'image/webp' for better compression
+      0.95 // High quality
     )
 
     onCrop?.(croppedImage)
