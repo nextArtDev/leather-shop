@@ -34,13 +34,9 @@ const data = {
       ],
     },
     {
-      title: 'محصولات',
+      title: 'فروشگاه',
       url: '/dashboard/products',
       items: [
-        {
-          title: 'محصولات',
-          url: '/dashboard/products',
-        },
         {
           title: 'دسته‌بندی',
           url: '/dashboard/categories',
@@ -50,6 +46,10 @@ const data = {
           title: 'زیر دسته‌بندی',
           url: '/dashboard/sub-categories',
           // isActive: true,
+        },
+        {
+          title: 'محصولات',
+          url: '/dashboard/products',
         },
         // {
         //   title: 'Rendering',

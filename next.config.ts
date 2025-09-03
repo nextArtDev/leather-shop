@@ -1,84 +1,25 @@
 import type { NextConfig } from 'next'
 
-//gemini
-// const securityHeaders = [
-//   {
-//     key: 'Content-Security-Policy',
-//     value: [
-//       "default-src 'self';",
-//       "script-src 'self' 'unsafe-eval' 'unsafe-inline';",
-
-//       // --- FIX IS HERE ---
-//       // We are adding 'data:' to connect-src to allow the cropper's fetch() call.
-//       // It's also better to be specific rather than using '*', so we list your trusted domains.
-//       "connect-src 'self'kharak.storage.c2.liara.space data:;",
-//       // --- END FIX ---
-
-//       "style-src 'self' 'unsafe-inline';",
-//       "font-src 'self';",
-//       "img-src 'self' data: blob:kharak.storage.c2.liara.space;",
-//       "media-src 'self' blob:kharak.storage.c2.liara.space;",
-//       "frame-ancestors 'none';",
-
-//       // --- PROACTIVE ADDITION HERE ---
-//       // Allow web workers from your own domain and from blobs. This is often
-//       // needed by client-side libraries for performance.
-//       "worker-src 'self' blob:;",
-//       // --- END ADDITION ---
-//     ].join(' '),
-//   },
-//   // All other headers remain the same...
-//   {
-//     key: 'Permissions-Policy',
-//     value: 'camera=(), microphone=(), geolocation=()',
-//   },
-//   {
-//     key: 'Strict-Transport-Security',
-//     value: 'max-age=63072000; includeSubDomains; preload',
-//   },
-//   {
-//     key: 'X-Frame-Options',
-//     value: 'SAMEORIGIN',
-//   },
-//   {
-//     key: 'X-Content-Type-Options',
-//     value: 'nosniff',
-//   },
-//   {
-//     key: 'Referrer-Policy',
-//     value: 'origin-when-cross-origin',
-//   },
-//   {
-//     key: 'Cross-Origin-Embedder-Policy',
-//     value: 'require-corp',
-//   },
-//   {
-//     key: 'Cross-Origin-Opener-Policy',
-//     value: 'same-origin',
-//   },
-//   {
-//     key: 'Cross-Origin-Resource-Policy',
-//     value: 'same-origin',
-//   },
-//   {
-//     key: 'Expect-CT',
-//     value: 'max-age=0',
-//   },
-// ]
-
 const isDev = process.env.NODE_ENV === 'development'
-// const isProduction = process.env.NODE_ENV === 'production'
 
 // Get allowed domains from environment variables
 const getAllowedDomains = () => {
   const envDomains = process.env.ALLOWED_DOMAINS?.split(',') || []
 
   const baseDomains = [
-    'mye-commerce.storage.c2.liara.space',
+    'https://kharak.storage.c2.liara.space',
     'https://*.zarinpal.com',
     'https://*.better-auth.com',
     'https://api.github.com',
     'https://accounts.google.com',
+    'https://kharak.liara.run',
+    // SMS service domains for Better-Auth phone plugin
+    'https://api.twilio.com',
+    'https://*.twilio.com',
+    'https://api.kavenegar.com',
+    'https://*.kavenegar.com',
+    'https://api.smsir.io',
+    'https://api.ghasedaksms.com',
   ]
 
   if (isDev) {
@@ -104,32 +45,13 @@ const getCorsOrigins = () => {
   }
 
   return [
-    'https://your-production-domain.com', // Replace with actual domain
+    'https://kharak.liara.run', // Replace with your actual domain
     // Add other production origins if needed
   ]
 }
 
-const securityHeaders = [
-  {
-    key: 'Content-Security-Policy',
-    value: [
-      "default-src 'self';",
-      "script-src 'self' 'unsafe-eval' 'unsafe-inline';",
-      `connect-src 'self' ${getAllowedDomains().join(' ')};`,
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
-      "font-src 'self' https://fonts.gstatic.com data:;",
-      "img-src 'self' data: blob:kharak.storage.c2.liara.space https://*.zarinpal.com;",
-      "media-src 'self' blob:kharak.storage.c2.liara.space;",
-      "frame-src 'self' https://*.zarinpal.com;",
-      "frame-ancestors 'none';",
-      "worker-src 'self' blob:;",
-      "object-src 'none';",
-    ].join(' '),
-  },
-  {
-    key: 'Permissions-Policy',
-    value: 'camera=(self), microphone=(), geolocation=(), payment=(self)',
-  },
+// Base security headers
+const baseSecurityHeaders = [
   {
     key: 'Strict-Transport-Security',
     value: 'max-age=63072000; includeSubDomains; preload',
@@ -145,18 +67,6 @@ const securityHeaders = [
   {
     key: 'Referrer-Policy',
     value: 'strict-origin-when-cross-origin',
-  },
-  {
-    key: 'Cross-Origin-Embedder-Policy',
-    value: 'unsafe-none',
-  },
-  {
-    key: 'Cross-Origin-Opener-Policy',
-    value: 'same-origin-allow-popups',
-  },
-  {
-    key: 'Cross-Origin-Resource-Policy',
-    value: 'cross-origin',
   },
   {
     key: 'Expect-CT',
@@ -175,16 +85,19 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'mye-commerce.storage.c2.liara.space',
+        hostname: 'kharak.storage.c2.liara.space',
         pathname: '/**',
       },
     ],
+    // Optimize for your use case
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
   },
   async headers() {
     const corsOrigins = getCorsOrigins()
 
     return [
-      // Strict security for public-facing pages
+      // Public pages - Strict security
       {
         source: '/((?!dashboard|api).*)',
         headers: [
@@ -196,8 +109,8 @@ const nextConfig: NextConfig = {
               `connect-src 'self' ${getAllowedDomains().join(' ')};`,
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
               "font-src 'self' https://fonts.gstatic.com data:;",
-              "img-src 'self' data: blob:kharak.storage.c2.liara.space https://*.zarinpal.com;",
-              "media-src 'self' blob:kharak.storage.c2.liara.space;",
+              "img-src 'self' data: blob: https://kharak.storage.c2.liara.space https://*.zarinpal.com;",
+              "media-src 'self' blob: https://kharak.storage.c2.liara.space;",
               "frame-src 'self' https://*.zarinpal.com;",
               "frame-ancestors 'none';",
               "worker-src 'self' blob:;",
@@ -220,10 +133,11 @@ const nextConfig: NextConfig = {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=()',
           },
-          ...securityHeaders.slice(2),
+          ...baseSecurityHeaders,
         ],
       },
-      // More permissive headers for admin dashboard
+
+      // Dashboard - More permissive for admin functionality
       {
         source: '/dashboard/(.*)',
         headers: [
@@ -232,13 +146,13 @@ const nextConfig: NextConfig = {
             value: [
               "default-src 'self';",
               "script-src 'self' 'unsafe-eval' 'unsafe-inline';",
-              `connect-src 'self'kharak.storage.c2.liara.space data: ${getAllowedDomains().join(
+              `connect-src 'self' https://kharak.storage.c2.liara.space data: ${getAllowedDomains().join(
                 ' '
               )};`,
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
               "font-src 'self' https://fonts.gstatic.com data:;",
-              "img-src 'self' data: blob:kharak.storage.c2.liara.space https://*.zarinpal.com;",
-              "media-src 'self' blob:kharak.storage.c2.liara.space;",
+              "img-src 'self' data: blob: https://kharak.storage.c2.liara.space https://*.zarinpal.com;",
+              "media-src 'self' blob: https://kharak.storage.c2.liara.space;",
               "frame-src 'self' https://*.zarinpal.com;",
               "frame-ancestors 'none';",
               "worker-src 'self' blob:;",
@@ -262,28 +176,34 @@ const nextConfig: NextConfig = {
             value:
               'camera=(self), microphone=(), geolocation=(), payment=(self)',
           },
-          ...securityHeaders.slice(2),
+          ...baseSecurityHeaders,
         ],
       },
-      // CORS-enabled headers for API routes
+
+      // API routes - CORS enabled
       {
         source: '/api/(.*)',
         headers: [
           {
             key: 'Access-Control-Allow-Origin',
-            value: isDev ? '*' : corsOrigins.join(','), // Allow all in dev, specific in prod
+            value: isDev ? '*' : corsOrigins.join(','),
           },
           {
             key: 'Access-Control-Allow-Methods',
-            value: 'GET, POST, PUT, DELETE, OPTIONS',
+            value: 'GET, POST, PUT, DELETE, OPTIONS, PATCH',
           },
           {
             key: 'Access-Control-Allow-Headers',
-            value: 'Content-Type, Authorization, X-Requested-With',
+            value:
+              'Content-Type, Authorization, X-Requested-With, X-CSRF-Token, Accept, Origin, User-Agent',
           },
           {
             key: 'Access-Control-Allow-Credentials',
             value: 'true',
+          },
+          {
+            key: 'Access-Control-Max-Age',
+            value: '86400', // 24 hours
           },
           {
             key: 'Cross-Origin-Resource-Policy',
@@ -295,7 +215,8 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-      // Specific CORS for auth endpoints
+
+      // Better-Auth specific endpoints - Most permissive for auth flows
       {
         source: '/api/auth/(.*)',
         headers: [
@@ -305,15 +226,20 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Access-Control-Allow-Methods',
-            value: 'GET, POST, PUT, DELETE, OPTIONS',
+            value: 'GET, POST, PUT, DELETE, OPTIONS, PATCH',
           },
           {
             key: 'Access-Control-Allow-Headers',
-            value: 'Content-Type, Authorization, X-Requested-With',
+            value:
+              'Content-Type, Authorization, X-Requested-With, X-CSRF-Token, Accept, Origin, User-Agent, Cache-Control, Pragma',
           },
           {
             key: 'Access-Control-Allow-Credentials',
             value: 'true',
+          },
+          {
+            key: 'Access-Control-Max-Age',
+            value: '86400',
           },
           {
             key: 'Cross-Origin-Opener-Policy',
@@ -327,6 +253,73 @@ const nextConfig: NextConfig = {
             key: 'Cross-Origin-Resource-Policy',
             value: 'cross-origin',
           },
+          // Important for Better-Auth phone plugin
+          {
+            key: 'Cache-Control',
+            value: 'no-cache, no-store, must-revalidate',
+          },
+        ],
+      },
+
+      // Phone/SMS specific routes for Better-Auth
+      {
+        source: '/api/auth/send-sms',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: isDev ? '*' : corsOrigins.join(','),
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'POST, OPTIONS',
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value:
+              'Content-Type, Authorization, X-Requested-With, X-CSRF-Token',
+          },
+          {
+            key: 'Access-Control-Allow-Credentials',
+            value: 'true',
+          },
+          {
+            key: 'Cross-Origin-Resource-Policy',
+            value: 'cross-origin',
+          },
+          {
+            key: 'Cross-Origin-Embedder-Policy',
+            value: 'unsafe-none',
+          },
+        ],
+      },
+      {
+        source: '/api/auth/verify-phone',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: isDev ? '*' : corsOrigins.join(','),
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'POST, OPTIONS',
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value:
+              'Content-Type, Authorization, X-Requested-With, X-CSRF-Token',
+          },
+          {
+            key: 'Access-Control-Allow-Credentials',
+            value: 'true',
+          },
+          {
+            key: 'Cross-Origin-Resource-Policy',
+            value: 'cross-origin',
+          },
+          {
+            key: 'Cross-Origin-Embedder-Policy',
+            value: 'unsafe-none',
+          },
         ],
       },
     ]
@@ -334,27 +327,3 @@ const nextConfig: NextConfig = {
 }
 
 export default nextConfig
-// const nextConfig: NextConfig = {
-//   output: 'standalone',
-//   // missingSuspenseWithCSRBailout: false,
-//   experimental: {
-//     serverActions: {
-//       bodySizeLimit: '5mb',
-//     },
-//   },
-//   images: {
-//     remotePatterns: [
-//       new URL('https://mye-commerce.storage.c2.liara.space/**'),
-//     ],
-//   },
-//   async headers() {
-//     return [
-//       {
-//         source: '/(.*)',
-//         headers: securityHeaders,
-//       },
-//     ]
-//   },
-// }
-
-// export default nextConfig

@@ -34,7 +34,7 @@ export async function uploadFileToS3(file: Buffer, fileName: string) {
 
   const validFileName = getValidFileName(fileName)
   const Key = `${validFileName}.${randomUUID()}`
-  const url = `https://mye-commerce.storage.c2.liara.space/${Key}`
+  const url = `https://kharak.storage.c2.liara.space/${Key}`
 
   const params = {
     Bucket: process.env.NEXT_AWS_S3_BUCKET_NAME,
