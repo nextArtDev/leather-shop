@@ -4,13 +4,14 @@ import React, { useState } from 'react'
 import { motion, AnimatePresence, easeInOut } from 'framer-motion'
 import { Menu, X, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
-import { NavigationData } from '@/lib/types/home'
+import { CurrentUserType, NavigationData } from '@/lib/types/home'
 
 interface MobileNavProps {
   navigation: NavigationData
+  session: CurrentUserType
 }
 
-export default function MobileNav({ navigation }: MobileNavProps) {
+export default function MobileNav({ navigation, session }: MobileNavProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null)
 
@@ -161,23 +162,41 @@ export default function MobileNav({ navigation }: MobileNavProps) {
                 className="border-border space-y-3 border-t p-4"
                 variants={mobileItemVariants}
               >
-                {/* <Link
-                  prefetch={false}
-                  href="/sign-in"
-                  className="text-foreground hover:bg-muted block w-full rounded-lg py-3 text-center font-medium transition-colors duration-200"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  ورود/عضویت
-                </Link> */}
-                {/* <Link
-                  prefetch={false}
-                  href="/signup"
-                  className="bg-foreground text-background hover:bg-foreground/90 block w-full rounded-lg py-3 text-center font-medium transition-all duration-200"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Get Started
-                </Link> */}
+                {!session?.id ? (
+                  <Link
+                    prefetch={false}
+                    href="/sign-in"
+                    className="text-foreground hover:bg-muted block w-full rounded-lg py-3 text-center font-medium transition-colors duration-200"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    ورود/عضویت
+                  </Link>
+                ) : (
+                  <Link
+                    prefetch={false}
+                    href="/user/profile"
+                    className="bg-foreground text-background hover:bg-foreground/90 block w-full rounded-lg py-3 text-center font-medium transition-all duration-200"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    پروفایل
+                  </Link>
+                )}
               </motion.div>
+              {session?.role === 'ADMIN' && (
+                <motion.div
+                  className="border-border space-y-3 border-t p-4"
+                  variants={mobileItemVariants}
+                >
+                  <Link
+                    prefetch={false}
+                    href="/dashboard"
+                    className="text-foreground hover:bg-muted block w-full rounded-lg py-3 text-center font-medium transition-colors duration-200"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    دشبورد
+                  </Link>
+                </motion.div>
+              )}
             </motion.div>
           </>
         )}

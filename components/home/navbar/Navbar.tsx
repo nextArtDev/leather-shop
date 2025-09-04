@@ -18,6 +18,7 @@ const Navbar = async () => {
       })),
     })),
     pages: [
+      { name: 'خانه', href: '/' },
       { name: 'درباره ما', href: '/about-us' },
       { name: 'ارتباط با ما', href: '/contact-us' },
       { name: 'سوالات متداول', href: '/faq' },

@@ -1,36 +1,17 @@
 'use client'
 
-import { Package2, SearchIcon } from 'lucide-react'
-import Image from 'next/image'
 import Link from 'next/link'
 import * as React from 'react'
-
-import { Button } from '@/components/ui/button'
-import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible'
-// import { Input } from '@/components/ui/input'
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-} from '@/components/ui/navigation-menu'
-// import { Separator } from '@/components/ui/separator'
-// import {
-//   Sheet,
-//   SheetClose,
-//   SheetContent,
-//   SheetTrigger,
-// } from '@/components/ui/sheet'
+import { NavigationMenuLink } from '@/components/ui/navigation-menu'
+import { CurrentUserType, NavigationData } from '@/lib/types/home'
 import { cn } from '@/lib/utils'
 import TextRotate from '../shared/text-rotate'
+import DesktopNav from './DesktopNav'
 import DrawerCart from './DrawerCart'
-import UserSession from './UserSession'
-import { CurrentUserType, NavigationData } from '@/lib/types/home'
 import MobileNav from './MobileNav'
-import SearchCombobox from '../shared/SearchCombo'
+import UserSession from './UserSession'
+import SearchBar from './SearchBar'
+import Logo from './Logo'
 
 // Hook to ensure consistent client-side rendering
 function useIsomorphicLayoutEffect(
@@ -53,15 +34,8 @@ function useHydrationSafe() {
   return isHydrated
 }
 
-const Logo = () => (
-  <Link href="/" className="flex items-center space-x-2">
-    <Package2 className="h-6 w-6" />
-    <span className="font-bold inline-block">SEP</span>
-  </Link>
-)
-
 // Fixed ListItem component - removed nested Link issue
-const ListItem = React.forwardRef<
+export const ListItem = React.forwardRef<
   HTMLAnchorElement,
   React.ComponentPropsWithoutRef<typeof Link> & {
     title: string
@@ -91,45 +65,6 @@ const ListItem = React.forwardRef<
   )
 })
 ListItem.displayName = 'ListItem'
-
-const DesktopNav = ({ navigation }: { navigation: NavigationData }) => (
-  <NavigationMenu dir="rtl" className="hidden lg:block">
-    <NavigationMenuList>
-      {navigation.categories.map((category) => (
-        <NavigationMenuItem key={category.name}>
-          <NavigationMenuTrigger>{category.name}</NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <div className="grid grid-cols-4 gap-6 p-6 w-[600px] lg:w-[800px]">
-              {category.featured.map((item) => (
-                <ListItem key={item.name} title={item.name} href={item.href}>
-                  <div className="aspect-square w-full overflow-hidden rounded-md group-hover:opacity-75">
-                    <Image
-                      unoptimized
-                      src={item.imageSrc}
-                      alt={item.imageAlt}
-                      width={200}
-                      height={200}
-                      className="object-cover object-center"
-                    />
-                  </div>
-                </ListItem>
-              ))}
-            </div>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-      ))}
-      {navigation.pages.map((page) => (
-        <NavigationMenuItem key={page.name}>
-          <NavigationMenuLink asChild>
-            <Link href={page.href} className={navigationMenuTriggerStyle()}>
-              {page.name}
-            </Link>
-          </NavigationMenuLink>
-        </NavigationMenuItem>
-      ))}
-    </NavigationMenuList>
-  </NavigationMenu>
-)
 
 // const MobileNav = ({ navigation }: { navigation: NavigationData }) => (
 //   <Sheet>
@@ -192,52 +127,6 @@ const DesktopNav = ({ navigation }: { navigation: NavigationData }) => (
 //   </Sheet>
 // )
 
-const SearchBar = ({
-  isOpen,
-  onToggle,
-  categories,
-}: {
-  isOpen: boolean
-  onToggle: () => void
-  categories: { category: string }[]
-}) => (
-  <>
-    <Button
-      variant="ghost"
-      size="icon"
-      aria-label="Search"
-      aria-expanded={isOpen}
-      onClick={onToggle}
-    >
-      <SearchIcon className="h-6 w-6" />
-    </Button>
-
-    <Collapsible
-      open={isOpen}
-      onOpenChange={onToggle}
-      className="absolute top-full right-0 w-full bg-background  border-b z-10"
-    >
-      <CollapsibleContent>
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="relative w-full flex h-16 items-center">
-            <div className="relative w-full">
-              {/* <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" /> */}
-              {/* <Input
-                type="search"
-                placeholder="جست‌و‌جوی محصولات..."
-                className="w-full pl-10 h-12"
-                autoFocus
-                /> */}
-              <SearchCombobox categories={categories || ['']} />
-              {/* <Search categories={categories || ['']} /> */}
-            </div>
-          </div>
-        </div>
-      </CollapsibleContent>
-    </Collapsible>
-  </>
-)
-
 const TopBanner = () => {
   const isHydrated = useHydrationSafe()
 
@@ -298,7 +187,7 @@ export default function MainNav({
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="flex h-16 items-center justify-between">
                 <div className="flex flex-1 items-center lg:hidden">
-                  <MobileNav navigation={navigation} />
+                  <MobileNav navigation={navigation} session={session} />
                 </div>
 
                 <div className="lg:hidden">
@@ -341,7 +230,7 @@ export default function MainNav({
                 </div>
 
                 <div className="hidden lg:items-center h-full lg:flex">
-                  <DesktopNav navigation={navigation} />
+                  <DesktopNav navigation={navigation} session={session} />
                 </div>
               </div>
             </div>
