@@ -8,12 +8,12 @@ import {
 } from '@/components/ui/carousel'
 import Image from 'next/image'
 import React, { useRef } from 'react'
-import Link from 'next/link'
 import { HomepageProduct } from '@/lib/types/home'
 import { FadeIn } from '../shared/fade-in'
 import { useInView } from 'framer-motion'
 import Autoplay from 'embla-carousel-autoplay'
 import { cn } from '@/lib/utils'
+import { TransitionLink } from '../home/shared/TransitionLink'
 
 export type item = {
   id: string
@@ -63,7 +63,7 @@ export default function MainPageCarousel({ items }: MainPageCarousel) {
               className="translate-y-5"
               vars={{ delay: 0.2 * i, duration: 0.3, ease: 'sine.inOut' }}
             >
-              <Link
+              <TransitionLink
                 href={`/products/${item.slug}`}
                 className="flex flex-col border-none rounded-none bg-transparent gap-4" /* Switched to flex-col for consistent height; moved gap here */
               >
@@ -112,7 +112,7 @@ export default function MainPageCarousel({ items }: MainPageCarousel) {
                     )}
                   </p> */}
                 </article>
-              </Link>
+              </TransitionLink>
             </FadeIn>
           </CarouselItem>
         ))}

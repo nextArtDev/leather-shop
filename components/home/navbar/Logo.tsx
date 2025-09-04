@@ -1,6 +1,7 @@
-import Link from 'next/link'
+import Image from 'next/image'
 import { FC } from 'react'
-
+import dateImage from '../../../public/images/palm-tree.png'
+import { TransitionLink } from '../shared/TransitionLink'
 interface LogoProps {
   href?: string
 }
@@ -8,10 +9,11 @@ interface LogoProps {
 const Logo: FC<LogoProps> = ({ href = '/' }) => {
   return (
     <div>
-      <Link href={href} className="flex items-center space-x-2">
+      <TransitionLink href={href} className="flex items-center space-x-2">
+        <Image src={dateImage} alt="logo" className="object-cover scale-50" />
         {/* <Package2 className="h-6 w-6" /> */}
-        <span className="font-bold inline-block">خارَک</span>
-      </Link>
+        {/* <span className="font-bold inline-block">خارَک</span> */}
+      </TransitionLink>
     </div>
   )
 }

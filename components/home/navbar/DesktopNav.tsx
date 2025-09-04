@@ -9,9 +9,10 @@ import {
 } from '@/components/ui/navigation-menu'
 import Image from 'next/image'
 import { CurrentUserType, NavigationData } from '@/lib/types/home'
-import Link from 'next/link'
+
 import { ListItem } from './MainNav'
 import { cn } from '@/lib/utils'
+import { TransitionLink } from '../shared/TransitionLink'
 
 type Props = {
   navigation: NavigationData
@@ -53,16 +54,19 @@ const DesktopNav = ({ navigation, session }: Props) => {
           {navigation.pages.map((page) => (
             <NavigationMenuItem key={page.name}>
               <NavigationMenuLink asChild>
-                <Link href={page.href} className={navigationMenuTriggerStyle()}>
+                <TransitionLink
+                  href={page.href}
+                  className={navigationMenuTriggerStyle()}
+                >
                   {page.name}
-                </Link>
+                </TransitionLink>
               </NavigationMenuLink>
             </NavigationMenuItem>
           ))}
           {session?.id && session?.role === 'ADMIN' && (
             <NavigationMenuItem>
               <NavigationMenuLink asChild>
-                <Link
+                <TransitionLink
                   href={'/dashboard'}
                   className={cn(
                     navigationMenuTriggerStyle(),
@@ -70,7 +74,7 @@ const DesktopNav = ({ navigation, session }: Props) => {
                   )}
                 >
                   دشبورد
-                </Link>
+                </TransitionLink>
               </NavigationMenuLink>
             </NavigationMenuItem>
           )}

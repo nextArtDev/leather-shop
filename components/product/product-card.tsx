@@ -10,9 +10,9 @@ import { cn } from '@/lib/utils'
 import { Card, CardContent } from '../ui/card'
 import Image from 'next/image'
 import Autoplay from 'embla-carousel-autoplay'
-import Link from 'next/link'
 import { FadeIn } from '../shared/fade-in'
 import { useInView } from 'framer-motion'
+import { TransitionLink } from '../home/shared/TransitionLink'
 // Using the detailed product type you provided
 type Product = {
   id: string
@@ -76,7 +76,7 @@ const ProductCard = ({ product }: Props) => {
             <p className="text-gray-500 text-xs">بدون عکس</p>
           </div>
         ) : (
-          <Link href={`/products/${product.slug}`} className="my-6">
+          <TransitionLink href={`/products/${product.slug}`} className="my-6">
             <Carousel
               opts={{
                 align: 'start',
@@ -134,7 +134,7 @@ const ProductCard = ({ product }: Props) => {
                 ))}
               </div>
             )}
-          </Link>
+          </TransitionLink>
         )}
       </div>
 

@@ -3,8 +3,8 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence, easeInOut } from 'framer-motion'
 import { Menu, X, ChevronDown } from 'lucide-react'
-import Link from 'next/link'
 import { CurrentUserType, NavigationData } from '@/lib/types/home'
+import { TransitionLink } from '../shared/TransitionLink'
 
 interface MobileNavProps {
   navigation: NavigationData
@@ -126,7 +126,7 @@ export default function MobileNav({ navigation, session }: MobileNavProps) {
                         >
                           <div className="space-y-2 py-2 pl-6 pr-4">
                             {category.featured.map((item) => (
-                              <Link
+                              <TransitionLink
                                 key={item.name}
                                 prefetch={false}
                                 href={item.href}
@@ -134,7 +134,7 @@ export default function MobileNav({ navigation, session }: MobileNavProps) {
                                 onClick={() => setIsMobileMenuOpen(false)}
                               >
                                 {item.name}
-                              </Link>
+                              </TransitionLink>
                             ))}
                           </div>
                         </motion.div>
@@ -146,14 +146,14 @@ export default function MobileNav({ navigation, session }: MobileNavProps) {
                 {/* Regular pages */}
                 {navigation.pages.map((page) => (
                   <motion.div key={page.name} variants={mobileItemVariants}>
-                    <Link
+                    <TransitionLink
                       prefetch={false}
                       href={page.href}
                       className="text-foreground hover:bg-muted block rounded-lg px-4 py-3 font-medium transition-colors duration-200"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       {page.name}
-                    </Link>
+                    </TransitionLink>
                   </motion.div>
                 ))}
               </div>
@@ -163,23 +163,23 @@ export default function MobileNav({ navigation, session }: MobileNavProps) {
                 variants={mobileItemVariants}
               >
                 {!session?.id ? (
-                  <Link
+                  <TransitionLink
                     prefetch={false}
                     href="/sign-in"
                     className="text-foreground hover:bg-muted block w-full rounded-lg py-3 text-center font-medium transition-colors duration-200"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     ورود/عضویت
-                  </Link>
+                  </TransitionLink>
                 ) : (
-                  <Link
+                  <TransitionLink
                     prefetch={false}
                     href="/user/profile"
                     className="bg-foreground text-background hover:bg-foreground/90 block w-full rounded-lg py-3 text-center font-medium transition-all duration-200"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     پروفایل
-                  </Link>
+                  </TransitionLink>
                 )}
               </motion.div>
               {session?.role === 'ADMIN' && (
@@ -187,14 +187,14 @@ export default function MobileNav({ navigation, session }: MobileNavProps) {
                   className="border-border space-y-3 border-t p-4"
                   variants={mobileItemVariants}
                 >
-                  <Link
+                  <TransitionLink
                     prefetch={false}
                     href="/dashboard"
                     className="text-foreground hover:bg-muted block w-full rounded-lg py-3 text-center font-medium transition-colors duration-200"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     دشبورد
-                  </Link>
+                  </TransitionLink>
                 </motion.div>
               )}
             </motion.div>

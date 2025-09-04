@@ -6,13 +6,13 @@ import {
 } from '@/components/ui/carousel'
 import Image from 'next/image'
 import React, { useRef } from 'react'
-import Link from 'next/link'
 // import { CategoryWithStats } from '@/lib/types/home'
 import Autoplay from 'embla-carousel-autoplay'
 // import { SubCategory } from '@/lib/generated/prisma'
 import { SubCategoryForHomePage } from '@/lib/types/home'
 import { FadeIn } from '@/components/shared/fade-in'
 import { useInView } from 'framer-motion'
+import { TransitionLink } from '../shared/TransitionLink'
 
 export default function DiscoverMoreCarousel({
   subCategories,
@@ -64,12 +64,12 @@ export default function DiscoverMoreCarousel({
                     />
                     <article className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-gradient-to-b from-secondary/5 to-secondary/20 px-2 py-3 text-center text-2xl font-semibold text-background">
                       {item.name}
-                      <Link
+                      <TransitionLink
                         href={`/sub-categories/${item.url}`}
                         className="bg-gradient-to-b from-secondary/5 to-secondary/30 border rounded-none px-1.5 py-1 text-center text-base  backdrop-blur-[2px]"
                       >
                         دیدن {item.name}
-                      </Link>
+                      </TransitionLink>
                     </article>
                   </figure>
                 </div>

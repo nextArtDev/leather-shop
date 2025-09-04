@@ -1,5 +1,5 @@
 import Navbar from '@/components/home/navbar/Navbar'
-
+import { ViewTransitions } from 'next-view-transitions'
 import Footer from '@/components/home/shared/Footer'
 
 export default function layout({
@@ -9,10 +9,12 @@ export default function layout({
 }>) {
   return (
     <section className="relative w-full h-full ">
-      <Navbar />
+      <ViewTransitions>
+        <Navbar />
 
-      {children}
-      <Footer />
+        {children}
+        <Footer />
+      </ViewTransitions>
     </section>
   )
 }
