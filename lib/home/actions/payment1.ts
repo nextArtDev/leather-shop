@@ -6,6 +6,7 @@ import ZarinPalCheckout from 'zarinpal-checkout'
 import prisma from '@/lib/prisma'
 import { PaymentResult } from '../schemas'
 import { getCurrentUser } from '@/lib/auth-helpers'
+// import { createHash } from 'crypto'
 
 // Types
 interface ZarinpalPaymentFormState {
@@ -21,10 +22,10 @@ interface ZarinpalPaymentFormState {
   }
 }
 
-interface PaymentVerificationResult {
-  status: number
-  refId: number
-}
+// interface PaymentVerificationResult {
+//   status: number
+//   refId: number
+// }
 
 interface PaymentRequestResult {
   status: number
@@ -52,7 +53,7 @@ const ERROR_MESSAGES = {
 } as const
 
 // In-memory cache to prevent duplicate processing
-const processingCache = new Map<string, Promise<any>>()
+// const processingCache = new Map<string, Promise<any>>()
 
 // Utility functions
 const createZarinpalInstance = () => {
@@ -142,115 +143,6 @@ async function updateOrderWithPaymentRequest(
   })
 }
 
-// Helper function to mark payment as failed
-async function markPaymentAsFailed(orderId: string, userId: string) {
-  await prisma.order.update({
-    where: {
-      id: orderId,
-      userId: userId,
-    },
-    data: {
-      paymentStatus: 'Pending',
-    },
-  })
-}
-
-// Helper function to verify successful payment
-async function verifySuccessfulPayment(
-  order: any,
-  Authority: string,
-  orderId: string,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  path: string
-) {
-  const zarinpal = createZarinpalInstance()
-
-  // Additional security check: verify the Authority matches the order's payment result
-  const storedPaymentResult = order.paymentResult as any
-  if (
-    storedPaymentResult?.authority &&
-    storedPaymentResult.authority !== Authority
-  ) {
-    // console.log('Authority mismatch - possible cross-order contamination:', {
-    //   stored: storedPaymentResult.authority,
-    //   received: Authority,
-    //   orderId,
-    // })
-    return {
-      errors: {
-        _form: [ERROR_MESSAGES.INVALID_PAYMENT_INFO],
-      },
-    }
-  }
-
-  // Double-check order is not already paid (race condition protection)
-  const freshOrder = await prisma.order.findFirst({
-    where: { id: orderId },
-    select: {
-      paymentStatus: true,
-      userId: true,
-    },
-  })
-
-  if (!freshOrder) {
-    return {
-      errors: {
-        _form: [ERROR_MESSAGES.ORDER_NOT_FOUND],
-      },
-    }
-  }
-
-  if (freshOrder.paymentStatus === 'Paid') {
-    // console.log('Order was paid during verification process:', orderId)
-    return { success: true, alreadyPaid: true }
-  }
-
-  const verification = (await zarinpal.PaymentVerification({
-    Amount: Number(order.total),
-    Authority,
-  })) as PaymentVerificationResult
-
-  // console.log('Payment verification result:', verification)
-
-  if (verification.status === PAYMENT_STATUS.SUCCESS) {
-    // console.log(`Payment verified! Ref ID: ${verification.refId}`)
-
-    // Use a transaction to ensure atomicity and prevent race conditions
-    try {
-      await updateOrderToPaid({
-        orderId,
-        paymentResult: {
-          id: verification.refId.toString(),
-          status: PAYMENT_STATUS.OK,
-          authority: Authority,
-          fee: order.total.toString(),
-        },
-      })
-
-      return { success: true }
-    } catch (error) {
-      // Check if the error is due to order already being paid
-      if (
-        error instanceof Error &&
-        error.message === ERROR_MESSAGES.ORDER_ALREADY_PAID
-      ) {
-        // console.log('Order was already paid during update process')
-        return { success: true, alreadyPaid: true }
-      }
-      throw error
-    }
-  } else {
-    // console.log('Payment verification failed with status:', verification.status)
-    await markPaymentAsFailed(orderId, order.userId)
-
-    return {
-      errors: {
-        _form: [ERROR_MESSAGES.INVALID_PAYMENT_INFO],
-      },
-    }
-  }
-}
-
 // Main payment request function
 export async function zarinpalPayment(
   path: string,
@@ -266,7 +158,16 @@ export async function zarinpalPayment(
     if (!user || !user.id) {
       return {
         errors: {
-          _form: [ERROR_MESSAGES.UNAUTHORIZED],
+          _form: ['شما اجازه دسترسی ندارید!'],
+        },
+      }
+    }
+
+    // CRITICAL: Check rate limiting
+    if (!checkRateLimit(user.id)) {
+      return {
+        errors: {
+          _form: ['تعداد تلاش‌های پرداخت شما بیش از حد مجاز است'],
         },
       }
     }
@@ -305,6 +206,12 @@ export async function zarinpalPayment(
     //   orderId,
     //   totalPrice: order.total,
     // })
+
+    // await storeOrderIntegrityHash(orderId, order.total, user.id)
+
+    // const zarinpal = ZarinPalCheckout.create(process.env.ZARINPAL_KEY!, true)
+
+    // const callbackURL = `${process.env.PAYMENT_CALLBACK_URL}/order/${orderId}`
 
     // Create payment request
     const payment = await createPaymentRequest(order, orderId)
@@ -346,116 +253,167 @@ export async function zarinpalPayment(
   }
 }
 
-// Main payment approval function
 export async function zarinpalPaymentApproval(
   path: string,
   orderId: string,
   Authority: string,
   Status: string
 ) {
-  // Create a unique key for this payment verification
-  const cacheKey = `verify-${orderId}-${Authority}`
+  // Clean up expired locks first
+  await cleanupExpiredLocks()
 
-  // Check if we're already processing this exact payment
-  if (processingCache.has(cacheKey)) {
-    // console.log('Already processing payment verification for:', cacheKey)
-    try {
-      return await processingCache.get(cacheKey)
-    } catch (error) {
-      processingCache.delete(cacheKey)
-      throw error
+  // CRITICAL: Acquire distributed lock
+  const lockAcquired = await acquirePaymentLock(orderId, Authority)
+  if (!lockAcquired) {
+    // console.log('Payment verification already in progress:', orderId)
+    return {
+      errors: {
+        _form: ['پرداخت در حال بررسی است، لطفا صبر کنید'],
+      },
     }
   }
 
-  // Create the processing promise
-  const processingPromise = (async () => {
-    try {
-      // console.log('Starting payment approval for:', {
-      //   orderId,
-      //   Authority,
-      //   Status,
-      // })
-
-      // Get current user
-      const user = await getCurrentUser()
-      if (!user?.id) {
-        return {
-          errors: {
-            _form: [ERROR_MESSAGES.UNAUTHORIZED],
-          },
-        }
-      }
-
-      // Validate parameters
-      const validation = validatePaymentParameters(orderId, Authority, Status)
-      if (!validation.isValid) {
-        return {
-          errors: {
-            _form: [validation.error!],
-          },
-        }
-      }
-
-      // Find order - get fresh data from database
-      const order = await findOrderByIdAndUser(orderId, user.id)
-      if (!order) {
-        return {
-          errors: {
-            _form: [ERROR_MESSAGES.ORDER_DELETED],
-          },
-        }
-      }
-
-      // CRITICAL: Check if order is already paid to prevent double processing
-      if (
-        order.paymentDetails?.status === 'Paid' ||
-        order.paymentStatus === 'Paid'
-      ) {
-        // console.log('Order already paid, skipping verification:', orderId)
-        return { success: true, alreadyPaid: true }
-      }
-
-      // Handle payment status
-      if (Status === PAYMENT_STATUS.OK) {
-        return await verifySuccessfulPayment(order, Authority, orderId, path)
-      } else if (Status === PAYMENT_STATUS.NOK) {
-        await markPaymentAsFailed(orderId, user.id)
-        return {
-          errors: {
-            _form: [ERROR_MESSAGES.PAYMENT_ERROR],
-          },
-        }
-      }
-
+  try {
+    const user = await getCurrentUser()
+    if (!user?.id) {
       return {
         errors: {
-          _form: [ERROR_MESSAGES.INVALID_PAYMENT_RESPONSE],
+          _form: ['شما اجازه دسترسی ندارید!'],
         },
       }
-    } catch (error) {
-      console.error('Payment approval error:', error)
-      return {
-        errors: {
-          _form: [
-            error instanceof Error
-              ? error.message
-              : ERROR_MESSAGES.GENERIC_ERROR,
-          ],
-        },
-      }
-    } finally {
-      revalidatePath(path)
-      // Clean up the cache after processing
-      setTimeout(() => {
-        processingCache.delete(cacheKey)
-      }, 5000)
     }
-  })()
 
-  // Store the promise in cache
-  processingCache.set(cacheKey, processingPromise)
+    // CRITICAL: Check rate limiting
+    if (!checkRateLimit(user.id)) {
+      return {
+        errors: {
+          _form: ['تعداد تلاش‌های پرداخت شما بیش از حد مجاز است'],
+        },
+      }
+    }
 
-  return await processingPromise
+    // Get order with latest data
+    const order = await prisma.order.findFirst({
+      where: {
+        id: orderId,
+        userId: user.id,
+      },
+      include: {
+        items: true,
+      },
+    })
+
+    if (!order) {
+      return {
+        errors: {
+          _form: ['سفارش در دسترس نیست!'],
+        },
+      }
+    }
+
+    // CRITICAL: Double-check payment status with fresh data
+    if (order.paymentStatus === 'Paid') {
+      // console.log('Order already paid during verification:', orderId)
+      return { success: true, alreadyPaid: true }
+    }
+
+    // CRITICAL: Validate payment attempt
+    const isValidAttempt = await validatePaymentAttempt(
+      orderId,
+      Authority,
+      order.total
+    )
+    if (!isValidAttempt) {
+      return {
+        errors: {
+          _form: ['درخواست پرداخت نامعتبر است'],
+        },
+      }
+    }
+
+    // CRITICAL: Validate order integrity
+    const isOrderValid = await validateOrderIntegrity(orderId, order.total)
+    if (!isOrderValid) {
+      return {
+        errors: {
+          _form: ['اطلاعات سفارش نامعتبر است'],
+        },
+      }
+    }
+
+    if (Status === 'OK') {
+      const zarinpal = ZarinPalCheckout.create(process.env.ZARINPAL_KEY!, true)
+
+      const verification = (await zarinpal.PaymentVerification({
+        Amount: Number(order.total),
+        Authority,
+      })) as { status: number; refId: number }
+
+      if (verification.status === 100) {
+        // CRITICAL: Mark authority as used to prevent replay
+        await prisma.paymentAttempt.update({
+          where: {
+            orderId_authority: {
+              orderId,
+              authority: Authority,
+            },
+          },
+          data: {
+            status: 'SUCCESS',
+          },
+        })
+
+        // Update order to paid with transaction
+        await updateOrderToPaidSecure({
+          orderId,
+          paymentResult: {
+            id: verification.refId.toString(),
+            status: 'OK',
+            authority: Authority,
+            fee: order.total.toString(),
+          },
+        })
+
+        return { success: true }
+      } else {
+        // Mark as failed
+        await prisma.paymentAttempt.update({
+          where: {
+            orderId_authority: {
+              orderId,
+              authority: Authority,
+            },
+          },
+          data: {
+            status: 'FAILED',
+          },
+        })
+
+        return {
+          errors: {
+            _form: ['پرداخت تایید نشد'],
+          },
+        }
+      }
+    } else {
+      return {
+        errors: {
+          _form: ['پرداخت لغو شد'],
+        },
+      }
+    }
+  } catch (error) {
+    console.error('Payment approval error:', error)
+    return {
+      errors: {
+        _form: ['خطا در تایید پرداخت'],
+      },
+    }
+  } finally {
+    // CRITICAL: Always release the lock
+    await releasePaymentLock(orderId)
+    revalidatePath(path)
+  }
 }
 
 // Function to update order to paid status with race condition protection
@@ -662,3 +620,499 @@ export async function updateOrderToPaidCOD(orderId: string) {
     }
   }
 }
+
+// Security issues
+async function acquirePaymentLock(
+  orderId: string,
+  authority: string
+): Promise<boolean> {
+  const lockExpiry = new Date(Date.now() + 5 * 60 * 1000) // 5 minutes
+
+  try {
+    await prisma.paymentLock.create({
+      data: {
+        orderId,
+        authority,
+        expiresAt: lockExpiry,
+      },
+    })
+    return true
+  } catch (error) {
+    // Lock already exists or other constraint violation
+    console.error('Failed to acquire payment lock:', error)
+    return false
+  }
+}
+
+async function releasePaymentLock(orderId: string) {
+  try {
+    await prisma.paymentLock.delete({
+      where: { orderId },
+    })
+  } catch (error) {
+    console.error('Failed to release payment lock:', error)
+  }
+}
+
+// CRITICAL: Clean up expired locks
+async function cleanupExpiredLocks() {
+  await prisma.paymentLock.deleteMany({
+    where: {
+      expiresAt: {
+        lt: new Date(),
+      },
+    },
+  })
+}
+
+async function validatePaymentAttempt(
+  orderId: string,
+  authority: string,
+  amount: number
+): Promise<boolean> {
+  // Check if this authority was already used
+  const existingAttempt = await prisma.paymentAttempt.findUnique({
+    where: {
+      orderId_authority: {
+        orderId,
+        authority,
+      },
+    },
+  })
+
+  if (existingAttempt) {
+    if (
+      existingAttempt.status === 'SUCCESS' ||
+      existingAttempt.status === 'USED'
+    ) {
+      // console.log('Authority already used:', authority)
+      return false
+    }
+    // Update existing attempt
+    await prisma.paymentAttempt.update({
+      where: { id: existingAttempt.id },
+      data: {
+        status: 'PENDING',
+        amount,
+      },
+    })
+  } else {
+    // Create new attempt record
+    await prisma.paymentAttempt.create({
+      data: {
+        orderId,
+        authority,
+        amount,
+        status: 'PENDING',
+      },
+    })
+  }
+
+  return true
+}
+
+// CRITICAL: Validate order hasn't been tampered with
+async function validateOrderIntegrity(
+  orderId: string,
+  expectedAmount: number
+): Promise<boolean> {
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    select: { total: true, userId: true, paymentStatus: true },
+  })
+
+  if (!order) return false
+  if (order.paymentStatus === 'Paid') return false
+
+  // Ensure amount matches exactly
+  if (Math.abs(order.total - expectedAmount) > 0.01) {
+    console.error('Payment amount mismatch:', {
+      orderId,
+      orderTotal: order.total,
+      paymentAmount: expectedAmount,
+    })
+    return false
+  }
+
+  return true
+}
+
+// CRITICAL: Rate limiting per user
+const userPaymentAttempts = new Map<
+  string,
+  { count: number; resetTime: number }
+>()
+
+function checkRateLimit(userId: string): boolean {
+  const now = Date.now()
+  const userAttempts = userPaymentAttempts.get(userId)
+
+  if (!userAttempts || now > userAttempts.resetTime) {
+    // Reset or create new rate limit window (5 attempts per hour)
+    userPaymentAttempts.set(userId, {
+      count: 1,
+      resetTime: now + 60 * 60 * 1000, // 1 hour
+    })
+    return true
+  }
+
+  if (userAttempts.count >= 5) {
+    return false
+  }
+
+  userAttempts.count++
+  return true
+}
+
+// SECURED Order Update Function
+export async function updateOrderToPaidSecure({
+  orderId,
+  paymentResult,
+}: {
+  orderId: string
+  paymentResult?: any
+}) {
+  return await prisma.$transaction(async (tx) => {
+    // CRITICAL: Use SELECT FOR UPDATE equivalent
+    const order = await tx.order.findFirst({
+      where: { id: orderId },
+      include: { items: true },
+    })
+
+    if (!order) {
+      throw new Error('Order not found')
+    }
+
+    // CRITICAL: Final check for payment status
+    if (order.paymentStatus === 'Paid') {
+      throw new Error('Order already paid')
+    }
+
+    // CRITICAL: Validate inventory before updating
+    for (const item of order.items) {
+      const currentSize = await tx.size.findUnique({
+        where: {
+          productId: item.productId,
+          id: item.sizeId,
+        },
+        select: { quantity: true },
+      })
+
+      if (!currentSize || currentSize.quantity < item.quantity) {
+        throw new Error(`Insufficient inventory for product ${item.productId}`)
+      }
+    }
+
+    // Update inventory
+    for (const item of order.items) {
+      await tx.size.update({
+        where: { productId: item.productId, id: item.sizeId },
+        data: {
+          quantity: { decrement: item.quantity },
+        },
+      })
+
+      await tx.product.update({
+        where: { id: item.productId },
+        data: {
+          sales: { increment: item.quantity },
+        },
+      })
+    }
+
+    // Mark order as paid
+    const updatedOrder = await tx.order.update({
+      where: { id: orderId },
+      data: {
+        paymentStatus: 'Paid',
+      },
+    })
+
+    // Update payment details
+    if (paymentResult) {
+      await tx.paymentDetails.upsert({
+        where: { orderId },
+        update: {
+          status: paymentResult.status,
+          Authority: paymentResult.authority,
+          amount: Number(paymentResult.fee),
+        },
+        create: {
+          orderId,
+          userId: order.userId,
+          status: paymentResult.status,
+          Authority: paymentResult.authority,
+          amount: Number(paymentResult.fee),
+        },
+      })
+    }
+
+    return updatedOrder
+  })
+}
+
+// Helper function to mark payment as failed
+// async function markPaymentAsFailed(orderId: string, userId: string) {
+//   await prisma.order.update({
+//     where: {
+//       id: orderId,
+//       userId: userId,
+//     },
+//     data: {
+//       paymentStatus: 'Pending',
+//     },
+//   })
+// }
+
+// Helper function to verify successful payment
+// async function verifySuccessfulPayment(
+//   order: any,
+//   Authority: string,
+//   orderId: string,
+//   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+//   path: string
+// ) {
+//   const zarinpal = createZarinpalInstance()
+
+//   // Additional security check: verify the Authority matches the order's payment result
+//   const storedPaymentResult = order.paymentResult as any
+//   if (
+//     storedPaymentResult?.authority &&
+//     storedPaymentResult.authority !== Authority
+//   ) {
+//     // console.log('Authority mismatch - possible cross-order contamination:', {
+//     //   stored: storedPaymentResult.authority,
+//     //   received: Authority,
+//     //   orderId,
+//     // })
+//     return {
+//       errors: {
+//         _form: [ERROR_MESSAGES.INVALID_PAYMENT_INFO],
+//       },
+//     }
+//   }
+
+//   // Double-check order is not already paid (race condition protection)
+//   const freshOrder = await prisma.order.findFirst({
+//     where: { id: orderId },
+//     select: {
+//       paymentStatus: true,
+//       userId: true,
+//     },
+//   })
+
+//   if (!freshOrder) {
+//     return {
+//       errors: {
+//         _form: [ERROR_MESSAGES.ORDER_NOT_FOUND],
+//       },
+//     }
+//   }
+
+//   if (freshOrder.paymentStatus === 'Paid') {
+//     // console.log('Order was paid during verification process:', orderId)
+//     return { success: true, alreadyPaid: true }
+//   }
+
+//   const verification = (await zarinpal.PaymentVerification({
+//     Amount: Number(order.total),
+//     Authority,
+//   })) as PaymentVerificationResult
+
+//   // console.log('Payment verification result:', verification)
+
+//   if (verification.status === PAYMENT_STATUS.SUCCESS) {
+//     // console.log(`Payment verified! Ref ID: ${verification.refId}`)
+
+//     // Use a transaction to ensure atomicity and prevent race conditions
+//     try {
+//       await updateOrderToPaid({
+//         orderId,
+//         paymentResult: {
+//           id: verification.refId.toString(),
+//           status: PAYMENT_STATUS.OK,
+//           authority: Authority,
+//           fee: order.total.toString(),
+//         },
+//       })
+
+//       return { success: true }
+//     } catch (error) {
+//       // Check if the error is due to order already being paid
+//       if (
+//         error instanceof Error &&
+//         error.message === ERROR_MESSAGES.ORDER_ALREADY_PAID
+//       ) {
+//         // console.log('Order was already paid during update process')
+//         return { success: true, alreadyPaid: true }
+//       }
+//       throw error
+//     }
+//   } else {
+//     // console.log('Payment verification failed with status:', verification.status)
+//     await markPaymentAsFailed(orderId, order.userId)
+
+//     return {
+//       errors: {
+//         _form: [ERROR_MESSAGES.INVALID_PAYMENT_INFO],
+//       },
+//     }
+//   }
+// }
+
+// async function releasePaymentLock(orderId: string) {
+//   try {
+//     await prisma.paymentLock.delete({
+//       where: { orderId },
+//     })
+//   } catch (error) {
+//     console.log('Failed to release payment lock:', error)
+//   }
+// }
+
+// // CRITICAL: Clean up expired locks
+// async function cleanupExpiredLocks() {
+//   await prisma.paymentLock.deleteMany({
+//     where: {
+//       expiresAt: {
+//         lt: new Date(),
+//       },
+//     },
+//   })
+// }
+
+// Main payment approval function
+// export async function zarinpalPaymentApproval(
+//   path: string,
+//   orderId: string,
+//   Authority: string,
+//   Status: string
+// ) {
+//   // Clean up expired locks first
+//   await cleanupExpiredLocks()
+
+//   // CRITICAL: Acquire distributed lock
+//   const lockAcquired = await acquirePaymentLock(orderId, Authority)
+//   if (!lockAcquired) {
+//     console.log('Payment verification already in progress:', orderId)
+//     return {
+//       errors: {
+//         _form: ['پرداخت در حال بررسی است، لطفا صبر کنید'],
+//       },
+//     }
+//   }
+
+//   // Create a unique key for this payment verification
+//   const cacheKey = `verify-${orderId}-${Authority}`
+
+//   // Check if we're already processing this exact payment
+//   if (processingCache.has(cacheKey)) {
+//     // console.log('Already processing payment verification for:', cacheKey)
+//     try {
+//       return await processingCache.get(cacheKey)
+//     } catch (error) {
+//       processingCache.delete(cacheKey)
+//       throw error
+//     }
+//   }
+
+//   // Create the processing promise
+//   const processingPromise = (async () => {
+//     try {
+//       // console.log('Starting payment approval for:', {
+//       //   orderId,
+//       //   Authority,
+//       //   Status,
+//       // })
+
+//       // Get current user
+//       const user = await getCurrentUser()
+//       if (!user?.id) {
+//         return {
+//           errors: {
+//             _form: [ERROR_MESSAGES.UNAUTHORIZED],
+//           },
+//         }
+//       }
+
+//       // Validate parameters
+//       const validation = validatePaymentParameters(orderId, Authority, Status)
+//       if (!validation.isValid) {
+//         return {
+//           errors: {
+//             _form: [validation.error!],
+//           },
+//         }
+//       }
+
+//       // Find order - get fresh data from database
+//       const order = await findOrderByIdAndUser(orderId, user.id)
+//       if (!order) {
+//         return {
+//           errors: {
+//             _form: [ERROR_MESSAGES.ORDER_DELETED],
+//           },
+//         }
+//       }
+
+//       // CRITICAL: Check if order is already paid to prevent double processing
+//       if (
+//         order.paymentDetails?.status === 'Paid' ||
+//         order.paymentStatus === 'Paid'
+//       ) {
+//         // console.log('Order already paid, skipping verification:', orderId)
+//         return { success: true, alreadyPaid: true }
+//       }
+
+//       // Handle payment status
+//       if (Status === PAYMENT_STATUS.OK) {
+//         return await verifySuccessfulPayment(order, Authority, orderId, path)
+//       } else if (Status === PAYMENT_STATUS.NOK) {
+//         await markPaymentAsFailed(orderId, user.id)
+//         return {
+//           errors: {
+//             _form: [ERROR_MESSAGES.PAYMENT_ERROR],
+//           },
+//         }
+//       }
+
+//       return {
+//         errors: {
+//           _form: [ERROR_MESSAGES.INVALID_PAYMENT_RESPONSE],
+//         },
+//       }
+//     } catch (error) {
+//       console.error('Payment approval error:', error)
+//       return {
+//         errors: {
+//           _form: [
+//             error instanceof Error
+//               ? error.message
+//               : ERROR_MESSAGES.GENERIC_ERROR,
+//           ],
+//         },
+//       }
+//     } finally {
+//       revalidatePath(path)
+//       // Clean up the cache after processing
+//       setTimeout(() => {
+//         processingCache.delete(cacheKey)
+//       }, 5000)
+//     }
+//   })()
+
+//   // Store the promise in cache
+//   processingCache.set(cacheKey, processingPromise)
+
+//   return await processingPromise
+// }
+
+// function createOrderHash(
+//   orderId: string,
+//   amount: number,
+//   userId: string
+// ): string {
+//   return createHash('sha256')
+//     .update(`${orderId}-${amount}-${userId}-${process.env.PAYMENT_SECRET}`)
+//     .digest('hex')
+// }

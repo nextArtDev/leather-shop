@@ -4,7 +4,7 @@ import prisma from '@/lib/prisma'
 import { isRedirectError } from 'next/dist/client/components/redirect-error'
 import { getValidatedCart } from './cart'
 import { getUserById } from '../queries/user'
-import { updateOrderToPaid } from './payment1'
+import { updateOrderToPaidSecure } from './payment1'
 import { revalidatePath } from 'next/cache'
 import { getCurrentUser } from '@/lib/auth-helpers'
 
@@ -106,7 +106,7 @@ export async function createOrder() {
 
 export async function updateOrderToPaidCOD(orderId: string) {
   try {
-    await updateOrderToPaid({ orderId })
+    await updateOrderToPaidSecure({ orderId })
 
     revalidatePath(`/order/${orderId}`)
 
