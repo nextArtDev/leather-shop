@@ -43,6 +43,14 @@ model User {
   @@map("user")
 }
 
+model OtpRateLimit {
+  id          String   @id @default(uuid())
+  phoneNumber String   @unique
+  lastSentAt  DateTime
+
+  @@index([phoneNumber])
+}
+
 model Session {
   id        String   @id
   expiresAt DateTime

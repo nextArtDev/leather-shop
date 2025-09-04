@@ -24,6 +24,25 @@ export const auth = betterAuth({
           //   throw   Error 'مشکلی پیش آمده، لطفا دوباره امتحان کنید!'
           return
         }
+        const threeMinutesAgo = new Date(Date.now() - 3 * 60 * 1000)
+
+        // 1. Check if there's a recent OTP request for this number
+        const existingRequest = await prisma.otpRateLimit.findUnique({
+          where: { phoneNumber },
+        })
+
+        if (existingRequest && existingRequest.lastSentAt > threeMinutesAgo) {
+          const timeLeft = Math.ceil(
+            (existingRequest.lastSentAt.getTime() +
+              3 * 60 * 1000 -
+              Date.now()) /
+              1000
+          )
+          // 2. If it's too soon, throw an error that better-auth will send to the client
+          throw new Error(
+            `Please wait ${timeLeft} more seconds before requesting a new code.`
+          )
+        }
         console.log({ code, phoneNumber })
         return
         // Implement sending OTP code via SMS

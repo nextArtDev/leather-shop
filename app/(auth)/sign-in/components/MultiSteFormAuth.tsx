@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useTransition } from 'react'
+import React, { useEffect, useState, useTransition } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
@@ -27,6 +27,7 @@ import {
 } from 'lucide-react'
 import { authClient } from '@/lib/auth-client'
 import { useRouter } from 'next/navigation'
+import { SlidingNumber } from './SlidingTimer'
 
 // Schemas
 const phoneSchema = z.object({
@@ -82,6 +83,7 @@ MultiStepFormAuthProps) {
   const [otpValue, setOtpValue] = useState<string>('')
   const [otpKey, setOtpKey] = useState<number>(0)
   const [isSuccess, setIsSuccess] = useState<boolean>(false)
+  const [countdown, setCountdown] = useState(180)
 
   const router = useRouter()
   // Define steps
@@ -105,6 +107,18 @@ MultiStepFormAuthProps) {
   ]
 
   const currentStep = steps[step]
+
+  useEffect(() => {
+    if (step === 1 && countdown > 0) {
+      const timerId = setInterval(() => {
+        setCountdown((prevCountdown) => prevCountdown - 1)
+      }, 1000)
+
+      // Cleanup function to clear the interval when the component unmounts
+      // or when the step changes or countdown reaches 0.
+      return () => clearInterval(timerId)
+    }
+  }, [step, countdown])
 
   // Form setup with proper typing
   const phoneForm = useForm<PhoneFormData>({
@@ -146,6 +160,7 @@ MultiStepFormAuthProps) {
           setOtpValue('')
           setOtpKey((prev) => prev + 1)
           otpForm.reset({ code: '' })
+          setCountdown(180)
           toast.success('کد تایید ارسال شد')
         }
       } catch (error) {
@@ -187,7 +202,7 @@ MultiStepFormAuthProps) {
           otpForm.setValue('code', '')
         } else {
           setIsSuccess(true)
-          toast.success('تایید موفقیت‌آمیز بود')
+          toast.success('تایید موفقیت‌آمیز بود!')
           // onSuccess?.()
           router.push('/')
         }
@@ -220,7 +235,11 @@ MultiStepFormAuthProps) {
   // Handle resend OTP
   const handleResendOtp = (): void => {
     if (!phoneNumber) {
-      toast.error('شماره تلفن یافت نشد')
+      toast.error('شماره تلفن یافت نشد!')
+      return
+    }
+    if (countdown > 0) {
+      toast.info(`لطفا ${countdown} ثانیه دیگر دوباره تلاش کنید.`)
       return
     }
 
@@ -231,16 +250,17 @@ MultiStepFormAuthProps) {
         })
 
         if (result.error) {
-          toast.error(result.error.message || 'خطا در ارسال مجدد کد')
+          toast.error(result.error.message || 'خطا در ارسال مجدد کد!')
         } else {
           setOtpValue('')
           setOtpKey((prev) => prev + 1)
           otpForm.setValue('code', '')
-          toast.success('کد تایید مجدداً ارسال شد')
+          setCountdown(180)
+          toast.success('کد تایید مجدداً ارسال شد!')
         }
       } catch (error) {
         console.error('Resend OTP error:', error)
-        toast.error('خطا در ارسال مجدد کد')
+        toast.error('خطا در ارسال مجدد کد!')
       }
     })
   }
@@ -277,6 +297,9 @@ MultiStepFormAuthProps) {
 
   const phoneError = phoneForm.formState.errors.phone?.message
   const codeError = otpForm.formState.errors.code?.message
+
+  const minutes = Math.floor(countdown / 60)
+  const seconds = countdown % 60
 
   return (
     <div
@@ -409,19 +432,29 @@ MultiStepFormAuthProps) {
                 {/* Resend OTP button */}
                 {step === 1 && (
                   <div className="text-center flex flex-col gap-1">
-                    <p>مدت اعتبار کد 3 دقیقه می‌باشد.</p>
-                    <Button
-                      type="button"
-                      variant="link"
-                      onClick={handleResendOtp}
-                      disabled={isPending}
-                      className="text-sm text-white/80  "
-                    >
-                      ارسال مجدد کد تایید
-                    </Button>
+                    {/* <p>مدت اعتبار کد 3 دقیقه می‌باشد.</p> */}
+                    {countdown > 0 ? (
+                      <div
+                        className="flex items-center justify-center gap-1 text-lg font-mono text-indigo-300"
+                        dir="ltr"
+                      >
+                        <SlidingNumber value={minutes} padStart />
+                        <span>:</span>
+                        <SlidingNumber value={seconds} padStart />
+                      </div>
+                    ) : (
+                      <Button
+                        type="button"
+                        variant="link"
+                        onClick={handleResendOtp}
+                        disabled={isPending}
+                        className="text-sm text-white/80"
+                      >
+                        ارسال مجدد کد تایید
+                      </Button>
+                    )}
                   </div>
                 )}
-
                 {/* Navigation buttons */}
                 <div className="flex justify-between pt-4">
                   <Button
