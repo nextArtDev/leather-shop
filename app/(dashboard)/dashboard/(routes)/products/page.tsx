@@ -11,8 +11,10 @@ import { DataTableSkeleton } from '../../components/shared/DataTableSkeleton'
 import { Heading } from '../../components/shared/Heading'
 import { getAllProductsList } from '../../lib/queries'
 import { columns, ProductColumn } from './components/columns'
-import { currentUser } from '@/lib/auth'
 import { Metadata } from 'next'
+import { getCurrentUserWithFetch } from '@/lib/auth-helpers'
+
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'محصولات',
@@ -46,7 +48,7 @@ export default async function ProductsPage({
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
-  const user = await currentUser()
+  const user = await getCurrentUserWithFetch()
 
   if (!user || user?.role !== 'ADMIN') return notFound()
   const params = await searchParams

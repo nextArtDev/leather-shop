@@ -246,8 +246,10 @@ const TopBanner = () => {
       {isHydrated ? (
         <TextRotate
           texts={[
-            'All duties and taxes included. within the US',
-            'Buy now. Pay later with Klarna. ',
+            // 'All duties and taxes included. within the US',
+            // 'Buy now. Pay later with Klarna. ',
+            'تمام محصولات چرم طبیعی و بوسیله دست تهیه شده‌اند.',
+            'همین حالا خرید کنید!',
           ]}
           mainClassName="flex items-center justify-center px-2 sm:px-2 md:px-3 overflow-hidden py-0.5 sm:py-1 md:py-1 justify-center rounded-lg"
           staggerFrom={'last'}

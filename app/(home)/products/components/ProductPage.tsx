@@ -280,17 +280,6 @@ const ProductPage: FC<ProductPageProp> = ({
         <Separator />
         <ProductStatements />
         <Separator />
-        <ReviewList
-          reviews={reviews}
-          productId={id}
-          userId={userId}
-          productSlug={slug}
-          // numReviews={numReviews}
-          userReview={userReview}
-        />
-
-        <Separator />
-
         {!!questions.filter((q) => q.question.trim().length > 0).length && (
           <div className="flex items-start w-full mx-auto max-w-2xl space-y-2">
             {questions.map((faq, index) => (
@@ -303,6 +292,17 @@ const ProductPage: FC<ProductPageProp> = ({
             ))}
           </div>
         )}
+        <Separator />
+        <ReviewList
+          reviews={reviews}
+          productId={id}
+          userId={userId}
+          productSlug={slug}
+          // numReviews={numReviews}
+          userReview={userReview}
+        />
+
+        <Separator />
       </div>
       <Separator />
       {!!relatedProducts?.length && (

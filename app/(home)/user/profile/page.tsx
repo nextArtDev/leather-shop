@@ -1,15 +1,16 @@
-import { getCurrentUser } from '@/lib/auth-helpers'
 import { Metadata } from 'next'
 import ProfileForm from './components/profile-form'
 import { notFound } from 'next/navigation'
 import SignOutBtn from '@/components/home/shared/SignOutBtn'
+import { getCurrentUserWithFetch } from '@/lib/auth-helpers'
 
 export const metadata: Metadata = {
   title: 'پروفایل',
 }
 
+export const dynamic = 'force-dynamic'
 const Profile = async () => {
-  const session = await getCurrentUser()
+  const session = await getCurrentUserWithFetch()
   if (!session?.name || !session.phoneNumber) notFound()
   const initialData = {
     name: session.name,

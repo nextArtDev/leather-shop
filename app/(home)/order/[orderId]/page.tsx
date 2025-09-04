@@ -2,10 +2,10 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import OrderDetailsTable from './components/order-details-table1'
 import { getOrderById } from '@/lib/home/queries/order'
-import { getCurrentUser } from '@/lib/auth-helpers'
 import { Order, OrderItem, ShippingAddress } from '@/lib/generated/prisma'
 import { Suspense } from 'react'
 import { OrderDetailsSkeleton } from './components/Skeletons'
+import { getCurrentUserWithFetch } from '@/lib/auth-helpers'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -52,7 +52,7 @@ const OrderDetailsPage = async ({
   const productId = (await params).orderId
   const [order, currentUser] = await Promise.all([
     getOrderById(productId),
-    getCurrentUser(),
+    getCurrentUserWithFetch(),
   ])
 
   if (!order) notFound()

@@ -16,9 +16,11 @@ import { Heading } from '@/app/(dashboard)/dashboard/components/shared/Heading'
 import { DataTableSkeleton } from '@/app/(dashboard)/dashboard/components/shared/DataTableSkeleton'
 import { DataTable } from '@/app/(dashboard)/dashboard/components/shared/DataTable'
 import { columns, OrderTypeColumn } from './components/columns'
-import { getCurrentUser } from '@/lib/auth-helpers'
 import { getMyOrders } from '@/lib/home/queries/order'
 import { redirect } from 'next/navigation'
+import { getCurrentUserWithFetch } from '@/lib/auth-helpers'
+
+export const dynamic = 'force-dynamic'
 
 function OrdersDataTable({
   formattedOrders,
@@ -48,7 +50,7 @@ async function AdminOrdersPage({
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
-  const session = await getCurrentUser()
+  const session = await getCurrentUserWithFetch()
   if (!session?.id) redirect('/sign-in')
   const params = await searchParams
   const page = params.page ? +params.page : 1

@@ -8,9 +8,11 @@ import { Suspense } from 'react'
 import { DataTableSkeleton } from '../../components/shared/DataTableSkeleton'
 import { Heading } from '../../components/shared/Heading'
 import { columns, UserColumnType } from './components/columns'
-import { currentUser } from '@/lib/auth'
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
+import { getCurrentUserWithFetch } from '@/lib/auth-helpers'
+
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'کاربرها',
@@ -44,7 +46,7 @@ async function AdminUsersPage({
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
-  const user = await currentUser()
+  const user = await getCurrentUserWithFetch()
 
   if (!user || user?.role !== 'ADMIN') return notFound()
 

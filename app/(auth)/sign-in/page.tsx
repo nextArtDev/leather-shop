@@ -9,6 +9,9 @@ import { cn } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
 import Image from 'next/image'
 import heroImage from '../../../public/images/hero-image.webp'
+
+export const dynamic = 'force-dynamic'
+
 const page = async () => {
   const session = await getCurrentUser()
 

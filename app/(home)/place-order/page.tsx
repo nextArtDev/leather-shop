@@ -26,18 +26,19 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { currentUser } from '@/lib/auth'
 import { getValidatedCart } from '@/lib/home/actions/cart'
 import { getUserShippingAddressById } from '@/lib/home/queries/user'
 import CheckoutSteps from '../shipping-address/components/checkout-steps'
 import PlaceOrderForm from './components/place-order-form'
+import { getCurrentUserWithFetch } from '@/lib/auth-helpers'
+
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'سفارش',
 }
-
 const PlaceOrderPage = async () => {
-  const cUser = await currentUser()
+  const cUser = await getCurrentUserWithFetch()
   const userId = cUser?.id
 
   if (!userId) redirect('/sign-in')

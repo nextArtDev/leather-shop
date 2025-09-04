@@ -2,13 +2,15 @@ import { redirect } from 'next/navigation'
 import ShippingDetails from './components/ShippingDetails'
 // import ShippingHeader from './components/ShippingHeader'
 import ShippingOrders from './components/ShippinOrders'
-import { currentUser } from '@/lib/auth'
 import { getMyCart, getUserById } from '@/lib/home/queries/user'
 import CheckoutSteps from './components/checkout-steps'
 import prisma from '@/lib/prisma'
+import { getCurrentUserWithFetch } from '@/lib/auth-helpers'
+
+export const dynamic = 'force-dynamic'
 
 const page = async () => {
-  const cUser = await currentUser()
+  const cUser = await getCurrentUserWithFetch()
   const provinces = await prisma.province.findMany()
   const userId = cUser?.id
 
