@@ -22,7 +22,7 @@ import { deliverOrder, updateOrderToPaidCOD } from '@/lib/home/actions/order'
 import { toast } from 'sonner'
 import { zarinpalPayment } from '@/lib/home/actions/payment1'
 import { formatDateTime, formatId } from '@/lib/utils'
-import OrderPayment from './OrderPayment'
+// import OrderPayment from './OrderPayment'
 
 // Types
 const errorMessages: Record<string, string> = {
@@ -395,7 +395,7 @@ const OrderSummaryCard = ({
                 {isPending ? 'در حال پردازش...' : 'پرداخت'}
               </Button>
             </form>
-            <OrderPayment orderId={orderId} amount={totalPrice} />
+            {/* <OrderPayment orderId={orderId} amount={totalPrice} /> */}
           </div>
         )}
 
