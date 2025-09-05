@@ -3,11 +3,11 @@ import { Bounded } from '@/components/shared/Bounded'
 import Image from 'next/image'
 import heroImage from '../../../public/images/hero-image.webp'
 // import heroImage from '../../../public/images/bg.jpg'
-import Link from 'next/link'
 
 import { FadeIn } from '@/components/shared/fade-in'
 import { RevealText } from '@/components/shared/reveal-text'
 import { SubCategoryForHomePage } from '@/lib/types/home'
+import { TransitionLink } from '../shared/TransitionLink'
 
 const Hero = ({
   subCategories,
@@ -60,12 +60,12 @@ const Hero = ({
           className="mt-8 translate-y-15"
           vars={{ delay: 1.5, duration: 1.1 }}
         >
-          <Link
+          <TransitionLink
             href={'/products'}
             className=" w-fit inline-flex items-center justify-center px-12 py-4 text-center font-extrabold tracking-wider uppercase transition-colors duration-300  border border-white text-white hover:bg-white/20"
           >
             محصولات
-          </Link>
+          </TransitionLink>
         </FadeIn>
         <FadeIn
           className="mt-8 -translate-y-15"
@@ -79,12 +79,12 @@ const Hero = ({
                     className="translate-y-10"
                     vars={{ delay: 0.2 * i, duration: 1, ease: 'sine.in' }}
                   >
-                    <Link
+                    <TransitionLink
                       href={`/sub-categories/${sub.url}`}
                       className="bg-gradient-to-b from-white/5 to-white/30 backdrop-blur-[2px] border rounded-none  px-2 py-1 text-center text-white border-white "
                     >
                       {sub.name}
-                    </Link>
+                    </TransitionLink>
                   </FadeIn>
                 </li>
               ))}

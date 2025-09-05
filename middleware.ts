@@ -23,11 +23,11 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/dashboard/:path*',
-    '/order/:path*',
-    '/shipping-address/:path*',
-    '/place-order/:path*',
-    '/cart/:path*',
+    // '/dashboard/:path*',
+    // '/order/:path*',
+    // '/shipping-address/:path*',
+    // '/place-order/:path*',
+    // '/cart/:path*',
   ],
 }
 // import { betterFetch } from '@better-fetch/fetch'

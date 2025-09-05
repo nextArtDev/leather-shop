@@ -17,8 +17,9 @@ import {
 import { useCartStore } from '@/hooks/useCartStore'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import ShoppingList from '@/app/(home)/cart/components/ShoppingList'
-import Link from 'next/link'
+
 import { Badge } from '@/components/ui/badge'
+import { TransitionLink } from '../shared/TransitionLink'
 
 type Props = {
   isOpen?: boolean
@@ -94,7 +95,9 @@ export default function DrawerCart({ isOpen, onClose }: Props) {
                       asChild
                       className="w-full max-w-sm mx-auto bg-indigo-600 text-white"
                     >
-                      <Link href="/cart">سبد خرید</Link>
+                      <TransitionLink aria-label="cart content" href="/cart">
+                        سبد خرید
+                      </TransitionLink>
                     </Button>
                   </DrawerClose>
                   <DrawerClose asChild>
@@ -103,7 +106,9 @@ export default function DrawerCart({ isOpen, onClose }: Props) {
                       variant="outline"
                       className="w-full max-w-sm mx-auto"
                     >
-                      <Link href="/">ادامه &larr;</Link>
+                      <TransitionLink aria-label="continue shopping" href="/">
+                        ادامه &larr;
+                      </TransitionLink>
                     </Button>
                   </DrawerClose>
                 </DrawerFooter>
@@ -115,7 +120,9 @@ export default function DrawerCart({ isOpen, onClose }: Props) {
                 </p>
                 <DrawerClose asChild>
                   <Button asChild>
-                    <Link href="/">ادامه خرید</Link>
+                    <TransitionLink aria-label="continue shopping" href="/">
+                      ادامه خرید
+                    </TransitionLink>
                   </Button>
                 </DrawerClose>
               </div>

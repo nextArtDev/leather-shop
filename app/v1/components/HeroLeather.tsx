@@ -74,12 +74,12 @@ const HeroLeather = () => {
             </div>
 
             {/* Border frame around it */}
-            <Image
+            {/* <Image
               src="/images/border-rounded.webp"
               alt="Border Frame"
               fill
               className="pointer-events-none select-none origin-center scale-125 mix-blend-multiply"
-            />
+            /> */}
           </figure>
         </article>
         <article className="w-full flex flex-col items-center justify-center gap-4    ">

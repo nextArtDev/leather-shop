@@ -9,19 +9,24 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { User } from 'lucide-react'
-import Link from 'next/link'
+
 import SignOutBtn from '../shared/SignOutBtn'
 // import { getCurrentUser } from '@/lib/auth-helpers'
 import { CurrentUserType } from '@/lib/types/home'
+import { TransitionLink } from '../shared/TransitionLink'
 
 export default function UserSession(session: {
   session: CurrentUserType | null
 }) {
   if (!session.session?.id) {
     return (
-      <Link href={'/sign-in'} className="w-full ">
+      <TransitionLink
+        aria-label="user sign in"
+        href={'/sign-in'}
+        className="w-full "
+      >
         <User className="h-6 w-6" />
-      </Link>
+      </TransitionLink>
     )
   }
 
@@ -42,11 +47,11 @@ export default function UserSession(session: {
         {session.session?.phoneNumber && (
           <>
             <DropdownMenuGroup dir="rtl">
-              <Link href={'/user/profile'}>
+              <TransitionLink href={'/user/profile'} aria-label="user profile">
                 <DropdownMenuItem className="cursor-pointer">
                   پروفایل
                 </DropdownMenuItem>
-              </Link>
+              </TransitionLink>
             </DropdownMenuGroup>
 
             <DropdownMenuSeparator />

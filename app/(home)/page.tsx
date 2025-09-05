@@ -30,24 +30,24 @@ export async function generateMetadata(): Promise<Metadata> {
       ).toFixed(1)
     : null
 
-  const description = `Premium online store offering ${categoryNames.join(
+  const description = ` ${categoryNames.join(
     ', '
-  )} and more. ${
-    avgRating ? `Rated ${avgRating}/5 by ${reviews?.length} customers.` : ''
-  } Fast shipping, quality products, and excellent customer service.`
+  )}کارگاه ساخت کیف و محصولات چرم طبیعی. ${
+    avgRating ? `امتیاز ${avgRating}/5 بوسیله ${reviews?.length} خریدار.` : ''
+  } ارسال سریع، کیفیت بالای محصولات و سرویس‌دهی عالی به خریداران.`
 
   return {
     title: 'کارگاه چرم خارَک - چرم طبیعی دست‌ساز',
     description,
     keywords: [
       ...categoryNames?.map((name) => name.toLowerCase()),
-      'online store',
-      'premium products',
-      'fast shipping',
-      'quality guarantee',
-      'customer service',
-      'best sellers',
-      'new arrivals',
+      'چرم طبیعی',
+      'کیف چرم طبیعی زنانه',
+      'کیف چرمی زنانه',
+      'چرم طبیعی تضمین شده',
+      'فروشگاه آنلاین',
+      'کارگاه چرم دست‌دوز',
+      'فروشگاه چرم',
     ].join(', '),
 
     // Open Graph for social sharing
