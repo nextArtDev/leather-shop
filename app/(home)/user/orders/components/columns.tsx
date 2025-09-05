@@ -21,10 +21,9 @@ import CustomModal from '@/app/(dashboard)/dashboard/components/custom-modal'
 import PaymentStatusTag from '@/app/(dashboard)/dashboard/(routes)/orders/components/payment-status'
 import StoreOrderSummary from './store-order-summary'
 import OrderStatusTag from '@/app/(dashboard)/dashboard/(routes)/orders/components/order-status'
-import { formatId } from '@/lib/utils'
 
 export type OrderTypeColumn = {
-  id: string
+  transactionId: string
   name: string
   paymentStatus: PaymentStatus
   shippingAddress: ShippingAddress & { province: Province | null } & {
@@ -35,7 +34,7 @@ export type OrderTypeColumn = {
   items: OrderItem[]
   shippingFees: number | null
   total: number | undefined
-
+  paidAt: string | null
   // name: string | null
   // isPending: boolean
   // description: string | null
@@ -43,9 +42,9 @@ export type OrderTypeColumn = {
 
 export const columns: ColumnDef<OrderTypeColumn>[] = [
   {
-    accessorKey: 'id',
-    header: 'id',
-    cell: ({ row }) => <span>{formatId(row.original.id)}</span>,
+    accessorKey: 'transactionId',
+    header: 'کد رهگیری',
+    cell: ({ row }) => <span>{row.original.transactionId}</span>,
   },
   // {
   //   accessorKey: 'products',

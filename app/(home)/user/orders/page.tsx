@@ -59,7 +59,7 @@ async function AdminOrdersPage({
   const orders = await getMyOrders({ page, pageSize, userId: session.id })
   // console.log(orders.order?.map((t) => t.shippingAddressId))
   const formattedOrders: OrderTypeColumn[] = orders.order?.map((item) => ({
-    id: item.id,
+    transactionId: item?.paymentDetails?.transactionId || '',
     name: item.user.name ?? '',
     paymentStatus: item.paymentStatus as PaymentStatus,
     orderStatus: item.orderStatus as OrderStatus,
@@ -72,7 +72,7 @@ async function AdminOrdersPage({
     total: item.total || undefined,
     items: item.items as OrderItem[],
     shippingFees: item.shippingFees,
-    createdAt: format(item.createdAt, 'dd MMMM yyyy'),
+    paidAt: item?.paidAt ? format(item.paidAt, 'dd MMMM yyyy HH:mm:ss') : null,
   }))
 
   return (

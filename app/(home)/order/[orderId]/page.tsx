@@ -21,7 +21,9 @@ function OrderDetailsTableWrapper({
     shippingAddress: ShippingAddress & { province: { name: string } } & {
       city: { name: string }
     }
-  } & { user: { name: string; phoneNumber: string | null } }
+  } & { paymentDetails: { transactionId: string | null } | null } & {
+    user: { name: string; phoneNumber: string | null }
+  }
 
   isAdmin: boolean
 }) {
@@ -29,6 +31,7 @@ function OrderDetailsTableWrapper({
     <OrderDetailsTable
       order={{
         ...order,
+
         shippingAddress: {
           ...order.shippingAddress,
           province: order.shippingAddress.province,

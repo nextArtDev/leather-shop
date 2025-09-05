@@ -28,7 +28,13 @@ const StoreOrderSummary: FC<Props> = ({ order }) => {
           <h2 className=" sr-only font-bold text-3xl leading-10 overflow-ellipsis line-clamp-1 ">
             جزئیات سفارش
           </h2>
-          <h6 className="font-semibold text-2xl leading-9">#{order.id}</h6>
+          <h6 className="font-semibold text-2xl leading-9">آیدی: {order.id}</h6>
+          <h6 className="font-semibold text-base leading-9">
+            کد رهگیری: {order.transactionId}
+          </h6>
+          <h6 className="font-semibold text-lg leading-9">
+            پرداخت شده در: {order.paidAt}
+          </h6>
           <div className="flex items-center gap-x-2">
             <PaymentStatusTag status={order.paymentStatus as PaymentStatus} />
             <OrderStatusSelect

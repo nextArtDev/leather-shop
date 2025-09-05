@@ -36,7 +36,7 @@ const CustomModal = ({
         <DialogContent
           dir="rtl"
           className={cn(
-            'overflow-y-scroll md:max-h-[700px] md:h-fit h-screen bg-card',
+            'overflow-y-scroll rounded-md md:max-h-[700px] md:h-fit h-[80svh] bg-card',
             maxWidth
           )}
         >

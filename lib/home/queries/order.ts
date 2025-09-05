@@ -36,7 +36,6 @@ export async function getOrderById(orderId: string) {
           },
         },
         user: { select: { name: true, phoneNumber: true, role: true } },
-        // paymentDetails:true
       },
     })
 
@@ -59,16 +58,16 @@ export type OrderType = {
   })[] // The result is an array of orders
   isNext: boolean // Added 'isNext'
 }
-interface getAllReviewsProps {
+interface getAllMyOrdersProps {
   userId: string
   page?: number
   pageSize?: number
 }
 
 export const getMyOrders = async (
-  params: getAllReviewsProps
+  params: getAllMyOrdersProps
 ): Promise<OrderType> => {
-  const { page = 1, pageSize = 30 } = params
+  const { page = 1, pageSize = 50 } = params
   const skipAmount = (page - 1) * pageSize
   try {
     const cUser = await getCurrentUser()
@@ -111,7 +110,11 @@ export const getMyOrders = async (
       skip: skipAmount,
       take: pageSize,
     })
-    const totalOrders = await prisma.order.count()
+    const totalOrders = await prisma.order.count({
+      where: {
+        userId: user.id,
+      },
+    })
 
     const isNext = totalOrders > skipAmount + allOrders.length
     return { order: allOrders || [], isNext }

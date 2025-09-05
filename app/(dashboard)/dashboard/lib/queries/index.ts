@@ -265,13 +265,13 @@ export const getAllReviews = async (params: getAllReviewsProps) => {
   }
 }
 
-interface getAllReviewsProps {
+interface getAllOrdersProps {
   page?: number
   pageSize?: number
 }
 
 export const getAllOrders = async (
-  params: getAllReviewsProps
+  params: getAllOrdersProps
 ): Promise<OrderType> => {
   const { page = 1, pageSize = 30 } = params
   const skipAmount = (page - 1) * pageSize
@@ -314,6 +314,66 @@ export const getAllOrders = async (
       take: pageSize,
     })
     const totalOrders = await prisma.order.count()
+
+    const isNext = totalOrders > skipAmount + allOrders.length
+    return { order: allOrders || [], isNext }
+  } catch (error) {
+    throw error
+  }
+}
+interface getAllOrdersProps {
+  page?: number
+  pageSize?: number
+}
+
+export const getAllPaidOrders = async (
+  params: getAllOrdersProps
+): Promise<OrderType> => {
+  const { page = 1, pageSize = 30 } = params
+  const skipAmount = (page - 1) * pageSize
+  try {
+    const user = await getCurrentUser()
+
+    if (!user) throw new Error('Unauthenticated.')
+
+    if (user.role !== 'ADMIN')
+      throw new Error(
+        'Unauthorized Access: Seller Privileges Required for Entry.'
+      )
+
+    // Retrieve order groups for the specified store and user
+    const allOrders = await prisma.order.findMany({
+      where: {
+        paymentStatus: 'Paid',
+      },
+      include: {
+        items: true,
+        // coupon: true,
+
+        paymentDetails: true,
+        user: {
+          select: {
+            phoneNumber: true,
+            name: true,
+          },
+        },
+
+        shippingAddress: {
+          include: {
+            city: true,
+            province: true,
+          },
+        },
+      },
+      orderBy: {
+        updatedAt: 'desc',
+      },
+      skip: skipAmount,
+      take: pageSize,
+    })
+    const totalOrders = await prisma.order.count({
+      where: { paymentStatus: 'Paid' },
+    })
 
     const isNext = totalOrders > skipAmount + allOrders.length
     return { order: allOrders || [], isNext }

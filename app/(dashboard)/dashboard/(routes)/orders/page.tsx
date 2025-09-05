@@ -1,5 +1,5 @@
 import { format } from 'date-fns-jalali'
-import { getAllOrders } from '../../lib/queries'
+import { getAllPaidOrders } from '../../lib/queries'
 import { DataTable } from '../../components/shared/DataTable'
 import { columns, OrderTypeColumn } from './components/columns'
 
@@ -59,12 +59,13 @@ async function AdminOrdersPage({
   const page = params.page ? +params.page : 1
   const pageSize = params.pageSize ? +params.pageSize : 50
 
-  const orders = await getAllOrders({ page, pageSize })
+  const orders = await getAllPaidOrders({ page, pageSize })
   // console.log(orders.order?.map((t) => t.shippingAddressId))
   const formattedOrders: OrderTypeColumn[] = orders.order?.map((item) => ({
     id: item.id,
     name: item.user.name ?? '',
     paymentStatus: item.paymentStatus as PaymentStatus,
+    transactionId: item?.paymentDetails?.transactionId || '',
     orderStatus: item.orderStatus as OrderStatus,
     shippingAddress: item.shippingAddress as ShippingAddress & {
       province: Province | null
@@ -75,7 +76,7 @@ async function AdminOrdersPage({
     total: item.total || undefined,
     items: item.items as OrderItem[],
     shippingFees: item.shippingFees,
-    createdAt: format(item.createdAt, 'dd MMMM yyyy'),
+    paidAt: item.paidAt ? format(item.paidAt, 'dd MMMM yyyy hh:mm:ss') : '',
   }))
 
   return (

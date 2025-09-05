@@ -31,7 +31,8 @@ export type OrderTypeColumn = {
   items: OrderItem[]
   shippingFees: number | null
   total: number | undefined
-
+  paidAt: string | null
+  transactionId: string | null
   // name: string | null
   // isPending: boolean
   // description: string | null
@@ -73,6 +74,13 @@ export const columns: ColumnDef<OrderTypeColumn>[] = [
           ))}
         </div>
       )
+    },
+  },
+  {
+    accessorKey: 'paidAt',
+    header: 'زمان پرداخت',
+    cell: ({ row }) => {
+      return <div>{row.original.paidAt || ''}</div>
     },
   },
   {
