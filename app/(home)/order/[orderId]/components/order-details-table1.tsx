@@ -22,6 +22,7 @@ import { deliverOrder, updateOrderToPaidCOD } from '@/lib/home/actions/order'
 import { toast } from 'sonner'
 import { zarinpalPayment } from '@/lib/home/actions/payment1'
 import { formatDateTime, formatId } from '@/lib/utils'
+import OrderPayment from './OrderPayment'
 
 // Types
 const errorMessages: Record<string, string> = {
@@ -384,15 +385,18 @@ const OrderSummaryCard = ({
             پرداخت شده
           </Badge>
         ) : (
-          <form action={zarinpalPaymentAction} className="space-y-2">
-            <Button
-              type="submit"
-              disabled={isPending}
-              className="w-full h-12 bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
-            >
-              {isPending ? 'در حال پردازش...' : 'پرداخت'}
-            </Button>
-          </form>
+          <div className="flex flex-col gap-4">
+            <form action={zarinpalPaymentAction} className="space-y-2">
+              <Button
+                type="submit"
+                disabled={isPending}
+                className="w-full h-12 bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+              >
+                {isPending ? 'در حال پردازش...' : 'پرداخت'}
+              </Button>
+            </form>
+            <OrderPayment orderId={orderId} amount={totalPrice} />
+          </div>
         )}
 
         {isAdmin && !isPaid && <MarkAsPaidButton />}
