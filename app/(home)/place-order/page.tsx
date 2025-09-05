@@ -11,7 +11,7 @@ import {
 import { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 // import { formatCurrency } from '@/lib/utils'
 // import { getMyCart } from '../../lib/actions/cart.action'
 // import { getUserById } from '../../lib/actions/user.action'
@@ -30,7 +30,7 @@ import { getValidatedCart } from '@/lib/home/actions/cart'
 import { getUserShippingAddressById } from '@/lib/home/queries/user'
 import CheckoutSteps from '../shipping-address/components/checkout-steps'
 import PlaceOrderForm from './components/place-order-form'
-import { getCurrentUserWithFetch } from '@/lib/auth-helpers'
+import { getCurrentUser } from '@/lib/auth-helpers'
 
 export const dynamic = 'force-dynamic'
 
@@ -38,7 +38,11 @@ export const metadata: Metadata = {
   title: 'سفارش',
 }
 const PlaceOrderPage = async () => {
-  const cUser = await getCurrentUserWithFetch()
+  const cUser = await getCurrentUser()
+
+  if (!cUser) {
+    notFound()
+  }
   const userId = cUser?.id
 
   if (!userId) redirect('/sign-in')

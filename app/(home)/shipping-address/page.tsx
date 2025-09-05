@@ -5,12 +5,12 @@ import ShippingOrders from './components/ShippinOrders'
 import { getMyCart, getUserById } from '@/lib/home/queries/user'
 import CheckoutSteps from './components/checkout-steps'
 import prisma from '@/lib/prisma'
-import { getCurrentUserWithFetch } from '@/lib/auth-helpers'
+import { getCurrentUser } from '@/lib/auth-helpers'
 
 export const dynamic = 'force-dynamic'
 
 const page = async () => {
-  const cUser = await getCurrentUserWithFetch()
+  const cUser = await getCurrentUser()
   const provinces = await prisma.province.findMany()
   const userId = cUser?.id
 

@@ -5,7 +5,7 @@ import { getOrderById } from '@/lib/home/queries/order'
 import { Order, OrderItem, ShippingAddress } from '@/lib/generated/prisma'
 import { Suspense } from 'react'
 import { OrderDetailsSkeleton } from './components/Skeletons'
-import { getCurrentUserWithFetch } from '@/lib/auth-helpers'
+import { getCurrentUser } from '@/lib/auth-helpers'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -55,7 +55,7 @@ const OrderDetailsPage = async ({
   const productId = (await params).orderId
   const [order, currentUser] = await Promise.all([
     getOrderById(productId),
-    getCurrentUserWithFetch(),
+    getCurrentUser(),
   ])
 
   if (!order) notFound()

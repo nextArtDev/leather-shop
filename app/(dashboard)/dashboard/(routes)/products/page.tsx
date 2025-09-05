@@ -12,7 +12,7 @@ import { Heading } from '../../components/shared/Heading'
 import { getAllProductsList } from '../../lib/queries'
 import { columns, ProductColumn } from './components/columns'
 import { Metadata } from 'next'
-import { getCurrentUserWithFetch } from '@/lib/auth-helpers'
+import { getCurrentUser } from '@/lib/auth-helpers'
 
 export const dynamic = 'force-dynamic'
 
@@ -48,7 +48,7 @@ export default async function ProductsPage({
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
-  const user = await getCurrentUserWithFetch()
+  const user = await getCurrentUser()
 
   if (!user || user?.role !== 'ADMIN') return notFound()
   const params = await searchParams

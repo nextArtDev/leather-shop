@@ -10,7 +10,7 @@ import { Heading } from '../../components/shared/Heading'
 import { columns, UserColumnType } from './components/columns'
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
-import { getCurrentUserWithFetch } from '@/lib/auth-helpers'
+import { getCurrentUser } from '@/lib/auth-helpers'
 
 export const dynamic = 'force-dynamic'
 
@@ -46,7 +46,7 @@ async function AdminUsersPage({
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
-  const user = await getCurrentUserWithFetch()
+  const user = await getCurrentUser()
 
   if (!user || user?.role !== 'ADMIN') return notFound()
 

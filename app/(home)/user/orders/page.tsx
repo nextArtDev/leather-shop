@@ -17,8 +17,8 @@ import { DataTableSkeleton } from '@/app/(dashboard)/dashboard/components/shared
 import { DataTable } from '@/app/(dashboard)/dashboard/components/shared/DataTable'
 import { columns, OrderTypeColumn } from './components/columns'
 import { getMyOrders } from '@/lib/home/queries/order'
-import { redirect } from 'next/navigation'
-import { getCurrentUserWithFetch } from '@/lib/auth-helpers'
+import { notFound } from 'next/navigation'
+import { getCurrentUser } from '@/lib/auth-helpers'
 
 export const dynamic = 'force-dynamic'
 
@@ -50,13 +50,16 @@ async function AdminOrdersPage({
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
-  const session = await getCurrentUserWithFetch()
-  if (!session?.id) redirect('/sign-in')
+  const user = await getCurrentUser()
+
+  if (!user) {
+    notFound()
+  }
   const params = await searchParams
   const page = params.page ? +params.page : 1
   const pageSize = params.pageSize ? +params.pageSize : 50
 
-  const orders = await getMyOrders({ page, pageSize, userId: session.id })
+  const orders = await getMyOrders({ page, pageSize, userId: user.id })
   // console.log(orders.order?.map((t) => t.shippingAddressId))
   const formattedOrders: OrderTypeColumn[] = orders.order?.map((item) => ({
     transactionId: item?.paymentDetails?.transactionId || '',

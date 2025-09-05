@@ -13,7 +13,7 @@ import { format } from 'date-fns-jalali'
 import { DataTable } from '../../components/shared/DataTable'
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
-import { getCurrentUserWithFetch } from '@/lib/auth-helpers'
+import { getCurrentUser } from '@/lib/auth-helpers'
 
 export const dynamic = 'force-dynamic'
 
@@ -49,7 +49,7 @@ export default async function AdminSubCategoriesPage({
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
-  const user = await getCurrentUserWithFetch()
+  const user = await getCurrentUser()
 
   if (!user || user?.role !== 'ADMIN') return notFound()
   const params = await searchParams

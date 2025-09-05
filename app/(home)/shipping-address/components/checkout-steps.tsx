@@ -6,7 +6,7 @@ const CheckoutSteps = ({ current = 0 }) => {
   const steps = ['عضویت', 'آدرس ارسال', 'ثبت سفارش']
 
   return (
-    <div className="flex w-full items-start">
+    <div className="flex w-full items-start max-w-xl mx-auto py-4">
       {steps.map((step, index) => (
         <React.Fragment key={step}>
           {/* Step Item: Circle + Label */}
