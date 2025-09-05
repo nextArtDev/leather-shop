@@ -354,3 +354,20 @@ export async function generateSearchMetadata(params: {
     },
   }
 }
+
+// utils/rateLimit.ts
+import prisma from '@/lib/prisma'
+
+export async function checkRateLimit(userId: string) {
+  const oneHourAgo = new Date(Date.now() - 1000 * 60 * 60)
+
+  const count = await prisma.paymentRateLimit.count({
+    where: { userId, createdAt: { gte: oneHourAgo } },
+  })
+
+  if (count >= 5) {
+    throw new Error('Too many payment attempts. Please wait before retrying.')
+  }
+
+  await prisma.paymentRateLimit.create({ data: { userId } })
+}

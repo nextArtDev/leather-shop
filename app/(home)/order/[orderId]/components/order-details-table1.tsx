@@ -14,38 +14,25 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import Image from 'next/image'
 
-import {
-  useActionState,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  useTransition,
-  useRef,
-} from 'react'
+import { useActionState, useEffect, useMemo, useTransition } from 'react'
 
 import { Order, OrderItem, ShippingAddress } from '@/lib/generated/prisma'
-// import {
-//   zarinpalPayment,
-//   zarinpalPaymentApproval,
-// } from '@/app/(home)/lib/actions/payment'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-// import {
-//   deliverOrder,
-//   updateOrderToPaidCOD,
-// } from '@/lib/actions/admin/order.actions'
-import { toast } from 'sonner'
-import {
-  zarinpalPayment,
-  zarinpalPaymentApproval,
-} from '@/lib/home/actions/payment1'
 import { deliverOrder, updateOrderToPaidCOD } from '@/lib/home/actions/order'
+import { toast } from 'sonner'
+import { zarinpalPayment } from '@/lib/home/actions/payment1'
 import { formatDateTime, formatId } from '@/lib/utils'
 
 // Types
-interface ZarinpalResponse {
-  Authority: string
-  Status: string
+const errorMessages: Record<string, string> = {
+  invalid_params: 'اطلاعات تایید پرداخت نامعتبر است.',
+  unauthorized: 'شما برای مشاهده این سفارش اجازه دسترسی ندارید.',
+  payment_failed: 'فرآیند پرداخت ناموفق بود یا توسط شما لغو شد.',
+  server_error: 'خطایی در سرور رخ داده است. لطفا با پشتیبانی تماس بگیرید.',
+  verification_failed:
+    'تایید پرداخت با خطا مواجه شد. اگر مبلغی از حساب شما کسر شده، طی ۷۲ ساعت آینده باز خواهد گشت.',
+  lock_failed:
+    'این پرداخت در حال پردازش است. لطفا چند لحظه صبر کرده و صفحه را رفرش کنید.',
 }
 
 interface OrderDetailsTableProps {
@@ -53,7 +40,9 @@ interface OrderDetailsTableProps {
     shippingAddress: ShippingAddress & { province: { name: string } } & {
       city: { name: string }
     }
-  } & { user: { name: string; phoneNumber: string } }
+  } & { paymentDetails: { transactionId: string | null } | null } & {
+    user: { name: string; phoneNumber: string }
+  }
   isAdmin: boolean
 }
 
@@ -65,281 +54,97 @@ const parseDate = (date: Date | string | null): Date | null => {
   return null
 }
 
-// Constants
-const PAYMENT_STATUS = {
-  OK: 'OK',
-  NOK: 'NOK',
-} as const
-
 const OrderDetailsTable = ({ order, isAdmin }: OrderDetailsTableProps) => {
-  const pathname = usePathname()
-  const router = useRouter()
   const searchParams = useSearchParams()
-
-  // Use ref to track the current order ID and prevent stale closures
-  const currentOrderIdRef = useRef(order.id)
-  const paymentProcessedRef = useRef<Set<string>>(new Set())
-
-  // Always use the prop data directly - don't maintain local state
-  // const {
-  //   id,
-  //   shippingAddress,
-  //   orderitems,
-  //   itemsPrice,
-  //   shippingPrice,
-  //   taxPrice,
-  //   totalPrice,
-  //   isDelivered,
-  //   isPaid,
-  //   paidAt: rawPaidAt,
-  //   deliveredAt: rawDeliveredAt,
-  // } = order
-
-  const id = order.id
-  const shippingAddress = order.shippingAddress
-  const orderitems = order.items
-  const itemsPrice = order.subTotal
-  const shippingPrice = order.shippingFees
-  // const taxPrice= order
-  const totalPrice = order.total
-  const isDelivered = order.orderStatus === 'Delivered'
-  const isPaid = order.paymentStatus === 'Paid'
-  const rawPaidAt = order.updatedAt
-  // const deliveredAt= order.orderStatus.
-  // } = order
-
-  // Safely parse dates
-  const paidAt = parseDate(rawPaidAt)
-  // const deliveredAt = parseDate(deliveredAt)
-
-  // State for payment callback handling - RESET when order changes
-  const [zarinpalResponse, setZarinpalResponse] = useState<ZarinpalResponse>({
-    Authority: '',
-    Status: '',
-  })
-
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false)
-
-  // CRITICAL: Reset ALL payment-related state when order ID changes
+  const router = useRouter()
+  const pathname = usePathname()
+  // Show toast messages based on URL parameters
   useEffect(() => {
-    // Only reset if the order ID actually changed
-    if (currentOrderIdRef.current !== id) {
-      currentOrderIdRef.current = id
+    const status = searchParams?.get('status')
+    const errorCode = searchParams?.get('error')
+    const hasQueryParams =
+      searchParams.has('status') || searchParams.has('error')
 
-      // Reset all payment-related state
-      setZarinpalResponse({
-        Authority: '',
-        Status: '',
+    if (status === 'success') {
+      toast.success('پرداخت با موفقیت انجام شد', {
+        position: 'top-center',
       })
-      setIsProcessingPayment(false)
-
-      // Clear URL parameters immediately when switching orders
-      const hasPaymentParams =
-        searchParams?.get('Authority') || searchParams?.get('Status')
-      if (hasPaymentParams) {
-        router.replace(pathname, { scroll: false })
-      }
+    } else if (status === 'already_paid') {
+      toast('سفارش قبلاً پرداخت شده بود')
+    } else if (errorCode) {
+      const message =
+        errorMessages[errorCode] || 'یک خطای پیش‌بینی نشده رخ داده است.'
+      toast.error(message)
     }
-  }, [id, pathname, router, searchParams])
+    if (hasQueryParams) {
+      router.replace(pathname, { scroll: false })
+    }
+  }, [searchParams, pathname, router])
 
-  // Debug logging
+  const {
+    id,
+    shippingAddress,
+    items: orderitems,
+    subTotal: itemsPrice,
+    shippingFees: shippingPrice,
+    total: totalPrice,
+    orderStatus,
+    paymentStatus,
+    paidAt: rawPaidAt,
+    paymentDetails,
+  } = order
 
+  const isDelivered = orderStatus === 'Delivered'
+  const isPaid = paymentStatus === 'Paid'
+  const paidAt = parseDate(rawPaidAt)
+  const transactionId = paymentDetails?.transactionId
   // Payment action state
   const [actionState, zarinpalPaymentAction, isPending] = useActionState(
-    zarinpalPayment.bind(null, pathname, id),
+    zarinpalPayment.bind(null, `/order/${id}`, id),
     {
       errors: {},
       payment: {},
     }
   )
 
-  // Memoized values - FORCE recalculation based on actual database state
-  const isPaymentSuccessful = useMemo(() => {
-    // Only consider callback successful if:
-    // 1. It's for the current order
-    // 2. The order isn't already paid in the database
-    // 3. We have valid callback data
-    const hasValidCallback =
-      zarinpalResponse.Status === PAYMENT_STATUS.OK &&
-      zarinpalResponse.Authority &&
-      !isPaid && // Only show as successful if not already paid in DB
-      currentOrderIdRef.current === id // Ensure it's for the current order
-
-    // Database state takes precedence
-    return isPaid || (hasValidCallback && isProcessingPayment)
-  }, [
-    isPaid,
-    zarinpalResponse.Status,
-    zarinpalResponse.Authority,
-    isProcessingPayment,
-    id,
-  ])
-
-  const formattedShippingAddress = useMemo(() => {
-    if (!shippingAddress) return ''
-    return `${shippingAddress.province.name}، ${shippingAddress.city.name}، ${shippingAddress.address1}، ${shippingAddress.zip_code}`
-  }, [shippingAddress])
-
-  // Refetch order data to ensure we have the latest state
-  const refetchOrder = useCallback(async () => {
-    try {
-      console.log('Refetching order data for:', id)
-      router.refresh()
-    } catch (error) {
-      console.error('Failed to refetch order:', error)
-    }
-  }, [router, id])
-
-  // Payment verification callback
-  const verifyPayment = useCallback(async () => {
-    // Ensure we're working with the current order
-    if (currentOrderIdRef.current !== id) {
-      return
-    }
-
-    if (!zarinpalResponse.Authority || !zarinpalResponse.Status) {
-      return
-    }
-
-    // Prevent duplicate processing
-    const paymentKey = `${id}-${zarinpalResponse.Authority}`
-    if (paymentProcessedRef.current.has(paymentKey)) {
-      return
-    }
-
-    // Skip if already paid
-    if (isPaid) {
-      return
-    }
-
-    paymentProcessedRef.current.add(paymentKey)
-    setIsProcessingPayment(true)
-
-    try {
-      const result = await zarinpalPaymentApproval(
-        pathname,
-        id,
-        zarinpalResponse.Authority,
-        zarinpalResponse.Status
-      )
-
-      if (result?.errors?._form) {
-        toast(result.errors._form[0])
-      } else if (result?.success) {
-        if (result.alreadyPaid) {
-          toast('سفارش قبلاً پرداخت شده بود')
-        } else {
-          toast.success('پرداخت با موفقیت انجام شد', {
-            position: 'top-center',
-          })
-        }
-
-        // Clean up URL parameters and refresh data
-        router.replace(pathname, { scroll: false })
-
-        // Wait a bit then refresh to get updated data
-        setTimeout(() => {
-          refetchOrder()
-        }, 1000)
-      }
-    } catch (error) {
-      console.error('Payment verification failed:', error)
-      toast.error('خطا در تأیید پرداخت')
-      // Remove from processed set on error to allow retry
-      paymentProcessedRef.current.delete(paymentKey)
-    } finally {
-      setIsProcessingPayment(false)
-    }
-  }, [
-    pathname,
-    id,
-    zarinpalResponse.Authority,
-    zarinpalResponse.Status,
-    router,
-    refetchOrder,
-    isPaid,
-  ])
-
-  // Handle URL parameters for payment callback - ONLY for current order
-  useEffect(() => {
-    const authority = searchParams?.get('Authority')
-    const status = searchParams?.get('Status')
-
-    // Only process if:
-    // 1. We have both authority and status
-    // 2. This is for the current order
-    // 3. We don't already have response data
-    // 4. Order is not already paid
-    if (
-      authority &&
-      status &&
-      currentOrderIdRef.current === id &&
-      !zarinpalResponse.Authority &&
-      !zarinpalResponse.Status &&
-      !isPaid
-    ) {
-      setZarinpalResponse({
-        Authority: authority,
-        Status: status,
-      })
-    } else if (authority && status && isPaid) {
-      // If order is already paid, clean up URL immediately
-      console.log('Order already paid, cleaning up URL parameters')
-      router.replace(pathname, { scroll: false })
-    }
-  }, [
-    searchParams,
-    id,
-    zarinpalResponse.Authority,
-    zarinpalResponse.Status,
-    isPaid,
-    router,
-    pathname,
-  ])
-
-  // Verify payment when response is set and it's for the current order
-  useEffect(() => {
-    if (
-      zarinpalResponse.Authority &&
-      zarinpalResponse.Status &&
-      currentOrderIdRef.current === id &&
-      !isPaid
-    ) {
-      verifyPayment()
-    }
-  }, [verifyPayment, zarinpalResponse, id, isPaid])
-
   // Handle payment URL redirect
   useEffect(() => {
-    if (actionState.payment?.url && currentOrderIdRef.current === id) {
-      router.push(actionState.payment.url)
+    if (actionState.payment?.url) {
+      window.location.href = actionState.payment.url
     }
-  }, [actionState.payment?.url, router, id])
+  }, [actionState.payment?.url])
 
   // Show error messages
   useEffect(() => {
     if (actionState.errors?._form) {
       toast.error(actionState.errors._form[0])
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [actionState.errors, toast])
+  }, [actionState.errors])
+
+  const formattedShippingAddress = useMemo(() => {
+    if (!shippingAddress) return ''
+    return `${shippingAddress.province.name}، ${shippingAddress.city.name}، ${shippingAddress.address1}، ${shippingAddress.zip_code}`
+  }, [shippingAddress])
 
   return (
-    <div key={`order-${id}`} className="container mx-auto py-4">
+    <div className="container mx-auto py-4">
       <h1 className="text-2xl font-bold mb-6">سفارش {formatId(id)}</h1>
 
       <div className="grid md:grid-cols-3 gap-6">
         {/* Main Content */}
         <div className="md:col-span-2 space-y-4">
           {/* Payment Status Card */}
-          <PaymentStatusCard isPaid={isPaid} paidAt={paidAt} />
+          <PaymentStatusCard
+            isPaid={isPaid}
+            paidAt={paidAt}
+            transactionId={transactionId}
+          />
 
           {/* Shipping Address Card */}
           <ShippingAddressCard
             shippingAddress={shippingAddress}
             formattedAddress={formattedShippingAddress}
             isDelivered={isDelivered}
-            // deliveredAt={deliveredAt}
           />
 
           {/* Order Items Card */}
@@ -350,10 +155,8 @@ const OrderDetailsTable = ({ order, isAdmin }: OrderDetailsTableProps) => {
         <div>
           <OrderSummaryCard
             itemsPrice={+itemsPrice}
-            // taxPrice={+taxPrice}
             shippingPrice={+shippingPrice}
             totalPrice={+totalPrice}
-            isPaymentSuccessful={!!isPaymentSuccessful}
             isPending={isPending}
             zarinpalPaymentAction={zarinpalPaymentAction}
             isAdmin={isAdmin}
@@ -361,7 +164,6 @@ const OrderDetailsTable = ({ order, isAdmin }: OrderDetailsTableProps) => {
             isDelivered={isDelivered}
             orderId={id}
             paidAt={paidAt}
-            isProcessingPayment={isProcessingPayment}
           />
         </div>
       </div>
@@ -369,48 +171,47 @@ const OrderDetailsTable = ({ order, isAdmin }: OrderDetailsTableProps) => {
   )
 }
 
-// Rest of the component code remains the same...
 const PaymentStatusCard = ({
   isPaid,
   paidAt,
+  transactionId,
 }: {
   isPaid: boolean
   paidAt: Date | null
-}) => {
-  // console.log('PaymentStatusCard:', {
-  //   isPaid,
-  //   paidAt,
-  //   paidAtType: typeof paidAt,
-  // })
-
-  return (
-    <Card>
-      <CardContent className="p-4">
-        <h2 className="text-xl mb-4">وضعیت پرداخت</h2>
-        {isPaid ? (
-          <Badge variant="secondary">
+  transactionId: string | null | undefined
+}) => (
+  <Card>
+    <CardContent className="p-4 space-y-2">
+      <h2 className="text-xl mb-2">وضعیت پرداخت</h2>
+      {isPaid ? (
+        <div className="space-y-3">
+          <Badge variant="secondary" className="bg-green-100 text-green-800">
             {paidAt
               ? `پرداخت در ${formatDateTime(paidAt).dateTime}`
               : 'پرداخت شده'}
           </Badge>
-        ) : (
-          <Badge variant="destructive">پرداخت نشده</Badge>
-        )}
-      </CardContent>
-    </Card>
-  )
-}
+          {transactionId && (
+            <div className="text-sm text-gray-600">
+              <span>شماره پیگیری: </span>
+              <span className="font-mono">{transactionId}</span>
+            </div>
+          )}
+        </div>
+      ) : (
+        <Badge variant="destructive">پرداخت نشده</Badge>
+      )}
+    </CardContent>
+  </Card>
+)
 
 const ShippingAddressCard = ({
   shippingAddress,
   formattedAddress,
   isDelivered,
-}: // deliveredAt,
-{
+}: {
   shippingAddress: ShippingAddress
   formattedAddress: string
   isDelivered: boolean
-  // deliveredAt: Date | null
 }) => (
   <Card>
     <CardContent className="p-4">
@@ -422,11 +223,7 @@ const ShippingAddressCard = ({
         </>
       )}
       {isDelivered ? (
-        <Badge variant="secondary">
-          {/* {deliveredAt
-            ? `تحویل شده در ${formatDateTime(deliveredAt).dateTime}`
-            : 'تحویل شده'} */}
-        </Badge>
+        <Badge variant="secondary">تحویل شده</Badge>
       ) : (
         <Badge variant="destructive">تحویل نشده</Badge>
       )}
@@ -483,10 +280,8 @@ const OrderItemsCard = ({ orderItems }: { orderItems: OrderItem[] }) => (
 
 const OrderSummaryCard = ({
   itemsPrice,
-  // taxPrice,
   shippingPrice,
   totalPrice,
-  // isPaymentSuccessful,
   isPending,
   zarinpalPaymentAction,
   isAdmin,
@@ -494,13 +289,10 @@ const OrderSummaryCard = ({
   isDelivered,
   orderId,
   paidAt,
-  isProcessingPayment,
 }: {
   itemsPrice: number
-  // taxPrice: number
   shippingPrice: number
   totalPrice: number
-  isPaymentSuccessful: boolean
   isPending: boolean
   zarinpalPaymentAction: (formData: FormData) => void
   isAdmin: boolean
@@ -508,7 +300,6 @@ const OrderSummaryCard = ({
   isDelivered: boolean
   orderId: string
   paidAt: Date | null
-  isProcessingPayment: boolean
 }) => {
   const MarkAsPaidButton = () => {
     const [isPending, startTransition] = useTransition()
@@ -578,7 +369,6 @@ const OrderSummaryCard = ({
         <h2 className="text-xl font-bold mb-4">خلاصه سفارش</h2>
 
         <SummaryRow label="سفارشها" value={itemsPrice.toString()} />
-        {/* <SummaryRow label="مالیات" value={taxPrice.toString()} /> */}
         <SummaryRow label="هزینه ارسال" value={shippingPrice.toString()} />
 
         <hr className="my-4" />
@@ -593,15 +383,11 @@ const OrderSummaryCard = ({
           <Badge className="bg-green-500 hover:bg-green-600 w-full justify-center h-12">
             پرداخت شده
           </Badge>
-        ) : isProcessingPayment ? (
-          <Badge className="bg-yellow-500 hover:bg-yellow-600 w-full justify-center h-12">
-            در حال تأیید پرداخت...
-          </Badge>
         ) : (
           <form action={zarinpalPaymentAction} className="space-y-2">
             <Button
               type="submit"
-              disabled={isPending || isProcessingPayment}
+              disabled={isPending}
               className="w-full h-12 bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
             >
               {isPending ? 'در حال پردازش...' : 'پرداخت'}

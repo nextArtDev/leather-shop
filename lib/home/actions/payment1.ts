@@ -4,8 +4,10 @@
 import { revalidatePath } from 'next/cache'
 import ZarinPalCheckout from 'zarinpal-checkout'
 import prisma from '@/lib/prisma'
-import { PaymentResult } from '../schemas'
+// import { PaymentResult } from '../schemas'
 import { getCurrentUser } from '@/lib/auth-helpers'
+import { checkRateLimit } from '@/lib/utils'
+import { PaymentError } from '@/lib/errors'
 // import { createHash } from 'crypto'
 
 // Types
@@ -101,13 +103,15 @@ const findOrderByIdAndUser = async (orderId: string, userId: string) => {
 async function createPaymentRequest(order: any, orderId: string) {
   const zarinpal = createZarinpalInstance()
 
-  const callbackURL =
-    process.env.NODE_ENV === 'production'
-      ? `${process.env.NEXT_PUBLIC_APP_URL}/order/${orderId}`
-      : `http://localhost:3000/order/${orderId}`
-
   const user = await getCurrentUser()
   if (!user?.phoneNumber) return null
+  await checkRateLimit(user.id)
+
+  // Use the new API route for callback
+  const callbackURL =
+    process.env.NODE_ENV === 'production'
+      ? `${process.env.NEXT_PUBLIC_APP_URL}/api/payment/callback?orderId=${orderId}`
+      : `http://localhost:3000/api/payment/callback?orderId=${orderId}`
 
   const payment = (await zarinpal.PaymentRequest({
     Amount: Number(order.total),
@@ -116,7 +120,6 @@ async function createPaymentRequest(order: any, orderId: string) {
     Mobile: user.phoneNumber,
   })) as PaymentRequestResult
 
-  // console.log('Payment request result:', payment)
   return payment
 }
 
@@ -202,11 +205,6 @@ export async function zarinpalPayment(
       }
     }
 
-    // console.log('Processing payment for order:', {
-    //   orderId,
-    //   totalPrice: order.total,
-    // })
-
     // await storeOrderIntegrityHash(orderId, order.total, user.id)
 
     // const zarinpal = ZarinPalCheckout.create(process.env.ZARINPAL_KEY!, true)
@@ -268,7 +266,7 @@ export async function zarinpalPaymentApproval(
     // console.log('Payment verification already in progress:', orderId)
     return {
       errors: {
-        _form: ['پرداخت در حال بررسی است، لطفا صبر کنید'],
+        _form: [PaymentError.LockFailed], // Use the error code
       },
     }
   }
@@ -278,7 +276,7 @@ export async function zarinpalPaymentApproval(
     if (!user?.id) {
       return {
         errors: {
-          _form: ['شما اجازه دسترسی ندارید!'],
+          _form: [PaymentError.Unauthorized],
         },
       }
     }
@@ -348,7 +346,7 @@ export async function zarinpalPaymentApproval(
         Amount: Number(order.total),
         Authority,
       })) as { status: number; refId: number }
-
+      // console.log({ verification })
       if (verification.status === 100) {
         // CRITICAL: Mark authority as used to prevent replay
         await prisma.paymentAttempt.update({
@@ -406,7 +404,7 @@ export async function zarinpalPaymentApproval(
     console.error('Payment approval error:', error)
     return {
       errors: {
-        _form: ['خطا در تایید پرداخت'],
+        _form: [PaymentError.ServerError],
       },
     }
   } finally {
@@ -414,89 +412,6 @@ export async function zarinpalPaymentApproval(
     await releasePaymentLock(orderId)
     revalidatePath(path)
   }
-}
-
-// Function to update order to paid status with race condition protection
-export async function updateOrderToPaid({
-  orderId,
-  paymentResult,
-}: {
-  orderId: string
-  paymentResult?: PaymentResult
-}) {
-  // console.log('Updating order to paid:', { orderId, paymentResult })
-
-  // Use a database transaction to prevent race conditions
-  return await prisma.$transaction(async (tx) => {
-    // Get order from database with a lock
-    const order = await tx.order.findFirst({
-      where: {
-        id: orderId,
-      },
-      include: {
-        items: true,
-      },
-    })
-
-    if (!order) {
-      throw new Error('Order not found')
-    }
-
-    // CRITICAL: Check if order is already paid
-    if (order.paymentStatus === 'Paid') {
-      // console.log('Order already paid during transaction:', orderId)
-      throw new Error(ERROR_MESSAGES.ORDER_ALREADY_PAID)
-    }
-
-    // Update product stock for each item
-    for (const item of order.items) {
-      await tx.size.update({
-        where: { productId: item.productId, id: item.sizeId },
-        data: {
-          quantity: {
-            decrement: item.quantity,
-          },
-        },
-      })
-      await tx.product.update({
-        where: {
-          id: item.productId,
-        },
-        data: {
-          sales: {
-            increment: item.quantity,
-          },
-        },
-      })
-    }
-
-    // Mark order as paid
-    const updatedOrder = await tx.order.update({
-      where: { id: orderId },
-      data: {
-        paymentStatus: 'Paid',
-      },
-      include: {
-        items: true,
-        user: { select: { name: true, phoneNumber: true } },
-        paymentDetails: true,
-      },
-    })
-
-    await tx.paymentDetails.update({
-      where: {
-        orderId: updatedOrder.id,
-      },
-      data: {
-        status: paymentResult?.status,
-        Authority: paymentResult?.authority,
-        amount: Number(paymentResult?.fee),
-      },
-    })
-
-    // console.log('Order successfully updated to paid:', { orderId })
-    return updatedOrder
-  })
 }
 
 // Server action to deliver order (for admin use)
@@ -603,7 +518,7 @@ export async function updateOrderToPaidCOD(orderId: string) {
       }
     }
 
-    await updateOrderToPaid({ orderId })
+    await updateOrderToPaidSecure({ orderId })
 
     revalidatePath(`/order/${orderId}`)
 
@@ -738,33 +653,32 @@ async function validateOrderIntegrity(
 }
 
 // CRITICAL: Rate limiting per user
-const userPaymentAttempts = new Map<
-  string,
-  { count: number; resetTime: number }
->()
+// const userPaymentAttempts = new Map<
+//   string,
+//   { count: number; resetTime: number }
+// >()
 
-function checkRateLimit(userId: string): boolean {
-  const now = Date.now()
-  const userAttempts = userPaymentAttempts.get(userId)
+// async function checkRateLimit(userId: string) {
+//   const oneHourAgo = new Date(Date.now() - 1000 * 60 * 60)
 
-  if (!userAttempts || now > userAttempts.resetTime) {
-    // Reset or create new rate limit window (5 attempts per hour)
-    userPaymentAttempts.set(userId, {
-      count: 1,
-      resetTime: now + 60 * 60 * 1000, // 1 hour
-    })
-    return true
-  }
+//   const count = await prisma.paymentRateLimit.count({
+//     where: {
+//       userId,
+//       createdAt: { gte: oneHourAgo },
+//     },
+//   })
 
-  if (userAttempts.count >= 5) {
-    return false
-  }
+//   if (count >= 50) {
+//     throw new Error('Too many payment attempts, please try again later.')
+//   }
 
-  userAttempts.count++
-  return true
-}
+//   await prisma.paymentRateLimit.create({
+//     data: { userId },
+//   })
+// }
 
 // SECURED Order Update Function
+// Updated updateOrderToPaidSecure function in payment1.ts
 export async function updateOrderToPaidSecure({
   orderId,
   paymentResult,
@@ -806,7 +720,11 @@ export async function updateOrderToPaidSecure({
     // Update inventory
     for (const item of order.items) {
       await tx.size.update({
-        where: { productId: item.productId, id: item.sizeId },
+        where: {
+          productId: item.productId,
+          id: item.sizeId,
+          quantity: { gte: item.quantity },
+        },
         data: {
           quantity: { decrement: item.quantity },
         },
@@ -825,10 +743,11 @@ export async function updateOrderToPaidSecure({
       where: { id: orderId },
       data: {
         paymentStatus: 'Paid',
+        paidAt: new Date(), // Set the actual payment date
       },
     })
 
-    // Update payment details
+    // Update payment details with transaction ID
     if (paymentResult) {
       await tx.paymentDetails.upsert({
         where: { orderId },
@@ -836,6 +755,7 @@ export async function updateOrderToPaidSecure({
           status: paymentResult.status,
           Authority: paymentResult.authority,
           amount: Number(paymentResult.fee),
+          transactionId: paymentResult.id, // Store the refId as transaction ID
         },
         create: {
           orderId,
@@ -843,6 +763,7 @@ export async function updateOrderToPaidSecure({
           status: paymentResult.status,
           Authority: paymentResult.authority,
           amount: Number(paymentResult.fee),
+          transactionId: paymentResult.id, // Store the refId as transaction ID
         },
       })
     }
@@ -850,6 +771,89 @@ export async function updateOrderToPaidSecure({
     return updatedOrder
   })
 }
+
+// Function to update order to paid status with race condition protection
+// export async function updateOrderToPaid({
+//   orderId,
+//   paymentResult,
+// }: {
+//   orderId: string
+//   paymentResult?: PaymentResult
+// }) {
+//   // console.log('Updating order to paid:', { orderId, paymentResult })
+
+//   // Use a database transaction to prevent race conditions
+//   return await prisma.$transaction(async (tx) => {
+//     // Get order from database with a lock
+//     const order = await tx.order.findFirst({
+//       where: {
+//         id: orderId,
+//       },
+//       include: {
+//         items: true,
+//       },
+//     })
+
+//     if (!order) {
+//       throw new Error('Order not found')
+//     }
+
+//     // CRITICAL: Check if order is already paid
+//     if (order.paymentStatus === 'Paid') {
+//       // console.log('Order already paid during transaction:', orderId)
+//       throw new Error(ERROR_MESSAGES.ORDER_ALREADY_PAID)
+//     }
+
+//     // Update product stock for each item
+//     for (const item of order.items) {
+//       await tx.size.update({
+//         where: { productId: item.productId, id: item.sizeId },
+//         data: {
+//           quantity: {
+//             decrement: item.quantity,
+//           },
+//         },
+//       })
+//       await tx.product.update({
+//         where: {
+//           id: item.productId,
+//         },
+//         data: {
+//           sales: {
+//             increment: item.quantity,
+//           },
+//         },
+//       })
+//     }
+
+//     // Mark order as paid
+//     const updatedOrder = await tx.order.update({
+//       where: { id: orderId },
+//       data: {
+//         paymentStatus: 'Paid',
+//       },
+//       include: {
+//         items: true,
+//         user: { select: { name: true, phoneNumber: true } },
+//         paymentDetails: true,
+//       },
+//     })
+
+//     await tx.paymentDetails.update({
+//       where: {
+//         orderId: updatedOrder.id,
+//       },
+//       data: {
+//         status: paymentResult?.status,
+//         Authority: paymentResult?.authority,
+//         amount: Number(paymentResult?.fee),
+//       },
+//     })
+
+//     // console.log('Order successfully updated to paid:', { orderId })
+//     return updatedOrder
+//   })
+// }
 
 // Helper function to mark payment as failed
 // async function markPaymentAsFailed(orderId: string, userId: string) {

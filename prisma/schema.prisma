@@ -578,13 +578,13 @@ model PaymentDetails {
 
   // paymentInetntId String
   // paymentMethod   String
-  status    String?
-  amount    Float?
-  Authority String? @db.Text
+  status        String?
+  amount        Float?
+  Authority     String? @db.Text
   // currency        String
-
-  orderId String @unique
-  order   Order  @relation("PaymentDetailsToOrder", fields: [orderId], references: [id], onDelete: Cascade)
+  transactionId String?
+  orderId       String  @unique
+  order         Order   @relation("PaymentDetailsToOrder", fields: [orderId], references: [id], onDelete: Cascade)
 
   userId String
   user   User   @relation("PaymentDetailsToUser", fields: [userId], references: [id], onDelete: Cascade)
@@ -739,4 +739,13 @@ model PaymentAttempt {
   @@unique([orderId, authority]) // Prevent duplicate authorities per order
   @@index([orderId])
   @@index([authority])
+}
+
+// schema.prisma
+model PaymentRateLimit {
+  id        String   @id @default(cuid())
+  userId    String
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
 }
