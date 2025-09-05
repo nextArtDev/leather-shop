@@ -57,7 +57,10 @@ export default function DiscoverMoreCarousel({
                   <figure className="relative w-full h-full bg-[#eceae8] border-none rounded-none">
                     <Image
                       unoptimized
-                      src={item.images.map((img) => img.url)[0]}
+                      src={
+                        item.images.map((img) => img.url)[0] ||
+                        '/images/fallback-image.webp'
+                      }
                       fill
                       alt={item.name}
                       className="object-cover " // Uncommented; remove if not needed

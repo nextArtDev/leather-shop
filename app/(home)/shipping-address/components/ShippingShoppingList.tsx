@@ -23,7 +23,7 @@ const ShippingShoppingList = ({ cartItems }: Props) => {
               unoptimized
               fill
               alt={item.name}
-              src={item.image || ''}
+              src={item.image || '/images/fallback-image.webp'}
               className="size-24 rounded-lg object-cover sm:size-32"
             />
           </div>

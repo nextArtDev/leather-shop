@@ -110,7 +110,7 @@ const StoreOrderSummary: FC<Props> = ({ order }) => {
             <div className="w-full h-full">
               <Image
                 unoptimized
-                src={product.image}
+                src={product.image || '/images/fallback-image.webp'}
                 alt=""
                 width={200}
                 height={200}

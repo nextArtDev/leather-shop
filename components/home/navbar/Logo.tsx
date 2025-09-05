@@ -10,7 +10,11 @@ const Logo: FC<LogoProps> = ({ href = '/' }) => {
   return (
     <div>
       <TransitionLink href={href} className="flex items-center space-x-2">
-        <Image src={dateImage} alt="logo" className="object-cover scale-50" />
+        <Image
+          src={dateImage || '/images/fallback-image.webp'}
+          alt="logo"
+          className="object-cover scale-50"
+        />
         {/* <Package2 className="h-6 w-6" /> */}
         {/* <span className="font-bold inline-block">خارَک</span> */}
       </TransitionLink>

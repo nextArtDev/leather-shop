@@ -457,7 +457,7 @@ const OrderItemsCard = ({ orderItems }: { orderItems: OrderItem[] }) => (
                   >
                     <Image
                       unoptimized
-                      src={item.image}
+                      src={item.image || '/images/fallback-image.webp'}
                       alt={item.name}
                       width={50}
                       height={50}

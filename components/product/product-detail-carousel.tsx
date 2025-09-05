@@ -58,7 +58,7 @@ const ProductDetailCarousel = ({ images }: Props) => {
                 >
                   <Image
                     unoptimized
-                    src={image.url}
+                    src={image.url || '/images/fallback-image.webp'}
                     fill
                     alt="product"
                     // className="object-cover mix-blend-darken"

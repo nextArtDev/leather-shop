@@ -73,7 +73,10 @@ export default function MainPageCarousel({ items }: MainPageCarousel) {
                     {/* Fixed aspect-square for uniform image height */}
                     <Image
                       unoptimized
-                      src={item.images.map((img) => img.url)[0]}
+                      src={
+                        item.images.map((img) => img.url)[0] ||
+                        '/images/fallback-image.webp'
+                      }
                       fill
                       alt={item.name!}
                       className="object-cover mix-blend-darken" // Uncommented; remove if not needed

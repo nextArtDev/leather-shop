@@ -31,7 +31,7 @@ const ShoppingList = ({ cartItems, mutable = false }: Props) => {
                   fill
                   alt={item.name}
                   // src={item.image || '/placeholder-image.jpg'}
-                  src={item.image || '/placeholder-image.jpg'}
+                  src={item.image || '/images/fallback-image.webp'}
                   className="object-cover transition-transform duration-300 hover:scale-105"
                   sizes="(max-width: 640px) 96px, (max-width: 1024px) 112px, 128px"
                 />

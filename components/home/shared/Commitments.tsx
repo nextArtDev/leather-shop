@@ -101,7 +101,7 @@ export default function Commitments() {
                   {/* Changed to figure for semantic; simplified, removed min-h to let aspect-square handle */}
                   <Image
                     unoptimized
-                    src={item.url}
+                    src={item.url || '/images/fallback-image.webp'}
                     fill
                     alt={item.title}
                     className="object-cover mix-blend-darken" // Uncommented; remove if not needed

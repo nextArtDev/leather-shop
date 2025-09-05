@@ -63,7 +63,7 @@ export const columns: ColumnDef<OrderTypeColumn>[] = [
             <Image
               unoptimized
               key={`${img}-${i}`}
-              src={img}
+              src={img || '/images/fallback-image.webp'}
               alt=""
               width={100}
               height={100}

@@ -11,8 +11,9 @@ import {
 } from '@/components/ui/tooltip'
 import { Facebook, Instagram, Linkedin, Send, Twitter } from 'lucide-react'
 
-import Link from 'next/link'
 import * as React from 'react'
+import { TransitionLink } from './TransitionLink'
+import { STORE_NAME } from '@/constants/store'
 
 export default function Footer() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -49,36 +50,36 @@ export default function Footer() {
           <div>
             <h3 className="mb-4 text-lg font-semibold">دسترسی سریع</h3>
             <nav className="space-y-2 text-sm">
-              <Link
+              <TransitionLink
                 href="/"
                 className="block transition-colors hover:text-primary"
               >
                 خانه
-              </Link>
-              <Link
+              </TransitionLink>
+              <TransitionLink
                 href="/products"
                 className="block transition-colors hover:text-primary"
               >
                 محصولات
-              </Link>
-              <Link
+              </TransitionLink>
+              <TransitionLink
                 href="/about-us"
                 className="block transition-colors hover:text-primary"
               >
                 درباره ما
-              </Link>
-              <Link
+              </TransitionLink>
+              <TransitionLink
                 href="/contact-us"
                 className="block transition-colors hover:text-primary"
               >
                 ارتباط با ما
-              </Link>
-              <Link
+              </TransitionLink>
+              <TransitionLink
                 href="/faq"
                 className="block transition-colors hover:text-primary"
               >
                 سوالات متداول
-              </Link>
+              </TransitionLink>
             </nav>
           </div>
           <div>
@@ -185,18 +186,27 @@ export default function Footer() {
         </div>
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t pt-8 text-center md:flex-row">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Le Tanneur. All rights reserved.
+            © {new Date().getFullYear()} Saeid. All rights reserved.
           </p>
           <nav className="flex gap-4 text-sm">
-            <Link href="#" className="transition-colors hover:text-primary">
+            <TransitionLink
+              href="#"
+              className="transition-colors hover:text-primary"
+            >
               Privacy Policy
-            </Link>
-            <Link href="#" className="transition-colors hover:text-primary">
+            </TransitionLink>
+            <TransitionLink
+              href="#"
+              className="transition-colors hover:text-primary"
+            >
               Terms of Service
-            </Link>
-            <Link href="#" className="transition-colors hover:text-primary">
+            </TransitionLink>
+            <TransitionLink
+              href="#"
+              className="transition-colors hover:text-primary"
+            >
               Cookie Settings
-            </Link>
+            </TransitionLink>
           </nav>
         </div>
       </div>
@@ -228,7 +238,7 @@ export default function Footer() {
       )}
       <div className=" w-full flex mt-4 items-center justify-center   ">
         <h1 className="text-center text-3xl md:text-5xl lg:text-[10rem] font-bold bg-clip-text text-transparent bg-gradient-to-b from-neutral-700 to-neutral-900 select-none">
-          Le Tanneur
+          {STORE_NAME}
         </h1>
       </div>
     </footer>

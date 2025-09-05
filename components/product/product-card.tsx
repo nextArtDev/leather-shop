@@ -103,7 +103,7 @@ const ProductCard = ({ product }: Props) => {
                       <CardContent className="relative flex aspect-square items-center justify-center p-0 h-full">
                         <Image
                           unoptimized
-                          src={url}
+                          src={url || '/images/fallback-image.webp'}
                           alt={product.name}
                           fill
                           className="object-cover"

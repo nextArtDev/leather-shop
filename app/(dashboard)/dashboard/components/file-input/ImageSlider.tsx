@@ -95,8 +95,8 @@ const ImageSlider = ({ urls, className, unoptimized }: ImageSliderProps) => {
                 '-z-10 h-full w-full object-contain object-center',
                 className
               )}
-              src={url}
-              alt="عکس پست"
+              src={url || '/images/fallback-image.webp'}
+              alt="عکس محصول"
             />
           </SwiperSlide>
         ))}

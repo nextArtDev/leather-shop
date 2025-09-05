@@ -204,7 +204,10 @@ const SubcategoryDetailsPage = async ({ params }: SubcategoryPageProps) => {
           >
             <Image
               unoptimized
-              src={subcategory.images.map((s) => s.url)[0]}
+              src={
+                subcategory.images.map((s) => s.url)[0] ||
+                '/images/fallback-image.webp'
+              }
               priority
               fetchPriority="high"
               alt="hero image"

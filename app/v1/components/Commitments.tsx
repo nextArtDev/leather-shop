@@ -77,7 +77,7 @@ export default function Commitments() {
               <Steel className="relative w-[90%] h-full pt-2 md:pt-4 mx-auto aspect-square px-1">
                 <Image
                   unoptimized
-                  src={item.url}
+                  src={item.url || '/images/fallback-image.webp'}
                   fill
                   alt={item.title}
                   className="object-contain mix-blend-darken  " // Uncommented; remove if not needed

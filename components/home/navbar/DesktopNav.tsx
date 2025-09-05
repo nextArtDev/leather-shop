@@ -38,7 +38,7 @@ const DesktopNav = ({ navigation, session }: Props) => {
                       <div className="aspect-square w-full overflow-hidden rounded-md group-hover:opacity-75">
                         <Image
                           unoptimized
-                          src={item.imageSrc}
+                          src={item.imageSrc || '/images/fallback-image.webp'}
                           alt={item.imageAlt}
                           width={200}
                           height={200}
