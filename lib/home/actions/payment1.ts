@@ -426,7 +426,7 @@ export async function deliverOrder(orderId: string) {
     }
 
     // Check admin authorization
-    if (user?.role !== 'ADMIN') {
+    if (user?.role !== 'admin') {
       return {
         success: false,
         message: 'شما اجازه انجام این عمل را ندارید!',
@@ -493,7 +493,7 @@ export async function updateOrderToPaidCOD(orderId: string) {
     }
 
     // Check admin authorization
-    if (user?.role !== 'ADMIN') {
+    if (user?.role !== 'admin') {
       return {
         success: false,
         message: 'شما اجازه انجام این عمل را ندارید!',

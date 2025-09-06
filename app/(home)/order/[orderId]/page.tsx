@@ -59,7 +59,7 @@ const OrderDetailsPage = async ({
   ])
 
   if (!order) notFound()
-  const isAdmin = currentUser?.role === 'ADMIN' || false
+  const isAdmin = currentUser?.role === 'admin' || false
 
   return (
     <section>

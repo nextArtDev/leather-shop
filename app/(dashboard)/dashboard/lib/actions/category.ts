@@ -35,7 +35,7 @@ export async function createCategory(
   //   console.log(result?.data)
 
   const user = await currentUser()
-  if (!user || user.role !== 'ADMIN') {
+  if (!user || user.role !== 'admin') {
     if (!user) {
       return {
         errors: {
@@ -122,7 +122,7 @@ export async function editCategory(
   }
   //   console.log(result.data)
   //   const session = await currentUser()
-  //   // if (!session || session.role !== 'ADMIN') {
+  //   // if (!session || session.role !== 'admin') {
   //   if (!session) {
   //     return {
   //       errors: {
@@ -284,7 +284,7 @@ export async function deleteCategory(
   formData: FormData
 ): Promise<DeleteBillboardFormState> {
   const user = await currentUser()
-  if (!user || user.role !== 'ADMIN') {
+  if (!user || user.role !== 'admin') {
     if (!user) {
       return {
         errors: {

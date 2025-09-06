@@ -280,7 +280,7 @@ export const getAllOrders = async (
 
     if (!user) throw new Error('Unauthenticated.')
 
-    if (user.role !== 'ADMIN')
+    if (user.role !== 'admin')
       throw new Error(
         'Unauthorized Access: Seller Privileges Required for Entry.'
       )
@@ -336,7 +336,7 @@ export const getAllPaidOrders = async (
 
     if (!user) throw new Error('Unauthenticated.')
 
-    if (user.role !== 'ADMIN')
+    if (user.role !== 'admin')
       throw new Error(
         'Unauthorized Access: Seller Privileges Required for Entry.'
       )
@@ -428,7 +428,7 @@ export const getAllCoupons = async (
 
     if (!user) throw new Error('Unauthenticated.')
 
-    if (user.role !== 'ADMIN')
+    if (user.role !== 'admin')
       throw new Error(
         'Unauthorized Access: Seller Privileges Required for Entry.'
       )
@@ -467,7 +467,7 @@ export const getAllUsers = async (
 
     if (!user) throw new Error('Unauthenticated.')
 
-    if (user.role !== 'ADMIN')
+    if (user.role !== 'admin')
       throw new Error(
         'Unauthorized Access: Seller Privileges Required for Entry.'
       )

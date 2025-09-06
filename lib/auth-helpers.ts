@@ -6,6 +6,7 @@ import { headers } from 'next/headers'
 import { betterFetch } from '@better-fetch/fetch'
 
 export async function getCurrentUser() {
+  // console.log('Session')
   try {
     const headersList = await headers()
     const session = await auth.api.getSession({

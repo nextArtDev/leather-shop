@@ -35,7 +35,7 @@ export async function createSubCategory(
   //   console.log(result?.data)
 
   const user = await currentUser()
-  if (!user || user.role !== 'ADMIN') {
+  if (!user || user.role !== 'admin') {
     if (!user) {
       return {
         errors: {
@@ -143,7 +143,7 @@ export async function editSubCategory(
     }
   }
   const user = await currentUser()
-  if (!user || user.role !== 'ADMIN') {
+  if (!user || user.role !== 'admin') {
     if (!user) {
       return {
         errors: {
@@ -300,7 +300,7 @@ export async function deleteSubCategory(
   formData: FormData
 ): Promise<DeleteSubCategoryFormState> {
   const user = await currentUser()
-  if (!user || user.role !== 'ADMIN') {
+  if (!user || user.role !== 'admin') {
     if (!user) {
       return {
         errors: {

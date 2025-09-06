@@ -63,7 +63,7 @@ const DesktopNav = ({ navigation, session }: Props) => {
               </NavigationMenuLink>
             </NavigationMenuItem>
           ))}
-          {session?.id && session?.role === 'ADMIN' && (
+          {session?.id && session?.role === 'admin' && (
             <NavigationMenuItem>
               <NavigationMenuLink asChild>
                 <TransitionLink

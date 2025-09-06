@@ -32,7 +32,7 @@ export const metadata: Metadata = {
 const AdminOverviewPage = async () => {
   const user = await currentUser()
 
-  if (!user || user?.role !== 'ADMIN') return notFound()
+  if (!user || user?.role !== 'admin') return notFound()
 
   const summary = await getOrderSummary()
 

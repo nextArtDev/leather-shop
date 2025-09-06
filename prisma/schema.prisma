@@ -1,4 +1,5 @@
 //npx prisma migrate dev --name realMigrateName
+
 generator client {
   provider = "prisma-client-js"
   output   = "../lib/generated/prisma"
@@ -10,14 +11,14 @@ datasource db {
 }
 
 enum Role {
-  USER
-  ADMIN
+  user
+  admin
 }
 
 model User {
   id                  String    @id
   name                String    @db.Text
-  role                Role      @default(USER)
+  role                Role      @default(user)
   email               String
   emailVerified       Boolean
   // image               String?   @db.Text
@@ -28,6 +29,10 @@ model User {
   sessions            Session[]
   accounts            Account[]
 
+  banned     Boolean? @default(false)
+  banReason  String?
+  banExpires String?
+
   address           String?           @db.Text
   reviews           Review[]          @relation("ReviewToUser")
   cart              Cart?             @relation("UserCart")
@@ -37,6 +42,8 @@ model User {
   payments          PaymentDetails[]  @relation("PaymentDetailsToUser")
   coupons           Coupon[]          @relation("CouponToUser")
   images            Image[]
+
+  image String? @db.Text
 
   @@unique([email])
   @@unique([phoneNumber])
@@ -59,8 +66,10 @@ model Session {
   updatedAt DateTime
   ipAddress String?  @db.Text
   userAgent String?  @db.Text
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  impersonatedBy String?
+  userId         String
+  user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([token])
   @@map("session")
@@ -736,12 +745,14 @@ model PaymentAttempt {
   amount    Float
   createdAt DateTime @default(now())
 
-  @@unique([orderId, authority]) // Prevent duplicate authorities per order
+  // Prevent duplicate authorities per order
+  @@unique([orderId, authority])
   @@index([orderId])
   @@index([authority])
 }
 
 // schema.prisma
+
 model PaymentRateLimit {
   id        String   @id @default(cuid())
   userId    String

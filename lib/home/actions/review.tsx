@@ -197,7 +197,7 @@ export async function deleteReview(
   formData: FormData
 ): Promise<DeleteReviewFormState> {
   const user = await currentUser()
-  if (!user || user.role !== 'ADMIN') {
+  if (!user || user.role !== 'admin') {
     if (!user) {
       return {
         errors: {

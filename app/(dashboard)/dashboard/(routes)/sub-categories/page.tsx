@@ -51,7 +51,7 @@ export default async function AdminSubCategoriesPage({
 }) {
   const user = await getCurrentUser()
 
-  if (!user || user?.role !== 'ADMIN') return notFound()
+  if (!user || user?.role !== 'admin') return notFound()
   const params = await searchParams
   const page = params.page ? +params.page : 1
   const pageSize = params.pageSize ? +params.pageSize : 50

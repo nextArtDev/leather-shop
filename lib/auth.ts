@@ -3,10 +3,12 @@ import { betterAuth } from 'better-auth'
 import { prismaAdapter } from 'better-auth/adapters/prisma'
 // If your Prisma file is located elsewhere, you can change the path
 // import { PrismaClient } from './generated/prisma'
-import { phoneNumber } from 'better-auth/plugins'
+import { admin, phoneNumber } from 'better-auth/plugins'
 import prisma from './prisma'
-import { headers } from 'next/headers'
 import { nextCookies } from 'better-auth/next-js'
+import { headers } from 'next/headers'
+import { cache } from 'react'
+// import { headers } from 'next/headers'
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -15,7 +17,20 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: false, // Disable email/password since we want phone-only
   },
+  user: {
+    additionalFields: {
+      role: {
+        type: 'string',
+        input: false, // user cannot set the own role
+      },
+      phoneNumber: {
+        type: 'string',
+        input: false, // user cannot set the own phone
+      },
+    },
+  },
   plugins: [
+    admin(),
     phoneNumber({
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       sendOTP: async ({ phoneNumber, code }, request) => {
@@ -76,7 +91,10 @@ export const auth = betterAuth({
   // },
 })
 
-export const currentUser = async () => {
+export type Session = typeof auth.$Infer.Session
+export type User = typeof auth.$Infer.Session.user
+
+export const currentUser = cache(async () => {
   'use server'
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -99,7 +117,7 @@ export const currentUser = async () => {
   })
 
   return user
-}
+})
 
 // export const currentRole = async () => {
 // const session = await auth.api.getSession({

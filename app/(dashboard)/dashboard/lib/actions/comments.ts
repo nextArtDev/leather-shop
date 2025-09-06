@@ -23,7 +23,7 @@ export async function deleteComment(
 ): Promise<DeleteCommentFormState> {
   // console.log({ path, storeId, categoryId })
   const user = await currentUser()
-  if (!user || user.role !== 'ADMIN') {
+  if (!user || user.role !== 'admin') {
     return {
       errors: {
         _form: ['شما اجازه دسترسی ندارید!'],
@@ -92,7 +92,7 @@ export async function shouldPublishedComment(
 ): Promise<ShouldPublishedCommentFormState> {
   // console.log({ path, storeId, categoryId })
   const user = await currentUser()
-  if (!user || user.role !== 'ADMIN') {
+  if (!user || user.role !== 'admin') {
     return {
       errors: {
         _form: ['شما اجازه دسترسی ندارید!'],

@@ -48,7 +48,7 @@ async function AdminUsersPage({
 }) {
   const user = await getCurrentUser()
 
-  if (!user || user?.role !== 'ADMIN') return notFound()
+  if (!user || user?.role !== 'admin') return notFound()
 
   const params = await searchParams
   const page = params.page ? +params.page : 1

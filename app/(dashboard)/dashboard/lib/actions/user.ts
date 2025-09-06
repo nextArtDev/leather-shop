@@ -49,7 +49,7 @@ export async function updateUser(
     }
   }
   const cUser = await currentUser()
-  if (!cUser || cUser.role !== 'ADMIN') {
+  if (!cUser || cUser.role !== 'admin') {
     if (!cUser) {
       return {
         errors: {
@@ -110,7 +110,7 @@ export async function deleteUser(
   formData: FormData
 ): Promise<DeleteUserFormState> {
   const cUser = await currentUser()
-  if (!cUser || cUser.role !== 'ADMIN') {
+  if (!cUser || cUser.role !== 'admin') {
     if (!cUser) {
       return {
         errors: {

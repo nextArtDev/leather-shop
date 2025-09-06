@@ -175,7 +175,7 @@ export async function updateOrderItemStatus(
   // console.log({ result })
   const session = await currentUser()
 
-  if (!session || !session.id || session.role !== 'ADMIN') {
+  if (!session || !session.id || session.role !== 'admin') {
     return {
       errors: {
         _form: ['شما اجازه دسترسی ندارید!'],

@@ -148,9 +148,9 @@ const UpdateUserForm = ({ user }: { user: User }) => {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {['ADMIN', 'USER'].map((role) => (
+                    {['admin', 'USER'].map((role) => (
                       <SelectItem key={role} value={role}>
-                        {role === 'ADMIN' ? 'ادمین' : 'کاربر'}
+                        {role === 'admin' ? 'ادمین' : 'کاربر'}
                       </SelectItem>
                     ))}
                   </SelectContent>

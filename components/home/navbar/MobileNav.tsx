@@ -182,7 +182,7 @@ export default function MobileNav({ navigation, session }: MobileNavProps) {
                   </TransitionLink>
                 )}
               </motion.div>
-              {session?.role === 'ADMIN' && (
+              {session?.role === 'admin' && (
                 <motion.div
                   className="border-border space-y-3 border-t p-4"
                   variants={mobileItemVariants}

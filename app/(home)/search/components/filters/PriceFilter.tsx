@@ -88,7 +88,7 @@ export default function PriceFilter({
             onValueChange={handleSliderChange}
             max={filtersData.priceRange.max}
             min={filtersData.priceRange.min}
-            step={10000}
+            step={100}
             className="w-full "
           />
         </div>

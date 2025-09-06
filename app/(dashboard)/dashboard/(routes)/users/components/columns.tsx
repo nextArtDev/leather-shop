@@ -62,7 +62,7 @@ export const columns: ColumnDef<UserColumnType>[] = [
     cell: ({ row }) => {
       return (
         <Badge
-          variant={row.original.role === 'ADMIN' ? 'destructive' : 'default'}
+          variant={row.original.role === 'admin' ? 'destructive' : 'default'}
         >
           {row.original.role}
         </Badge>

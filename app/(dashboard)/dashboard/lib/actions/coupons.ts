@@ -30,7 +30,7 @@ export async function createCoupon(
     }
   }
   const user = await currentUser()
-  if (!user || user.role !== 'ADMIN') {
+  if (!user || user.role !== 'admin') {
     if (!user) {
       return {
         errors: {
@@ -105,7 +105,7 @@ export async function deleteCoupon(
   formData: FormData
 ): Promise<DeleteBillboardFormState> {
   const user = await currentUser()
-  if (!user || user.role !== 'ADMIN') {
+  if (!user || user.role !== 'admin') {
     if (!user) {
       return {
         errors: {

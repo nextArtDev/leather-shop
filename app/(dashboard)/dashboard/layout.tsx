@@ -27,12 +27,12 @@ export default async function Layout({
   children: React.ReactNode
 }) {
   const user = await currentUser()
-  if (!user || user.role !== 'ADMIN') return notFound()
+  if (!user || user.role !== 'admin') return notFound()
   // if (!user ) {
   //   redirect('/')
   // }
 
-  // if (user.role !== 'ADMIN') {
+  // if (user.role !== 'admin') {
   //   redirect('/sign-in')
   // }
 

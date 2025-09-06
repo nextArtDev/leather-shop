@@ -46,7 +46,7 @@ export async function createProduct(
   }
   // console.log(result.data)
   const user = await currentUser()
-  if (!user || user.role !== 'ADMIN') {
+  if (!user || user.role !== 'admin') {
     if (!user) {
       return {
         errors: {
@@ -225,7 +225,7 @@ export async function createProduct(
 //   }
 //   // console.log('result.data', result.data)
 //   const user = await currentUser()
-//   if (!user || user.role !== 'ADMIN') {
+//   if (!user || user.role !== 'admin') {
 //     if (!user) {
 //       return {
 //         errors: {
@@ -504,7 +504,7 @@ export async function editProduct(
   }
 
   const user = await currentUser()
-  if (!user || user.role !== 'ADMIN') {
+  if (!user || user.role !== 'admin') {
     if (!user) {
       return {
         errors: {
@@ -849,7 +849,7 @@ export async function deleteProduct(
   formData: FormData
 ): Promise<DeleteProductFormState> {
   const user = await currentUser()
-  if (!user || user.role !== 'ADMIN') {
+  if (!user || user.role !== 'admin') {
     if (!user) {
       return {
         errors: {
