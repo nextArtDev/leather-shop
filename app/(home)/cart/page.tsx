@@ -1,7 +1,7 @@
 import React from 'react'
 
 import CartContainer from './components/CartContainer'
-import { notFound } from 'next/navigation'
+import { redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth-helpers'
 
 export const dynamic = 'force-dynamic'
@@ -9,9 +9,7 @@ export const dynamic = 'force-dynamic'
 const page = async () => {
   const user = await getCurrentUser()
 
-  if (!user) {
-    notFound()
-  }
+  if (!user) redirect('/sign-in')
 
   return (
     <div>

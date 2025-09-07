@@ -55,7 +55,6 @@ async function AdminUsersPage({
   const pageSize = params.pageSize ? +params.pageSize : 50
 
   const users = await getAllUsers({ page, pageSize })
-  // console.log(users.user?.map((t) => t.shippingAddressId))
   const formattedUsers: UserColumnType[] = users.users?.map((item) => ({
     id: item.id,
     name: item.name ?? '',
