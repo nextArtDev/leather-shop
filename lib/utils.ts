@@ -133,7 +133,7 @@ export const isProductValidToAdd = (product: CartProductType): boolean => {
     image,
     quantity,
     price,
-    sizeId,
+    variantId,
     size,
     stock,
     weight,
@@ -145,7 +145,7 @@ export const isProductValidToAdd = (product: CartProductType): boolean => {
     image?.trim() &&
     quantity > 0 &&
     price > 0 &&
-    sizeId?.trim() &&
+    variantId?.trim() &&
     size?.trim() &&
     stock > 0 &&
     weight > 0
