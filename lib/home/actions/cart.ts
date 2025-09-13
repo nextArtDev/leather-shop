@@ -8,171 +8,21 @@ import { calculateShippingCost } from '@/lib/shipping-price'
 import { CartProductType } from '@/lib/types/home'
 import { revalidatePath } from 'next/cache'
 
-// export async function saveAllToCart(items: CartProductType[]) {
-//   try {
-//     const user = await currentUser()
-//     const userId = user?.id
-//     if (!user || !user.id) {
-//       return {
-//         success: false,
-//         message: 'لطفا وارد حساب کاربری خود شوید.',
-//       }
-//     }
-
-//     // Validate that we have items
-//     if (!items || items.length === 0) {
-//       return {
-//         success: false,
-//         message: 'محصولی برای خرید انتخاب نشده است.',
-//       }
-//     }
-//     const userCart = await prisma.cart.findFirst({
-//       where: { userId },
-//     })
-
-//     // Delete any existing user cart
-//     if (userCart) {
-//       await prisma.cart.delete({
-//         where: {
-//           userId,
-//         },
-//       })
-//     }
-//     const validatedCartItems = await Promise.all(
-//       items.map(async (cartProduct) => {
-//         const { productId, sizeId, quantity } = cartProduct
-
-//         // Fetch the product, variant, and size from the database
-//         const product = await prisma.product.findUnique({
-//           where: {
-//             id: productId,
-//           },
-//           include: {
-//             images: true,
-//             sizes: {
-//               where: {
-//                 id: sizeId,
-//               },
-//             },
-//           },
-//         })
-
-//         if (!product || product.sizes.length === 0) {
-//           return {
-//             success: false,
-//             message: 'محصول یا سایز انتخابی اشتباه است.',
-//           }
-//         }
-
-//         const size = product.sizes[0]
-
-//         // Validate stock and price
-//         const validQuantity = Math.min(quantity, size.quantity)
-
-//         const price = size.discount
-//           ? size.price - size.price * (size.discount / 100)
-//           : size.price
-
-//         // let shippingFee = 0
-//         // const { shippingFeeMethod } = product
-//         // if (shippingFeeMethod === 'ITEM') {
-//         //   shippingFee =
-//         //     quantity === 1
-//         //       ? details.shippingFee
-//         //       : details.shippingFee + details.extraShippingFee * (quantity - 1)
-//         // } else if (shippingFeeMethod === 'WEIGHT') {
-//         //   shippingFee = details.shippingFee * variant.weight * quantity
-//         // } else if (shippingFeeMethod === 'FIXED') {
-//         //   shippingFee = details.shippingFee
-//         // }
-
-//         // const totalPrice = price * validQuantity + shippingFee
-//         const totalPrice = price * validQuantity + 0
-//         revalidatePath(`/product/${product.slug}`)
-//         return {
-//           productId,
-//           productSlug: product.slug,
-//           sizeId,
-//           sku: product.sku,
-//           name: `${product.name} `,
-//           image: product?.images?.[0].url || '',
-//           size: size.size,
-//           quantity: validQuantity,
-//           price,
-//           //   shippingFee,
-//           totalPrice,
-//         }
-//       })
-//     )
-//     const subTotal = validatedCartItems.reduce(
-//       (acc, item) => acc + item.price! * item.quantity!,
-//       0
-//     )
-
-//     // const shippingFees = validatedCartItems.reduce(
-//     //   (acc, item) => acc + item.shippingFee,
-//     //   0
-//     // )
-
-//     // const total = subTotal + shippingFees
-
-//     // Save the validated items to the cart in the database
-//     const cart = await prisma.cart.create({
-//       data: {
-//         cartItems: {
-//           create: validatedCartItems.map((item) => ({
-//             productId: item.productId!,
-//             sizeId: item.sizeId!,
-//             sku: item.sku!,
-//             productSlug: item.productSlug!,
-//             name: item.name ?? '',
-//             image: item.image ?? '',
-//             quantity: item.quantity ?? 0,
-//             size: item.size ?? '',
-//             price: item.price ?? 0,
-//             // shippingFee: item.shippingFee ?? 0,
-//             // totalPrice: item.totalPrice ?? 0,
-//             totalPrice: item.totalPrice ?? 0,
-//           })),
-//         },
-//         // shippingFees,
-//         subTotal,
-//         total: subTotal,
-//         userId: userId!,
-//       },
-//     })
-
-//     return {
-//       success: true,
-//       message: `${validatedCartItems.length} item${
-//         validatedCartItems.length > 1 ? 's' : ''
-//       } added to cart`,
-//     }
-//   } catch (error) {
-//     return {
-//       success: false,
-//       message: error,
-//     }
-//   }
-// }
-
-// app/actions/cart.ts
-
 export interface SaveCartResult {
   success: boolean
   message: string
   cartId?: string
   validationErrors?: Array<{
-    productId: string
-    sizeId: string
+    variantId: string
+
     productName: string
     issue: string
     requestedQuantity: number
     availableStock: number
   }>
   correctedItems?: Array<{
-    productId: string
-    sizeId: string
+    variantId: string
+
     originalQuantity: number
     correctedQuantity: number
   }>
@@ -181,24 +31,23 @@ export interface SaveCartResult {
 export async function saveAllToCart(
   items: CartProductType[]
 ): Promise<SaveCartResult> {
+  // 1. Authentication check
+  const user = await currentUser()
+  if (!user?.id) {
+    return {
+      success: false,
+      message: 'لطفا وارد حساب کاربری خود شوید.',
+    }
+  }
+
+  // 2. Input validation
+  if (!items || items.length === 0) {
+    return {
+      success: false,
+      message: 'محصولی برای خرید انتخاب نشده است.',
+    }
+  }
   try {
-    // 1. Authentication check
-    const user = await currentUser()
-    if (!user?.id) {
-      return {
-        success: false,
-        message: 'لطفا وارد حساب کاربری خود شوید.',
-      }
-    }
-
-    // 2. Input validation
-    if (!items || items.length === 0) {
-      return {
-        success: false,
-        message: 'محصولی برای خرید انتخاب نشده است.',
-      }
-    }
-
     // 3. Start database transaction for atomicity
     const result = await prisma.$transaction(async (tx) => {
       // Delete existing cart if exists
@@ -215,43 +64,39 @@ export async function saveAllToCart(
       // 4. Validate all items and prepare cart data
       const validationErrors: SaveCartResult['validationErrors'] = []
       const correctedItems: SaveCartResult['correctedItems'] = []
-      const validatedCartItems: Array<{
-        productId: string
-        sizeId: string
-        productSlug: string
-        sku: string | ''
-        name: string
-        image: string
-        size: string
-        quantity: number
-        price: number
-        weight: number
-        totalPrice: number
-      }> = []
+      // const validatedCartItems: Array<{
+      //   productId: string
+      //   sizeId: string
+      //   productSlug: string
+      //   sku: string | ''
+      //   name: string
+      //   image: string
+      //   size: string
+      //   quantity: number
+      //   price: number
+      //   weight: number
+      //   totalPrice: number
+      // }> = []
+      const validatedCartItemsData = []
 
       for (const cartProduct of items) {
-        const { productId, sizeId, quantity } = cartProduct
+        const { variantId, quantity, name: productName } = cartProduct
 
-        // Fetch product with size information
-        const product = await tx.product.findUnique({
-          where: { id: productId },
+        const variant = await tx.productVariant.findUnique({
+          where: { id: variantId },
           include: {
-            images: {
-              take: 1,
-              orderBy: { created_at: 'asc' },
+            product: {
+              include: { images: { take: 1, orderBy: { created_at: 'asc' } } },
             },
-            sizes: {
-              where: { id: sizeId },
-            },
+            size: true,
+            color: true,
           },
         })
 
-        // Product validation
-        if (!product) {
+        if (!variant || !variant.product || !variant.size) {
           validationErrors.push({
-            productId,
-            sizeId,
-            productName: cartProduct.name || 'نامشخص',
+            variantId,
+            productName,
             issue: 'محصول یافت نشد.',
             requestedQuantity: quantity,
             availableStock: 0,
@@ -259,26 +104,10 @@ export async function saveAllToCart(
           continue
         }
 
-        // Size validation
-        const size = product.sizes[0]
-        if (!size) {
+        if (variant.quantity <= 0) {
           validationErrors.push({
-            productId,
-            sizeId,
-            productName: product.name,
-            issue: 'سایز انتخابی موجود نیست.',
-            requestedQuantity: quantity,
-            availableStock: 0,
-          })
-          continue
-        }
-
-        // Stock validation
-        if (size.quantity <= 0) {
-          validationErrors.push({
-            productId,
-            sizeId,
-            productName: product.name,
+            variantId,
+            productName,
             issue: 'موجودی تمام شده است.',
             requestedQuantity: quantity,
             availableStock: 0,
@@ -286,12 +115,10 @@ export async function saveAllToCart(
           continue
         }
 
-        // Quantity adjustment if needed
-        const validQuantity = Math.min(quantity, size.quantity)
+        const validQuantity = Math.min(quantity, variant.quantity)
         if (validQuantity < quantity) {
           correctedItems.push({
-            productId,
-            sizeId,
+            variantId,
             originalQuantity: quantity,
             correctedQuantity: validQuantity,
           })
@@ -299,40 +126,42 @@ export async function saveAllToCart(
 
         // Calculate price with discount
         const price =
-          size.discount && size.discount > 0
-            ? size.price - size.price * (size.discount / 100)
-            : size.price
-
+          variant.discount > 0
+            ? variant.price - variant.price * (variant.discount / 100)
+            : variant.price
         const totalPrice = price * validQuantity
 
-        validatedCartItems.push({
-          productId,
-          sizeId,
-          productSlug: product.slug,
-          sku: product.sku || '',
-          name: product.name,
-          image: product.images[0]?.url || '',
-          size: size.size,
+        validatedCartItemsData.push({
+          variantId: variant.id,
+          variant: variant,
+          productSlug: variant.product.slug,
+          productId: variant.product.id,
+          sku: variant.sku || '',
+          name: variant.product.name,
+          image: variant.product.images[0]?.url || '',
+          size: variant.size.name,
+          color: variant.color.name,
           quantity: validQuantity,
           price,
           totalPrice,
-          weight: product.weight || 0,
+          weight: variant.weight || 0,
         })
       }
 
       // If there are critical validation errors, return them
       if (validationErrors.length > 0) {
-        throw new Error('VALIDATION_FAILED')
+        throw { type: 'VALIDATION_FAILED', errors: validationErrors }
       }
 
-      // If no valid items after validation
-      if (validatedCartItems.length === 0) {
-        throw new Error('NO_VALID_ITEMS')
+      if (validatedCartItemsData.length === 0) {
+        return {
+          success: false,
+          message: 'هیچ محصول معتبری برای خرید یافت نشد.',
+        }
       }
 
-      // Calculate totals
-      const subTotal = validatedCartItems.reduce(
-        (acc, item) => acc + item.price * item.quantity,
+      const subTotal = validatedCartItemsData.reduce(
+        (acc, item) => acc + item.totalPrice,
         0
       )
 
@@ -343,9 +172,10 @@ export async function saveAllToCart(
           subTotal,
           total: subTotal, // Will be updated after shipping calculation
           cartItems: {
-            create: validatedCartItems.map((item) => ({
-              productId: item.productId,
-              sizeId: item.sizeId,
+            create: validatedCartItemsData.map((item) => ({
+              // variantId: item.variantId,
+              variant: { connect: { id: item.variantId } },
+              product: { connect: { id: item.productId } },
               productSlug: item.productSlug,
               sku: item.sku,
               name: item.name,
@@ -354,15 +184,17 @@ export async function saveAllToCart(
               quantity: item.quantity,
               price: item.price,
               totalPrice: item.totalPrice,
-              shippingFee: 0, // Will be calculated later
+              weight: item.weight,
+              color: item.color,
             })),
           },
         },
       })
 
       return {
+        success: true,
+        message: `${validatedCartItemsData.length} محصول با موفقیت به سبد خرید اضافه شد.`,
         cartId: cart.id,
-        itemCount: validatedCartItems.length,
         correctedItems: correctedItems.length > 0 ? correctedItems : undefined,
       }
     })
@@ -371,12 +203,7 @@ export async function saveAllToCart(
     revalidatePath('/cart')
     revalidatePath('/checkout')
 
-    return {
-      success: true,
-      message: `${result.itemCount} محصول با موفقیت به سبد خرید اضافه شد.`,
-      cartId: result.cartId,
-      correctedItems: result.correctedItems,
-    }
+    return result
   } catch (error) {
     console.error('Save cart error:', error)
 
@@ -540,36 +367,18 @@ export async function updateCartWithShipping(
   }
 }
 
-// Helper function to calculate shipping fee
-// function calculateShippingFee(cartItem: any, shippingAddress: any): number {
-//   // Implement your shipping calculation logic here
-//   // This could be based on weight, location, item type, etc.
-//   return 0 // Placeholder
-// }
-
-export async function fetchCurrentPricesAndStock(sizeIds: string[]) {
+export async function fetchCurrentPricesAndStock(variantIds: string[]) {
   try {
-    const productSizes = await prisma.size.findMany({
-      where: {
-        id: {
-          in: sizeIds,
-        },
-      },
-      select: {
-        id: true,
-        price: true,
-        quantity: true,
-        productId: true,
-        discount: true,
-      },
+    const variants = await prisma.productVariant.findMany({
+      where: { id: { in: variantIds } },
+      select: { id: true, price: true, quantity: true, discount: true },
     })
 
-    return productSizes.map((size) => ({
-      productId: size.productId,
-      sizeId: size.id,
-      price: size.price,
-      stock: size.quantity,
-      discount: size.discount,
+    return variants.map((variant) => ({
+      variantId: variant.id,
+      price: variant.price,
+      stock: variant.quantity,
+      discount: variant.discount,
     }))
   } catch (error) {
     console.error('Failed to fetch current prices and stock:', error)
@@ -584,7 +393,7 @@ export async function fetchCurrentPricesAndStock(sizeIds: string[]) {
 export interface DbCartItem {
   id: string
   productId: string
-  sizeId: string
+  variantId: string
   productSlug: string
   sku: string
   name: string
@@ -599,6 +408,7 @@ export interface DbCartItem {
   currentPrice: number
   isStockValid: boolean
   isPriceValid: boolean
+  color: string
   maxAvailableQuantity: number
 }
 
@@ -658,20 +468,12 @@ export async function getValidatedCart(): Promise<CartValidationResult> {
 
     for (const item of cart.cartItems) {
       // Get current product and size data
-      const currentProduct = await prisma.product.findUnique({
-        where: { id: item.productId },
-        include: {
-          sizes: {
-            where: { id: item.sizeId },
-          },
-          images: {
-            take: 1,
-            orderBy: { created_at: 'asc' },
-          },
-        },
+      const currentVariant = await prisma.productVariant.findUnique({
+        where: { id: item.variantId },
+        include: { product: { include: { images: { take: 1 } } } },
       })
 
-      if (!currentProduct) {
+      if (!currentVariant) {
         validationErrors.push({
           itemId: item.id,
           productName: item.name,
@@ -682,34 +484,41 @@ export async function getValidatedCart(): Promise<CartValidationResult> {
         continue
       }
 
-      const currentSize = currentProduct.sizes[0]
-      if (!currentSize) {
+      const currentPrice =
+        currentVariant.discount > 0
+          ? currentVariant.price -
+            currentVariant.price * (currentVariant.discount / 100)
+          : currentVariant.price
+      const isStockValid = currentVariant.quantity >= item.quantity
+      const isPriceValid = Math.abs(currentPrice - item.price) < 0.01
+      const maxAvailableQuantity = currentVariant.quantity
+
+      if (!isStockValid) {
+        hasValidationIssues = true
         validationErrors.push({
           itemId: item.id,
           productName: item.name,
-          issue: 'سایز انتخابی دیگر موجود نیست.',
-          severity: 'error',
+          issue:
+            currentVariant.quantity === 0
+              ? 'موجودی تمام شده است.'
+              : `تنها ${currentVariant.quantity} عدد در انبار موجود است.`,
+          severity: currentVariant.quantity === 0 ? 'error' : 'warning',
         })
-        hasValidationIssues = true
-        continue
       }
 
-      // Calculate current price
-      const currentPrice =
-        currentSize.discount && currentSize.discount > 0
-          ? currentSize.price - currentSize.price * (currentSize.discount / 100)
-          : currentSize.price
-
-      // Check stock
-      const isStockValid = currentSize.quantity >= item.quantity
-      const maxAvailableQuantity = currentSize.quantity
-
-      // Check price
-      const isPriceValid = Math.abs(currentPrice - item.price) < 0.01
+      if (!isPriceValid) {
+        hasValidationIssues = true
+        validationErrors.push({
+          itemId: item.id,
+          productName: item.name,
+          issue: 'قیمت تغییر کرده است!',
+          severity: 'warning',
+        })
+      }
 
       // Add validation issues
       if (!isStockValid) {
-        if (currentSize.quantity === 0) {
+        if (currentVariant.quantity === 0) {
           validationErrors.push({
             itemId: item.id,
             productName: item.name,
@@ -720,7 +529,7 @@ export async function getValidatedCart(): Promise<CartValidationResult> {
           validationErrors.push({
             itemId: item.id,
             productName: item.name,
-            issue: `تنها ${currentSize.quantity} عدد در انبار موجود است. (درخواستی: ${item.quantity})`,
+            issue: `تنها ${currentVariant.quantity} عدد در انبار موجود است. (درخواستی: ${item.quantity})`,
             severity: 'warning',
           })
         }
@@ -738,28 +547,29 @@ export async function getValidatedCart(): Promise<CartValidationResult> {
       }
 
       // Create validated item
-      const validatedQuantity = Math.min(item.quantity, currentSize.quantity)
+      const validatedQuantity = Math.min(item.quantity, currentVariant.quantity)
       const validatedTotalPrice = currentPrice * validatedQuantity
 
       validatedItems.push({
         id: item.id,
         productId: item.productId,
-        sizeId: item.sizeId,
+        variantId: item.variantId,
         productSlug: item.productSlug,
         sku: item.sku,
         name: item.name,
-        image: currentProduct.images[0]?.url || item.image,
+        image: currentVariant.product?.images?.[0]?.url || item.image,
         size: item.size,
         price: item.price,
         quantity: item.quantity,
         shippingFee: item.shippingFee,
         totalPrice: item.totalPrice,
         // Current validation data
-        currentStock: currentSize.quantity,
+        currentStock: currentVariant.quantity,
         currentPrice,
         isStockValid,
         isPriceValid,
         maxAvailableQuantity,
+        color: item.color,
       })
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -767,11 +577,7 @@ export async function getValidatedCart(): Promise<CartValidationResult> {
     }
 
     const validatedCart: DbCart = {
-      id: cart.id,
-      userId: cart.userId,
-      subTotal: cart.subTotal,
-      shippingFees: cart.shippingFees,
-      total: cart.total,
+      ...cart,
       items: validatedItems,
       hasValidationIssues,
       validationErrors,
@@ -813,31 +619,23 @@ export async function autoFixCartIssues(cartId: string) {
       }
 
       for (const item of cart.cartItems) {
-        // Get current product data
-        const currentProduct = await tx.product.findUnique({
-          where: { id: item.productId },
-          include: {
-            sizes: { where: { id: item.sizeId } },
-          },
+        const currentVariant = await tx.productVariant.findUnique({
+          where: { id: item.variantId },
         })
 
-        if (!currentProduct || currentProduct.sizes.length === 0) {
-          // Remove invalid items
+        if (!currentVariant || currentVariant.quantity === 0) {
           await tx.cartItem.delete({ where: { id: item.id } })
           continue
         }
 
-        const currentSize = currentProduct.sizes[0]
         const currentPrice =
-          currentSize.discount && currentSize.discount > 0
-            ? currentSize.price -
-              currentSize.price * (currentSize.discount / 100)
-            : currentSize.price
+          currentVariant.discount > 0
+            ? currentVariant.price -
+              currentVariant.price * (currentVariant.discount / 100)
+            : currentVariant.price
+        const validQuantity = Math.min(item.quantity, currentVariant.quantity)
 
-        // Fix quantity if exceeds stock
-        const validQuantity = Math.min(item.quantity, currentSize.quantity)
-
-        if (currentSize.quantity === 0) {
+        if (currentVariant.quantity === 0) {
           // Remove out of stock items
           await tx.cartItem.delete({ where: { id: item.id } })
           continue
@@ -854,22 +652,15 @@ export async function autoFixCartIssues(cartId: string) {
         })
       }
 
-      // Recalculate cart totals
-      const updatedItems = await tx.cartItem.findMany({
-        where: { cartId: cart.id },
-      })
-
+      const updatedItems = await tx.cartItem.findMany({ where: { cartId } })
       const newSubTotal = updatedItems.reduce(
         (sum, item) => sum + item.totalPrice,
         0
       )
 
       await tx.cart.update({
-        where: { id: cart.id },
-        data: {
-          subTotal: newSubTotal,
-          total: newSubTotal, // Will be updated with shipping later
-        },
+        where: { id: cartId },
+        data: { subTotal: newSubTotal, total: newSubTotal }, // Reset total, shipping will be recalculated
       })
     })
 

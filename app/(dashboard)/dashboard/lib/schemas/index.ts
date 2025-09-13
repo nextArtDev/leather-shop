@@ -128,11 +128,7 @@ export const ProductFormSchema = z.object({
       z.array(z.object({ url: z.string() })),
     ])
     .optional(),
-  variantImages: z.union([
-    z.array(z.instanceof(File)),
-    z.array(z.string()),
-    z.array(z.object({ url: z.string() })),
-  ]),
+
   // .optional(),
   offerTagId: z.string().optional(),
   isFeatured: z.union([z.boolean().default(false)]).optional(),
@@ -171,40 +167,33 @@ export const ProductFormSchema = z.object({
     //   message: 'SKU حداکثر می‌تواند 50 کاراکتر باشد',
     // })
     .optional(),
-  weight: z.number().default(0).optional(),
-  // .optional(),
 
-  colors: z
-    .object({ color: z.string() })
-    .array()
-    .min(1, 'حداقل یک رنگ انتخاب کنید.')
-    .refine((colors) => colors.every((c) => c.color.length > 0), {
-      message: 'همه فیلدهای رنگ را تکمیل کنید.',
-    })
+  variants: z
+    .array(
+      z.object({
+        // You'll likely use IDs for existing sizes/colors, or create new ones
+        size: z.string().min(1, 'سایز الزامی است.'),
+        color: z.string().min(1, 'رنگ الزامی است.'),
+        colorHex: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'کد رنگ معتبر نیست.'),
+        quantity: z.number().min(0, 'تعداد نمی‌تواند منفی باشد.'),
+        price: z.number().min(1000, 'قیمت باید از هزارتومان بیشتر باشد.'),
+        discount: z.number().min(0).default(0).optional(),
+        weight: z.number().min(0, 'وزن نمی‌تواند منفی باشد.'),
+        length: z.number().min(0),
+        width: z.number().min(0),
+        height: z.number().min(0),
+        sku: z.string().optional(),
+      })
+    )
+    .min(1, 'حداقل یک نوع محصول (وریانت) باید اضافه کنید.'),
+  variantImages: z
+    .union([
+      z.array(z.instanceof(File)),
+      z.array(z.string()),
+      z.array(z.object({ url: z.string() })),
+    ])
     .optional(),
-  sizes: z
-    .object({
-      size: z.string(),
-      quantity: z
-        .number()
-        .min(1, { message: 'تعداد باید از صفر بزرگتر باشد.' }),
-      price: z
-        .number()
-        .min(1000, { message: 'قیمت باید از هزارتومان بیشتر باشد.' }),
-      discount: z.number().min(0).default(0).optional(),
-      length: z.number().min(1, { message: 'طول باید از صفر بزرگتر باشد.' }),
-      width: z.number().min(1, { message: 'عرض باید از صفر بزرگتر باشد.' }),
-      height: z.number().min(1, { message: 'ارتفاع باید از صفر بزرگتر باشد.' }),
-    })
-    .array()
-    .min(1, 'حداقل یک سایز را انتخاب کنید.')
-    .refine(
-      (sizes) =>
-        sizes.every((s) => s.size.length > 0 && s.price > 0 && s.quantity > 0),
-      {
-        message: 'همه فیلدها باید به درستی پر شوند.',
-      }
-    ),
+
   isSale: z.boolean().default(false).optional(),
   // saleEndDate: z.string().optional(),
   keywords: z
@@ -217,6 +206,10 @@ export const ProductFormSchema = z.object({
 
   saleEndDate: z.union([z.date(), z.string()]).optional(),
 })
+
+export type ProductVariantSchema = z.infer<
+  typeof ProductFormSchema
+>['variants'][number]
 
 export const CategoryFormSchema = z.object({
   name: z

@@ -25,6 +25,7 @@ import {
   Color,
   Image,
   OfferTag,
+  ProductVariant,
   Size,
   SubCategory,
 } from '@/lib/generated/prisma'
@@ -53,8 +54,11 @@ export type ProductColumn = {
   offerTag?: OfferTag | null
   featured: boolean
   images: Image[]
-  colors: Color[]
-  sizes: Size[]
+  variants: (ProductVariant & { images: Image[] | null } & {
+    size: Size | null
+  } & { color: Color | null })[]
+  // colors: Color[]
+  // sizes: Size[]
   category: Category
   createdAt: string
 }
@@ -99,28 +103,18 @@ export const columns: ColumnDef<ProductColumn>[] =
 
                 <div className="flex flex-col gap-y-2 group">
                   <div className="relative **:flex flex-col mt-2 gap-2 cursor-pointer p-2">
-                    <div className=" flex flex-wrap max-w-sm gap-2 rounded-md">
-                      {row.original?.colors?.map((color: Color) => (
-                        <span
-                          key={color.name}
-                          className="w-4 h-4 rounded-full shadow-2xl"
-                          style={{ backgroundColor: color.name }}
-                        />
+                    <div className=" flex flex-col flex-wrap max-w-sm gap-2 rounded-md">
+                      {row.original?.variants?.map((vr) => (
+                        <div key={vr.id} className="flex gap-0.5">
+                          <span
+                            className="w-4 h-4 rounded-full shadow-2xl"
+                            style={{ backgroundColor: vr.color?.hex }}
+                          />
+                          {vr?.size?.name} - ({vr.quantity} عدد)
+                        </div>
                       ))}
                     </div>
-                    <div>
-                      {/* Sizes */}
-                      <div className="flex flex-col  gap-2 max-w-72 mt-1">
-                        {row.original.sizes?.map((size: Size) => (
-                          <span
-                            key={size.size}
-                            className="w-fit p-1 rounded-md text-[11px] font-medium border-2 bg-white/10"
-                          >
-                            {size.size} - ({size.quantity} عدد) - {size.price}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
+                    <div></div>
                   </div>
                 </div>
               </div>

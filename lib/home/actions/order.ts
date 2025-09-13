@@ -59,13 +59,15 @@ export async function createOrder() {
         total: cart.cart.total, // Will calculate below
       },
     })
-
     const insertedOrderId = await prisma.$transaction(async (tx) => {
       for (const item of cart?.cart?.items ?? []) {
         await tx.orderItem.create({
           data: {
-            productId: item.productId,
-            sizeId: item.sizeId,
+            // productId: item.productId,
+
+            // sizeId: item.sizeId,
+            variantId: item.variantId,
+            color: item.color,
             productSlug: item.productSlug,
             sku: item.sku,
             name: item.name,
@@ -81,6 +83,7 @@ export async function createOrder() {
         // console.log({ orders })
       }
 
+      // console.log({ order })
       await tx.cart.delete({
         where: {
           userId,
@@ -99,6 +102,7 @@ export async function createOrder() {
       redirectTo: `/order/${insertedOrderId}`,
     }
   } catch (error) {
+    console.log({ error })
     if (isRedirectError(error)) throw error
     return { success: false, message: error }
   }

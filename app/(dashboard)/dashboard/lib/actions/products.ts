@@ -9,7 +9,6 @@ import { ProductFormSchema } from '../schemas'
 import { currentUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { generateUniqueSlug } from '../server-utils'
-import { Image, Product } from '@/lib/generated/prisma'
 
 interface CreateProductFormState {
   success?: string
@@ -17,18 +16,17 @@ interface CreateProductFormState {
     name?: string[]
     description?: string[]
     isFeatured?: string[]
-
     images?: string[]
     categoryId?: string[]
     subCategoryId?: string[]
     offerTagId?: string[]
     brand?: string[]
-
     specs?: string[]
     keywords?: string[]
     questions?: string[]
-
+    variants?: string[]
     _form?: string[]
+    // [key: string]: unknown // Allow for other fields
   }
 }
 
@@ -44,24 +42,33 @@ export async function createProduct(
       errors: result.error.flatten().fieldErrors,
     }
   }
-  // console.log(result.data)
+
   const user = await currentUser()
   if (!user || user.role !== 'admin') {
-    if (!user) {
-      return {
-        errors: {
-          _form: ['شما اجازه دسترسی ندارید!'],
-        },
-      }
+    return {
+      errors: {
+        _form: ['شما اجازه دسترسی ندارید!'],
+      },
     }
   }
 
   try {
+    const {
+      variants,
+      images,
+      variantImages,
+      specs,
+      questions,
+      brand,
+      ...productData
+    } = result.data
+
     const isExistingProduct = await prisma.product.findFirst({
       where: {
         name: result.data.name,
       },
     })
+
     if (isExistingProduct) {
       return {
         errors: {
@@ -79,9 +86,10 @@ export async function createProduct(
       'product'
     )
 
+    // Handle main product images
     let imageIds: string[] = []
-    if (result.data.images) {
-      const filesToUpload = result.data.images.filter(
+    if (images) {
+      const filesToUpload = images.filter(
         (img): img is File => img instanceof File
       )
       const newImageUploadPromises = filesToUpload.map(async (img: File) => {
@@ -93,9 +101,11 @@ export async function createProduct(
         .map((res) => res?.imageId)
         .filter(Boolean) as string[]
     }
+
+    // Handle variant images (global variant images)
     let variantImageIds: string[] = []
-    if (result.data.variantImages) {
-      const filesToUpload = result.data.variantImages?.filter(
+    if (variantImages) {
+      const filesToUpload = variantImages.filter(
         (img): img is File => img instanceof File
       )
       const newImageUploadPromises = filesToUpload.map(async (img: File) => {
@@ -108,387 +118,83 @@ export async function createProduct(
         .filter(Boolean) as string[]
     }
 
-    const product = await prisma.product.create({
-      data: {
-        categoryId: result.data.categoryId,
-        subCategoryId: result.data.subCategoryId,
-        name: result.data.name,
-        description: result.data.description,
-        slug: productSlug,
-        brand: result.data?.brand || '',
-        shippingFeeMethod: result.data.shippingFeeMethod,
-        isFeatured: result.data.isFeatured,
-        keywords: result.data.keywords?.length
-          ? result.data.keywords?.join(',')
-          : '',
-        sku: result.data.sku ? result.data.sku : '',
-        isSale: result.data.isSale,
-        weight: result.data.weight ? +result.data.weight : 0,
-        saleEndDate: String(result.data.saleEndDate),
+    await prisma.$transaction(async (tx) => {
+      // Create the main product
+      const product = await tx.product.create({
+        data: {
+          ...productData,
+          brand: brand || '',
+          slug: productSlug,
+          keywords: productData.keywords?.join(',') ?? '',
+          saleEndDate: String(productData.saleEndDate),
+          images: { connect: imageIds.map((id) => ({ id })) },
+        },
+      })
 
-        // freeShipping:result.data.freeShippingCountriesIds?true:false,
-        images: {
-          connect: imageIds.map((id) => ({
-            id: id,
-          })),
-        },
-        variantImages: {
-          connect: variantImageIds.map((id) => ({
-            id: id,
-          })),
-        },
-      },
+      // Create Variants
+      for (const variantData of variants) {
+        // Create or get Size
+        const size = await tx.size.upsert({
+          where: { name: variantData.size },
+          update: {},
+          create: { name: variantData.size },
+        })
+
+        // Create or get Color
+        const color = await tx.color.upsert({
+          where: { hex: variantData.colorHex },
+          update: { name: variantData.color },
+          create: { name: variantData.color, hex: variantData.colorHex },
+        })
+
+        // Create the variant
+        await tx.productVariant.create({
+          data: {
+            productId: product.id,
+            sizeId: size.id,
+            colorId: color.id,
+            price: variantData.price,
+            quantity: variantData.quantity,
+            discount: variantData.discount || 0,
+            weight: variantData.weight,
+            length: variantData.length,
+            width: variantData.width,
+            height: variantData.height,
+            sku: variantData.sku,
+            // Connect variant images (these are shared across all variants for now)
+            images: { connect: variantImageIds.map((id) => ({ id })) },
+          },
+        })
+      }
+
+      // Create Specs if they exist
+      if (specs && specs.length > 0) {
+        await tx.spec.createMany({
+          data: specs
+            .filter((s) => s.name && s.name.trim() !== '')
+            .map((spec) => ({ ...spec, productId: product.id })),
+        })
+      }
+
+      // Create Questions if they exist
+      if (questions && questions.length > 0) {
+        await tx.question.createMany({
+          data: questions
+            .filter((q) => q.question && q.question.trim() !== '')
+            .map((q) => ({ ...q, productId: product.id })),
+        })
+      }
     })
-
-    let newSpecs
-    if (result.data.specs) {
-      newSpecs = result.data.specs.map((spec) => ({
-        name: spec.name,
-        value: spec.value,
-        productId: product.id,
-      }))
-    }
-    if (newSpecs) {
-      await prisma.spec.createMany({
-        data: newSpecs,
-      })
-    }
-    let newQuestions
-    if (result.data.questions) {
-      newQuestions = result.data.questions.map((question) => ({
-        question: question.question,
-        answer: question.answer,
-        productId: product.id,
-      }))
-    }
-    if (newQuestions) {
-      await prisma.question.createMany({
-        data: newQuestions,
-      })
-    }
-    let newColors
-    if (result.data.colors) {
-      newColors = result.data.colors.map((color) => ({
-        name: color.color,
-        productId: product.id,
-      }))
-    }
-
-    if (newColors) {
-      await prisma.color.createMany({
-        data: newColors,
-      })
-    }
-    //  new Size
-    let newSizes
-    if (result.data.sizes) {
-      newSizes = result.data.sizes.map((size) => ({
-        size: size.size,
-        quantity: size.quantity,
-        price: size.price,
-        discount: size.discount,
-        productId: product.id,
-        length: size.length,
-        width: size.width,
-        height: size.height,
-      }))
-    }
-
-    if (newSizes) {
-      await prisma.size.createMany({
-        data: newSizes,
-      })
-    }
-
-    // console.log({ product })
   } catch (err: unknown) {
     const message =
       err instanceof Error ? err.message : 'مشکلی در سرور پیش آمده.'
     return { errors: { _form: [message] } }
   }
+
   revalidatePath(path)
   redirect(`/dashboard/products`)
 }
 
-// export async function editProduct(
-//   data: unknown,
-//   productId: string,
-//   path: string
-// ): Promise<CreateProductFormState> {
-//   const result = ProductFormSchema.safeParse(data)
-
-//   if (!result.success) {
-//     console.error(result.error.flatten().fieldErrors)
-//     return {
-//       errors: result.error.flatten().fieldErrors,
-//     }
-//   }
-//   // console.log('result.data', result.data)
-//   const user = await currentUser()
-//   if (!user || user.role !== 'admin') {
-//     if (!user) {
-//       return {
-//         errors: {
-//           _form: ['شما اجازه دسترسی ندارید!'],
-//         },
-//       }
-//     }
-//   }
-//   if (!productId) {
-//     return {
-//       errors: {
-//         _form: ['محصول موجود نیست!'],
-//       },
-//     }
-//   }
-//   // console.log({ result })
-//   let isExisting:
-//     | (Product & {
-//         images: { id: string; key: string }[] | null
-//       } & {
-//         variantImages: { id: string; key: string }[] | null
-//       })
-//     | null
-//   try {
-//     isExisting = await prisma.product.findFirst({
-//       where: { id: productId },
-//       include: {
-//         images: { select: { id: true, key: true } },
-//         variantImages: { select: { id: true, key: true } },
-//       },
-//     })
-//     if (!isExisting) {
-//       return {
-//         errors: {
-//           _form: ['محصول حذف شده است!'],
-//         },
-//       }
-//     }
-
-//     const isNameExisting = await prisma.product.findFirst({
-//       where: {
-//         AND: [
-//           {
-//             OR: [{ name: result.data.name }],
-//           },
-//           {
-//             NOT: {
-//               id: productId,
-//             },
-//           },
-//         ],
-//       },
-//     })
-
-//     if (isNameExisting) {
-//       return {
-//         errors: {
-//           _form: ['محصول با این نام موجود است!'],
-//         },
-//       }
-//     }
-
-//     if (
-//       typeof result.data?.images?.[0] === 'object' &&
-//       result.data.images[0] instanceof File
-//     ) {
-//       if (isExisting.images && isExisting.images.length > 0) {
-//         const oldImageKeys = isExisting.images.map((img) => img.key)
-//         // console.log('Deleting old keys from S3:', oldImageKeys)
-//         await Promise.all(oldImageKeys.map((key) => deleteFileFromS3(key)))
-//       }
-//       const filesToUpload = result.data.images.filter(
-//         (img): img is File => img instanceof File
-//       )
-//       const newImageUploadPromises = filesToUpload.map(async (img: File) => {
-//         const buffer = Buffer.from(await img.arrayBuffer())
-//         return uploadFileToS3(buffer, img.name)
-//       })
-//       const uploadedImages = await Promise.all(newImageUploadPromises)
-//       const imageIds = uploadedImages
-//         .map((res) => res?.imageId)
-//         .filter(Boolean) as string[]
-
-//       await prisma.product.update({
-//         where: {
-//           id: productId,
-//         },
-//         data: {
-//           images: {
-//             disconnect: isExisting.images?.map((image: { id: string }) => ({
-//               id: image.id,
-//             })),
-//           },
-//         },
-//       })
-//       await prisma.product.update({
-//         where: {
-//           id: productId,
-//         },
-//         data: {
-//           images: {
-//             connect: imageIds.map((id) => ({
-//               id: id,
-//             })),
-//           },
-//         },
-//       })
-//     }
-
-//     if (
-//       typeof result.data?.variantImages?.[0] === 'object' &&
-//       result.data.variantImages[0] instanceof File
-//     ) {
-//       if (isExisting.variantImages && isExisting.variantImages.length > 0) {
-//         const oldImageKeys = isExisting.variantImages.map((img) => img.key)
-//         // console.log('Deleting old keys from S3:', oldImageKeys)
-//         await Promise.all(oldImageKeys.map((key) => deleteFileFromS3(key)))
-//       }
-//       const filesToUpload = result.data.variantImages.filter(
-//         (img): img is File => img instanceof File
-//       )
-//       const newImageUploadPromises = filesToUpload.map(async (img: File) => {
-//         const buffer = Buffer.from(await img.arrayBuffer())
-//         return uploadFileToS3(buffer, img.name)
-//       })
-//       const uploadedImages = await Promise.all(newImageUploadPromises)
-//       const variantImageIds = uploadedImages
-//         .map((res) => res?.imageId)
-//         .filter(Boolean) as string[]
-
-//       await prisma.product.update({
-//         where: {
-//           id: productId,
-//         },
-//         data: {
-//           variantImages: {
-//             disconnect: isExisting.images?.map((image: { id: string }) => ({
-//               id: image.id,
-//             })),
-//           },
-//         },
-//       })
-//       await prisma.product.update({
-//         where: {
-//           id: productId,
-//         },
-//         data: {
-//           variantImages: {
-//             connect: variantImageIds.map((id) => ({
-//               id: id,
-//             })),
-//           },
-//         },
-//       })
-//     }
-
-//     await prisma.$transaction(async (tx) => {
-//       await tx.product.update({
-//         where: {
-//           id: productId,
-//         },
-//         data: {
-//           categoryId: result.data.categoryId,
-//           subCategoryId: result.data.subCategoryId,
-//           name: result.data.name,
-//           description: result.data.description,
-//           brand: result.data?.brand || '',
-//           shippingFeeMethod: result.data.shippingFeeMethod,
-//           isFeatured: result.data?.isFeatured,
-//           keywords: result.data.keywords?.length
-//             ? result.data.keywords?.join(',')
-//             : '',
-//           sku: result.data.sku ? result.data.sku : '',
-//           isSale: result.data.isSale,
-//           weight: result.data.weight ? +result.data.weight : 0,
-//           saleEndDate: String(result.data.saleEndDate),
-//         },
-//       })
-
-//       await tx.spec.deleteMany({
-//         where: { productId: productId },
-//       })
-//       await tx.question.deleteMany({
-//         where: { productId: productId },
-//       })
-
-//       let newSpecs
-//       if (result.data.specs && result.data.specs.length > 0) {
-//         newSpecs = result.data.specs
-//           .filter((spec) => spec.name.trim() !== '' || spec.value.trim() !== '')
-//           .map((spec) => ({
-//             name: spec.name,
-//             value: spec.value,
-//             productId: productId,
-//           }))
-//       }
-//       if (newSpecs) {
-//         await tx.spec.createMany({
-//           data: newSpecs,
-//         })
-//       }
-//       let newQuestions
-//       if (result.data.questions && result.data.questions.length > 0) {
-//         newQuestions = result.data.questions
-//           .filter((qa) => qa.question.trim() !== '' || qa.answer.trim() !== '')
-//           .map((question) => ({
-//             question: question.question,
-//             answer: question.answer,
-//             productId: productId,
-//           }))
-//       }
-//       if (newQuestions) {
-//         await tx.question.createMany({
-//           data: newQuestions,
-//         })
-//       }
-//     })
-//     let newColors
-//     if (result.data.colors) {
-//       await prisma.color.deleteMany({
-//         where: { productId: productId },
-//       })
-//       newColors = result.data.colors.map((color) => ({
-//         name: color.color,
-//         productId: productId,
-//       }))
-//     }
-
-//     if (newColors) {
-//       await prisma.color.createMany({
-//         data: newColors,
-//       })
-//     }
-//     //  new Size
-//     let newSizes
-//     if (result.data.sizes) {
-//       await prisma.size.deleteMany({
-//         where: { productId },
-//       })
-//       newSizes = result.data.sizes.map((size) => ({
-//         size: size.size,
-//         quantity: size.quantity,
-//         price: size.price,
-//         discount: size.discount,
-//         productId,
-//       }))
-//     }
-
-//     if (newSizes) {
-//       await prisma.size.createMany({
-//         data: newSizes,
-//       })
-//     }
-//   } catch (err: unknown) {
-//     const message =
-//       err instanceof Error ? err.message : 'مشکلی در سرور پیش آمده.'
-//     return { errors: { _form: [message] } }
-//   }
-//   revalidatePath(path)
-//   redirect(`/dashboard/products`)
-// }
-
-//////////////////////
 export async function editProduct(
   data: unknown,
   productId: string,
@@ -505,12 +211,10 @@ export async function editProduct(
 
   const user = await currentUser()
   if (!user || user.role !== 'admin') {
-    if (!user) {
-      return {
-        errors: {
-          _form: ['شما اجازه دسترسی ندارید!'],
-        },
-      }
+    return {
+      errors: {
+        _form: ['شما اجازه دسترسی ندارید!'],
+      },
     }
   }
 
@@ -522,20 +226,18 @@ export async function editProduct(
     }
   }
 
-  let isExisting:
-    | (Product & {
-        images: { id: string; key: string }[] | null
-      } & {
-        variantImages: { id: string; key: string }[] | null
-      })
-    | null
-
   try {
-    isExisting = await prisma.product.findFirst({
+    const isExisting = await prisma.product.findFirst({
       where: { id: productId },
       include: {
         images: { select: { id: true, key: true } },
-        variantImages: { select: { id: true, key: true } },
+        variants: {
+          include: {
+            images: { select: { id: true, key: true } },
+            size: true,
+            color: true,
+          },
+        },
       },
     })
 
@@ -549,16 +251,7 @@ export async function editProduct(
 
     const isNameExisting = await prisma.product.findFirst({
       where: {
-        AND: [
-          {
-            OR: [{ name: result.data.name }],
-          },
-          {
-            NOT: {
-              id: productId,
-            },
-          },
-        ],
+        AND: [{ name: result.data.name }, { NOT: { id: productId } }],
       },
     })
 
@@ -570,7 +263,7 @@ export async function editProduct(
       }
     }
 
-    // Handle image uploads (keeping your existing logic)
+    // Handle main product image updates
     if (
       typeof result.data?.images?.[0] === 'object' &&
       result.data.images[0] instanceof File
@@ -579,6 +272,7 @@ export async function editProduct(
         const oldImageKeys = isExisting.images.map((img) => img.key)
         await Promise.all(oldImageKeys.map((key) => deleteFileFromS3(key)))
       }
+
       const filesToUpload = result.data.images.filter(
         (img): img is File => img instanceof File
       )
@@ -592,39 +286,33 @@ export async function editProduct(
         .filter(Boolean) as string[]
 
       await prisma.product.update({
-        where: {
-          id: productId,
-        },
+        where: { id: productId },
         data: {
           images: {
             disconnect: isExisting.images?.map((image: { id: string }) => ({
               id: image.id,
             })),
-          },
-        },
-      })
-      await prisma.product.update({
-        where: {
-          id: productId,
-        },
-        data: {
-          images: {
-            connect: imageIds.map((id) => ({
-              id: id,
-            })),
+            connect: imageIds.map((id) => ({ id })),
           },
         },
       })
     }
 
+    // Handle variant images updates
     if (
       typeof result.data?.variantImages?.[0] === 'object' &&
       result.data.variantImages[0] instanceof File
     ) {
-      if (isExisting.variantImages && isExisting.variantImages.length > 0) {
-        const oldImageKeys = isExisting.variantImages.map((img) => img.key)
-        await Promise.all(oldImageKeys.map((key) => deleteFileFromS3(key)))
+      // Delete old variant images
+      if (isExisting.variants && isExisting.variants.length > 0) {
+        for (const variant of isExisting.variants) {
+          if (variant.images && variant.images.length > 0) {
+            const oldImageKeys = variant.images.map((img) => img.key)
+            await Promise.all(oldImageKeys.map((key) => deleteFileFromS3(key)))
+          }
+        }
       }
+
       const filesToUpload = result.data.variantImages.filter(
         (img): img is File => img instanceof File
       )
@@ -637,39 +325,27 @@ export async function editProduct(
         .map((res) => res?.imageId)
         .filter(Boolean) as string[]
 
-      await prisma.product.update({
-        where: {
-          id: productId,
-        },
-        data: {
-          variantImages: {
-            disconnect: isExisting.images?.map((image: { id: string }) => ({
-              id: image.id,
-            })),
+      // Update all variants with new images
+      for (const variant of isExisting.variants) {
+        await prisma.productVariant.update({
+          where: { id: variant.id },
+          data: {
+            images: {
+              disconnect: variant.images?.map((image: { id: string }) => ({
+                id: image.id,
+              })),
+              connect: variantImageIds.map((id) => ({ id })),
+            },
           },
-        },
-      })
-      await prisma.product.update({
-        where: {
-          id: productId,
-        },
-        data: {
-          variantImages: {
-            connect: variantImageIds.map((id) => ({
-              id: id,
-            })),
-          },
-        },
-      })
+        })
+      }
     }
 
     // Main transaction for product updates
     await prisma.$transaction(async (tx) => {
       // Update product basic info
       await tx.product.update({
-        where: {
-          id: productId,
-        },
+        where: { id: productId },
         data: {
           categoryId: result.data.categoryId,
           subCategoryId: result.data.subCategoryId,
@@ -683,19 +359,18 @@ export async function editProduct(
             : '',
           sku: result.data.sku ? result.data.sku : '',
           isSale: result.data.isSale,
-          weight: result.data.weight ? +result.data.weight : 0,
           saleEndDate: String(result.data.saleEndDate),
         },
       })
 
-      // Handle specs - delete and recreate (these don't affect cart)
+      // Handle specs - delete and recreate
       await tx.spec.deleteMany({
         where: { productId: productId },
       })
 
       if (result.data.specs && result.data.specs.length > 0) {
         const newSpecs = result.data.specs
-          .filter((spec) => spec.name.trim() !== '' || spec.value.trim() !== '')
+          .filter((spec) => spec.name.trim() !== '' && spec.value.trim() !== '')
           .map((spec) => ({
             name: spec.name,
             value: spec.value,
@@ -709,14 +384,14 @@ export async function editProduct(
         }
       }
 
-      // Handle questions - delete and recreate (these don't affect cart)
+      // Handle questions - delete and recreate
       await tx.question.deleteMany({
         where: { productId: productId },
       })
 
       if (result.data.questions && result.data.questions.length > 0) {
         const newQuestions = result.data.questions
-          .filter((qa) => qa.question.trim() !== '' || qa.answer.trim() !== '')
+          .filter((qa) => qa.question.trim() !== '' && qa.answer.trim() !== '')
           .map((question) => ({
             question: question.question,
             answer: question.answer,
@@ -730,90 +405,105 @@ export async function editProduct(
         }
       }
 
-      // Handle colors - delete and recreate (these don't affect cart)
-      if (result.data.colors) {
-        await tx.color.deleteMany({
-          where: { productId: productId },
-        })
-
-        const newColors = result.data.colors.map((color) => ({
-          name: color.color,
-          productId: productId,
-        }))
-
-        if (newColors.length > 0) {
-          await tx.color.createMany({
-            data: newColors,
-          })
-        }
-      }
-      // Handle sizes - SMART UPDATE to preserve IDs and cart items
-      if (result.data.sizes) {
-        // Get existing sizes
-        const existingSizes = await tx.size.findMany({
+      // Handle variants - SMART UPDATE to preserve cart items
+      if (result.data.variants) {
+        const existingVariants = await tx.productVariant.findMany({
           where: { productId },
-          select: {
-            id: true,
+          include: {
             size: true,
-            quantity: true,
-            price: true,
-            discount: true,
-            length: true,
-            width: true,
-            height: true,
+            color: true,
+            images: { select: { id: true, key: true } },
           },
         })
 
-        // Track processed size names to identify what to delete
-        const formSizeNames = result.data.sizes.map((s) => s.size)
-        const processedSizeNames: string[] = []
+        // Track processed variants by size-color combination
+        const formVariantKeys = result.data.variants.map(
+          (v) => `${v.size}-${v.colorHex}`
+        )
 
-        // Process each size from the form
-        for (const sizeData of result.data.sizes) {
-          const existingSize = existingSizes.find(
-            (s) => s.size === sizeData.size
+        // Process each variant from the form
+        for (const variantData of result.data.variants) {
+          const variantKey = `${variantData.size}-${variantData.colorHex}`
+
+          // Find existing variant by size name and color hex
+          const existingVariant = existingVariants.find(
+            (v) => `${v.size.name}-${v.color.hex}` === variantKey
           )
 
-          if (existingSize) {
-            await tx.size.update({
-              where: { id: existingSize.id },
+          // Create or get Size
+          const size = await tx.size.upsert({
+            where: { name: variantData.size },
+            update: {},
+            create: { name: variantData.size },
+          })
+
+          // Create or get Color
+          const color = await tx.color.upsert({
+            where: { hex: variantData.colorHex },
+            update: { name: variantData.color },
+            create: { name: variantData.color, hex: variantData.colorHex },
+          })
+
+          if (existingVariant) {
+            // Update existing variant
+            await tx.productVariant.update({
+              where: { id: existingVariant.id },
               data: {
-                quantity: sizeData.quantity,
-                price: sizeData.price,
-                discount: sizeData.discount,
-                length: sizeData.length,
-                width: sizeData.width,
-                height: sizeData.height,
+                sizeId: size.id,
+                colorId: color.id,
+                quantity: variantData.quantity,
+                price: variantData.price,
+                discount: variantData.discount || 0,
+                weight: variantData.weight,
+                length: variantData.length,
+                width: variantData.width,
+                height: variantData.height,
+                sku: variantData.sku,
               },
             })
           } else {
-            await tx.size.create({
+            // Create new variant
+            await tx.productVariant.create({
               data: {
-                size: sizeData.size,
-                quantity: sizeData.quantity,
-                price: sizeData.price,
-                discount: sizeData.discount,
-                length: sizeData.length,
-                width: sizeData.width,
-                height: sizeData.height,
                 productId,
+                sizeId: size.id,
+                colorId: color.id,
+                quantity: variantData.quantity,
+                price: variantData.price,
+                discount: variantData.discount || 0,
+                weight: variantData.weight,
+                length: variantData.length,
+                width: variantData.width,
+                height: variantData.height,
+                sku: variantData.sku,
               },
             })
           }
-
-          processedSizeNames.push(sizeData.size)
         }
 
-        // Delete sizes that are no longer in the form
-        const sizesToDelete = existingSizes.filter(
-          (existingSize) => !formSizeNames.includes(existingSize.size)
+        // Delete variants that are no longer in the form
+        const variantsToDelete = existingVariants.filter(
+          (existingVariant) =>
+            !formVariantKeys.includes(
+              `${existingVariant.size.name}-${existingVariant.color.hex}`
+            )
         )
 
-        if (sizesToDelete.length > 0) {
-          await tx.size.deleteMany({
+        if (variantsToDelete.length > 0) {
+          // Delete variant images first
+          for (const variant of variantsToDelete) {
+            if (variant.images && variant.images.length > 0) {
+              const oldImageKeys = variant.images.map((img) => img.key)
+              await Promise.all(
+                oldImageKeys.map((key) => deleteFileFromS3(key))
+              )
+            }
+          }
+
+          await tx.productVariant.deleteMany({
             where: {
               id: {
-                in: sizesToDelete.map((s) => s.id),
+                in: variantsToDelete.map((v) => v.id),
               },
             },
           })
@@ -829,13 +519,10 @@ export async function editProduct(
   revalidatePath(path)
   redirect(`/dashboard/products`)
 }
+
 interface DeleteProductFormState {
   errors: {
-    // name?: string[]
-    // featured?: string[]
-    // url?: string[]
     images?: string[]
-
     _form?: string[]
   }
 }
@@ -850,36 +537,34 @@ export async function deleteProduct(
 ): Promise<DeleteProductFormState> {
   const user = await currentUser()
   if (!user || user.role !== 'admin') {
-    if (!user) {
-      return {
-        errors: {
-          _form: ['شما اجازه دسترسی ندارید!'],
-        },
-      }
+    return {
+      errors: {
+        _form: ['شما اجازه دسترسی ندارید!'],
+      },
     }
   }
-  // console.log(result)
+
   if (!productId) {
     return {
       errors: {
-        _form: ['فروشگاه در دسترس نیست!'],
+        _form: ['محصول در دسترس نیست!'],
       },
     }
   }
 
   try {
-    const isExisting:
-      | (Product & { variantImages: Image[] } & {
-          images: Image[] | null
-        })
-      | null = await prisma.product.findFirst({
+    const isExisting = await prisma.product.findFirst({
       where: { id: productId },
       include: {
         images: true,
-
-        variantImages: true,
+        variants: {
+          include: {
+            images: true,
+          },
+        },
       },
     })
+
     if (!isExisting) {
       return {
         errors: {
@@ -887,8 +572,9 @@ export async function deleteProduct(
         },
       }
     }
+
     const ordersWithProduct = await prisma.orderItem.count({
-      where: { productId: productId },
+      where: { productSlug: isExisting.slug },
     })
 
     if (ordersWithProduct > 0) {
@@ -899,21 +585,23 @@ export async function deleteProduct(
       }
     }
 
-    const deletePromises: Promise<unknown>[] = []
-
-    if (isExisting?.images && isExisting?.images?.length > 0) {
+    // Delete product images from S3
+    if (isExisting?.images && isExisting.images.length > 0) {
       const oldImageKeys = isExisting.images.map((img) => img.key)
       await Promise.all(oldImageKeys.map((key) => deleteFileFromS3(key)))
     }
 
-    if (isExisting?.variantImages && isExisting?.variantImages?.length > 0) {
-      const oldImageKeys = isExisting.variantImages.map((img) => img.key)
-      await Promise.all(oldImageKeys.map((key) => deleteFileFromS3(key)))
-    }
-    if (deletePromises.length > 0) {
-      await Promise.allSettled(deletePromises) // Use allSettled to continue even if some fail
+    // Delete variant images from S3
+    if (isExisting?.variants && isExisting.variants.length > 0) {
+      for (const variant of isExisting.variants) {
+        if (variant.images && variant.images.length > 0) {
+          const oldImageKeys = variant.images.map((img) => img.key)
+          await Promise.all(oldImageKeys.map((key) => deleteFileFromS3(key)))
+        }
+      }
     }
 
+    // Delete the product (cascading will handle variants)
     await prisma.product.delete({
       where: {
         id: isExisting.id,
@@ -934,6 +622,7 @@ export async function deleteProduct(
       }
     }
   }
+
   revalidatePath(path)
   redirect(`/dashboard/products`)
 }

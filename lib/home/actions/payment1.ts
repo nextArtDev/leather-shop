@@ -704,25 +704,25 @@ export async function updateOrderToPaidSecure({
 
     // CRITICAL: Validate inventory before updating
     for (const item of order.items) {
-      const currentSize = await tx.size.findUnique({
+      const currentVariant = await tx.productVariant.findUnique({
         where: {
-          productId: item.productId,
-          id: item.sizeId,
+          // : item.productSlug,
+          id: item.variantId,
         },
         select: { quantity: true },
       })
 
-      if (!currentSize || currentSize.quantity < item.quantity) {
-        throw new Error(`Insufficient inventory for product ${item.productId}`)
+      if (!currentVariant || currentVariant.quantity < item.quantity) {
+        throw new Error(`Insufficient inventory for product ${item.variantId}`)
       }
     }
 
     // Update inventory
     for (const item of order.items) {
-      await tx.size.update({
+      await tx.productVariant.update({
         where: {
-          productId: item.productId,
-          id: item.sizeId,
+          //
+          id: item.variantId,
           quantity: { gte: item.quantity },
         },
         data: {
@@ -731,7 +731,7 @@ export async function updateOrderToPaidSecure({
       })
 
       await tx.product.update({
-        where: { id: item.productId },
+        where: { slug: item.productSlug },
         data: {
           sales: { increment: item.quantity },
         },

@@ -117,7 +117,7 @@ model Image {
   SubCategory   SubCategory? @relation(fields: [subCategoryId], references: [id])
   subCategoryId String?
 
-  variantImage   Product? @relation("variantImage", fields: [variantImageId], references: [id])
+  variantImage   ProductVariant? @relation(fields: [variantImageId], references: [id])
   variantImageId String?
 
   product   Product? @relation("productImage", fields: [productId], references: [id])
@@ -137,11 +137,12 @@ model Image {
 }
 
 model Category {
-  id       String  @id @default(uuid())
-  name     String
-  images   Image[]
-  url      String  @unique
-  featured Boolean @default(false)
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  images      Image[]
+  url         String  @unique
+  featured    Boolean @default(false)
 
   subCategories SubCategory[]
   products      Product[]     @relation("CategoryToProduct")
@@ -151,11 +152,12 @@ model Category {
 }
 
 model SubCategory {
-  id       String  @id @default(uuid())
-  name     String
-  images   Image[]
-  url      String  @unique
-  featured Boolean @default(false)
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  images      Image[]
+  url         String  @unique
+  featured    Boolean @default(false)
 
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
@@ -166,13 +168,6 @@ model SubCategory {
   updatedAt DateTime @updatedAt
 
   @@index([categoryId])
-}
-
-enum StoreStatus {
-  PENDING
-  ACTIVE
-  BANNED
-  DISABLED
 }
 
 enum ShippingFeeMethod {
@@ -186,33 +181,25 @@ model Product {
   name              String
   description       String
   slug              String            @unique
-  brand             String
+  brand             String?
   rating            Float             @default(0)
   sales             Int               @default(0)
   numReviews        Int               @default(0)
   shippingFeeMethod ShippingFeeMethod @default(ITEM)
   views             Int               @default(0)
   images            Image[]           @relation("productImage")
-  variantImages     Image[]           @relation("variantImage")
   freeShipping      FreeShipping?     @relation("ProductFreeShipping")
   isFeatured        Boolean           @default(false)
   isSale            Boolean           @default(false)
   saleEndDate       String?
   sku               String?
   keywords          String
-  weight            Float?
 
-  specs Spec[] @relation("ProductSpec")
-
-  questions Question[] @relation("ProductQuestion")
-
-  reviews Review[] @relation("ReviewToProduct")
-
-  wishlist Wishlist[] @relation("WishlistToProduct")
-
-  sizes Size[] @relation("ProductSizes")
-
-  colors Color[] @relation("ProductColors")
+  variants  ProductVariant[]
+  wishlist  Wishlist[]       @relation("WishlistToProduct")
+  specs     Spec[]           @relation("ProductSpec")
+  questions Question[]       @relation("ProductQuestion")
+  reviews   Review[]         @relation("ReviewToProduct")
 
   categoryId String
   category   Category @relation("CategoryToProduct", fields: [categoryId], references: [id], onDelete: Cascade)
@@ -223,46 +210,61 @@ model Product {
   offerTagId String?
   offerTag   OfferTag? @relation("OfferTagToProduct", fields: [offerTagId], references: [id])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @default(now()) @updatedAt
+  CartItem  CartItem[]
 
   @@index([categoryId])
   @@index([subCategoryId])
   @@index([offerTagId])
 }
 
-model Size {
-  id       String @id @default(uuid())
-  size     String
-  quantity Int
+model ProductVariant {
+  id       String  @id @default(uuid())
+  sku      String? @unique
   price    Float
-  discount Float  @default(0)
-  length   Int
-  width    Int
-  height   Int
+  quantity Int
+  discount Float   @default(0)
+  weight   Float
+  length   Int?
+  width    Int?
+  height   Int?
 
-  wishlist Wishlist[] @relation("WishlistToSize")
+  images Image[]
 
-  productId String?
-  product   Product? @relation("ProductSizes", fields: [productId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  sizeId String
+  size   Size   @relation(fields: [sizeId], references: [id])
+
+  colorId String
+  color   Color  @relation(fields: [colorId], references: [id])
+
+  cartItems  OrderItem[]
+  orderItems CartItem[]
+  wishList   Wishlist[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
+  @@unique([productId, sizeId, colorId])
   @@index([productId])
+  @@index([sizeId])
+  @@index([colorId])
+}
+
+model Size {
+  id       String           @id @default(uuid())
+  name     String           @unique
+  variants ProductVariant[]
 }
 
 model Color {
-  id   String @id @default(uuid())
-  name String
-
-  productId String?
-  product   Product? @relation("ProductColors", fields: [productId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-
-  @@index([productId])
+  id       String           @id @default(uuid())
+  name     String           @unique
+  hex      String           @unique
+  variants ProductVariant[]
 }
 
 model OfferTag {
@@ -417,15 +419,21 @@ model Cart {
 }
 
 model CartItem {
-  id          String @id @default(uuid())
-  productId   String
-  sizeId      String
+  id String @id @default(uuid())
+
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id])
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
   productSlug String
   sku         String
   name        String
   image       String
   size        String
-  weight      Float?
+  color       String
+  weight      Float
   price       Float
   quantity    Int    @default(1)
   shippingFee Float  @default(0)
@@ -537,16 +545,17 @@ model Order {
 model OrderItem {
   id String @id @default(uuid())
 
-  productId String
-  sizeId    String
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id])
 
   productSlug String
-  sku         String
+  sku         String?
   name        String
   image       String
   size        String
-  quantity    Int    @default(1)
-  shippingFee Float  @default(0)
+  color       String
+  quantity    Int     @default(1)
+  shippingFee Float   @default(0)
   price       Float
   totalPrice  Float
 
@@ -555,31 +564,6 @@ model OrderItem {
   order     Order         @relation("OrderToItem", fields: [orderId], references: [id])
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
-}
-
-model OrderGroup {
-  id     String      @id @default(uuid())
-  status OrderStatus @default(Pending)
-
-  shippingService     String
-  shippingDeliveryMin Int
-  shippingDeliveryMax Int
-
-  shippingFees Float
-  subTotal     Float
-  total        Float
-
-  // orderId String
-  // order   Order  @relation("OrderGroupToOrder", fields: [orderId], references: [id])
-
-  // couponId String?
-  // coupon   Coupon? @relation("CouponToOrderGroup", fields: [couponId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // @@index([orderId])
-  // @@index([couponId])
 }
 
 model PaymentDetails {
@@ -655,18 +639,17 @@ model Wishlist {
   userId String
   user   User   @relation("WishlistToUser", fields: [userId], references: [id], onDelete: Cascade)
 
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
   productId String
   product   Product @relation("WishlistToProduct", fields: [productId], references: [id], onDelete: Cascade)
-
-  sizeId String?
-  size   Size?   @relation("WishlistToSize", fields: [sizeId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([userId])
-  @@index([productId])
-  @@index([sizeId])
+  @@index([variantId])
 }
 
 model Coupon {

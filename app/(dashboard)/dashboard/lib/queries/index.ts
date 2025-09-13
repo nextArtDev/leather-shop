@@ -10,6 +10,7 @@ import {
   PaymentDetails,
   // Prisma,
   Product,
+  ProductVariant,
   Province,
   Question,
   ShippingAddress,
@@ -156,11 +157,18 @@ export const getAllProductsList = cache(
           subCategory: true,
           offerTag: true,
           images: { orderBy: { created_at: 'desc' } },
-          variantImages: true,
           questions: true,
           specs: true,
-          colors: true,
-          sizes: true,
+          // variantImages: true,
+          // colors: true,
+          // sizes: true,
+          variants: {
+            include: {
+              color: true,
+              images: true,
+              size: true,
+            },
+          },
         },
         skip: skipAmount,
         take: pageSize,
@@ -203,10 +211,13 @@ export const getProductById = cache(
     | (Product & { images: Image[] | null } & { specs: Spec[] | null } & {
         questions: Question[] | null
       } & {
-        variantImages: Image[] | null
-        colors: Color[] | null
-        sizes: Size[] | null
-        specs: Spec[] | null
+        variants:
+          | (ProductVariant & { images: Image[] | null } & {
+              color: Color | null
+            } & {
+              size: Size | null
+            })[]
+          | null
       })
     | null
   > => {
@@ -215,13 +226,16 @@ export const getProductById = cache(
         id,
       },
       include: {
-        variantImages: true,
-        colors: true,
-        sizes: true,
-        specs: true,
-
-        questions: true,
+        variants: {
+          include: {
+            images: true,
+            color: true,
+            size: true,
+          },
+        },
         images: true,
+        specs: true,
+        questions: true,
       },
     })
 

@@ -16,6 +16,8 @@ import { Label } from '@/components/ui/label'
 import { PlusCircle, XCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ColorPicker } from './color-picker'
+import colorNamer from 'color-namer'
+import { ProductVariantSchema } from '../lib/schemas'
 
 // --- Type Definitions ---
 type FormValues = any // Consider defining a more specific type for your form values
@@ -54,7 +56,7 @@ const ClickToAddInputsRHF: React.FC<ClickToAddInputsRHFProps> = ({
   onRemove,
   initialDetailSchema,
   header,
-  colorPicker,
+
   containerClassName,
   inputClassName,
   labels, // Destructure the new labels prop
@@ -73,6 +75,7 @@ const ClickToAddInputsRHF: React.FC<ClickToAddInputsRHFProps> = ({
       {header && <Label className="text-md font-semibold">{header}</Label>}
 
       {fields.map((fieldItem, index) => {
+        const variantItem = fieldItem as unknown as ProductVariantSchema
         const currentDetail = fieldItem as unknown as DetailSchemaType
 
         return (
@@ -90,7 +93,34 @@ const ClickToAddInputsRHF: React.FC<ClickToAddInputsRHFProps> = ({
                 typeof initialDetailSchema[
                   propertyKey as keyof DetailSchemaType
                 ] === 'number'
-
+              if (propertyKey === 'colorHex') {
+                return (
+                  <div key={propertyKey} className="flex flex-col gap-1">
+                    <Label
+                      htmlFor={fieldPath}
+                      className="text-xs text-muted-foreground"
+                    >
+                      {labels?.[propertyKey] || propertyKey}
+                      {isMandatory && <span className="text-rose-500">*</span>}
+                    </Label>
+                    <div className="flex items-center gap-x-2">
+                      <ColorPicker
+                        value={variantItem.colorHex}
+                        onChange={(newHex) => {
+                          setValue(fieldPath, newHex, { shouldValidate: true })
+                          // Also update the color name field automatically
+                          try {
+                            const colorName = colorNamer(newHex).ntc[0].name
+                            setValue(`${name}.${index}.color`, colorName)
+                          } catch {
+                            setValue(`${name}.${index}.color`, 'Custom Color')
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                )
+              }
               return (
                 <div
                   key={propertyKey}
@@ -104,7 +134,7 @@ const ClickToAddInputsRHF: React.FC<ClickToAddInputsRHFProps> = ({
                     {labels?.[propertyKey] || propertyKey}
                     {isMandatory && <span className="text-rose-500">*</span>}
                   </Label>
-                  {propertyKey === 'color' && colorPicker ? (
+                  {/* {propertyKey === 'color' && colorPicker ? (
                     <div className="flex items-center gap-x-2">
                       <ColorPicker
                         value={(currentDetail as any)?.color || ''}
@@ -123,6 +153,26 @@ const ClickToAddInputsRHF: React.FC<ClickToAddInputsRHFProps> = ({
                           inputClassName
                         )}
                         placeholder="Hex Color e.g. #FF0000"
+                        maxLength={7}
+                      />
+                    </div> */}
+                  {propertyKey === 'colorHex' ? (
+                    <div className="flex items-center gap-x-2">
+                      <ColorPicker
+                        value={(currentDetail as any)?.colorHex || ''}
+                        onChange={(newColorValue) => {
+                          setValue(fieldPath, newColorValue as any, {
+                            shouldValidate: true,
+                            shouldDirty: true,
+                          })
+                        }}
+                      />
+                      {/* You might not need this input if the picker is enough */}
+                      <Input
+                        {...register(fieldPath as any)}
+                        id={fieldPath}
+                        className={cn('w-28', inputClassName)}
+                        placeholder="e.g. #FF0000"
                         maxLength={7}
                       />
                     </div>

@@ -64,8 +64,9 @@ export default async function ProductsPage({
     slug: item.slug,
     subCategory: item.subCategory,
     offerTag: item?.offerTag,
-    colors: item.colors,
-    sizes: item.sizes,
+    variants: item?.variants,
+    // colors: item.variants.map((variant) => variant.color),
+    // sizes: item.variants.map((variant) => variant.size),
     images: item.images,
     category: item.category,
     featured: item.isFeatured,
@@ -97,25 +98,5 @@ export default async function ProductsPage({
         </Suspense>
       </div>
     </div>
-    // <div className="w-full px-1">
-    //   <Suspense>
-    //     <DataTable
-    //       actionButtonText={
-    //         <>
-    //           <Plus size={15} />
-    //           ایجاد محصول
-    //         </>
-    //       }
-    //       modalChildren={
-    //         <ProductDetails categories={categories} offerTags={offerTags} />
-    //       }
-    //       newTabLink={`/dashboard/products/new`}
-    //       filterValue="name"
-    //       data={products}
-    //       columns={columns}
-    //       searchPlaceholder="جست‌وجوی نام محصول..."
-    //     />
-    //   </Suspense>
-    // </div>
   )
 }
