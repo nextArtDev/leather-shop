@@ -114,6 +114,7 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 export default async function Home() {
+  // await seed()
   // const [products, bestSellers, categories, subCategories, reviews] =
   //   await Promise.all([
   //     getHomepageProducts(),
@@ -140,9 +141,9 @@ export default async function Home() {
       'Premium online store offering quality products with fast shipping and excellent customer service',
     contactPoint: {
       '@type': 'ContactPoint',
-      telephone: '+1-555-123-4567', // Your phone number
-      contactType: 'Customer Service',
-      email: 'support@yourstore.com', // Your email
+      // telephone: '+1-555-123-4567', // Your phone number
+      // contactType: 'Customer Service',
+      // email: 'support@yourstore.com', // Your email
       availableLanguage: ['English', 'Persian'],
     },
     sameAs: [
@@ -152,11 +153,11 @@ export default async function Home() {
     ],
     address: {
       '@type': 'PostalAddress',
-      addressCountry: 'US', // Your country
-      addressLocality: 'Your City',
-      addressRegion: 'Your State',
-      postalCode: '12345',
-      streetAddress: 'Your Address',
+      addressCountry: 'Iran', // Your country
+      addressLocality: 'Dezful',
+      addressRegion: 'Khozestan',
+      // postalCode: '12345',
+      // streetAddress: 'Your Address',
     },
   }
 
@@ -201,28 +202,38 @@ export default async function Home() {
       ? {
           '@context': 'https://schema.org',
           '@type': 'ItemList',
-          name: 'Best Sellers',
+          name: 'پرفروش‌ترینها',
           description: 'Our most popular products',
           numberOfItems: bestSellers.length,
-          itemListElement: bestSellers.slice(0, 10)?.map((product, index) => ({
-            '@type': 'ListItem',
-            position: index + 1,
-            item: {
-              '@type': 'Product',
-              name: product.name,
-              description: product.description,
-              image: product.images?.[0]?.url,
-              url: `${process.env.NEXT_PUBLIC_SITE_URL}/products/${product.slug}`,
-              ...(product.sizes?.map((s) => s.price) && {
+          itemListElement: bestSellers.slice(0, 10)?.map((product, index) => {
+            const firstVariant = product.variants[0]
+            const price = firstVariant
+              ? firstVariant.price -
+                firstVariant.price * (firstVariant.discount / 100)
+              : 0
+            const availability =
+              firstVariant && firstVariant.quantity > 0
+                ? 'https://schema.org/InStock'
+                : 'https://schema.org/OutOfStock'
+            return {
+              '@type': 'ListItem',
+              position: index + 1,
+              item: {
+                '@type': 'Product',
+                name: product.name,
+                description: product.description,
+                image: product.images?.[0]?.url,
+                url: `${process.env.NEXT_PUBLIC_SITE_URL}/products/${product.slug}`,
+
                 offers: {
                   '@type': 'Offer',
-                  price: product.sizes?.map((s) => s.price)[0],
-                  priceCurrency: 'USD',
-                  availability: 'https://schema.org/InStock',
+                  price: price,
+                  priceCurrency: 'IRT',
+                  availability: availability,
                 },
-              }),
-            },
-          })),
+              },
+            }
+          }),
         }
       : null
 
@@ -244,14 +255,20 @@ export default async function Home() {
               description: product.description,
               image: product.images?.[0]?.url,
               url: `${process.env.NEXT_PUBLIC_SITE_URL}/products/${product.slug}`,
-              ...(product.sizes?.map((s) => s.price) && {
-                offers: {
-                  '@type': 'Offer',
-                  price: product.sizes?.map((s) => s.price)[0],
-                  priceCurrency: 'USD',
-                  availability: 'https://schema.org/InStock',
-                },
-              }),
+
+              offers: {
+                '@type': 'Offer',
+                price: product.variants[0]
+                  ? product.variants[0].price -
+                    product.variants[0].price *
+                      (product.variants[0].discount / 100)
+                  : 0,
+                priceCurrency: 'IRR',
+                availability:
+                  product.variants[0] && product.variants[0].quantity > 0
+                    ? 'https://schema.org/InStock'
+                    : 'https://schema.org/OutOfStock',
+              },
             },
           })),
         }

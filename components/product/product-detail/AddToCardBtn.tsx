@@ -3,126 +3,83 @@ import { Button } from '@/components/ui/button'
 import { useCartStore } from '@/hooks/useCartStore'
 import useFromStore from '@/hooks/useFromStore'
 import { CartProductType } from '@/lib/types/home'
-import { cn, isProductValidToAdd } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import { Minus, Plus } from 'lucide-react'
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC } from 'react'
+import { toast } from 'sonner'
 
 type AddToCardBtnProps = {
-  sizeId: string
-  size: string
-  discount: number
-  price: number
-  stockQuantity: number
-  productId: string
-  slug: string
-  name: string
-  qty: number
-  image: string
-  weight?: number | null
-  shippingFeeMethod: string
+  product: {
+    id: string
+    slug: string
+    name: string
+    image: string
+    shippingFeeMethod: string
+  }
+  variant: {
+    id: string
+    size: string
+    color: string
+    price: number
+    discount: number
+    quantity: number
+    weight: number | null
+  }
 }
 
-const AddToCardBtn: FC<AddToCardBtnProps> = ({
-  sizeId,
-  size,
-  discount,
-  price,
-  stockQuantity,
-  productId,
-  slug,
-  name,
-  qty,
-  image,
-  weight,
-  shippingFeeMethod,
-}) => {
-  const cartItems = useFromStore(useCartStore, (state) => state.cart)
-  const updateProductQty = useCartStore((state) => state.updateProductQuantity)
+const AddToCardBtn: FC<AddToCardBtnProps> = ({ product, variant }) => {
+  const cart = useFromStore(useCartStore, (state) => state.cart)
   const addToCart = useCartStore((state) => state.addToCart)
-
-  const [productToBeAddedToCart, setProductToBeAddedToCart] =
-    useState<CartProductType>({
-      productId,
-      slug,
-      name,
-      image,
-      sizeId,
-      size: size,
-      quantity: qty,
-      price: price! - price! * ((discount ?? 0) / 100),
-      stock: stockQuantity,
-      weight: weight || 1,
-      shippingMethod: shippingFeeMethod,
-      shippingFee: 0,
-      extraShippingFee: 0,
-    })
-
-  const { stock } = productToBeAddedToCart
-  const [isProductValid, setIsProductValid] = useState<boolean>(false)
-
-  useEffect(() => {
-    setProductToBeAddedToCart((prevProduct) => ({
-      ...prevProduct,
-      productId,
-      slug,
-      name,
-      image,
-      stock: stockQuantity,
-      weight: weight ?? 1,
-      sizeId: sizeId,
-      size: size!,
-      price: price! - price! * ((discount ?? 0) / 100),
-    }))
-  }, [
-    slug,
-    weight,
-    sizeId,
-    productId,
-    name,
-    image,
-    stock,
-    size,
-    price,
-    discount,
-    stockQuantity,
-  ])
-
-  useEffect(() => {
-    const check = isProductValidToAdd(productToBeAddedToCart)
-    setIsProductValid(check)
-  }, [productToBeAddedToCart])
-
-  // Find existing item in cart
-  const existItem = cartItems?.find(
-    (x) => x.productId === productId && x.sizeId === sizeId
+  const updateProductQuantity = useCartStore(
+    (state) => state.updateProductQuantity
   )
 
-  // Calculate remaining stock available for this item
-  const remainingStock = existItem
-    ? stockQuantity - existItem.quantity
-    : stockQuantity
+  const existItem = cart?.find((item) => item.variantId === variant.id)
 
-  const handleAddQtyToCart = async () => {
-    if (existItem && existItem.quantity < stock) {
-      updateProductQty(existItem, existItem.quantity + 1)
+  const handleAddToCart = () => {
+    // Construct the cart item object right when the user clicks.
+    const itemToAdd: CartProductType = {
+      variantId: variant.id,
+      productId: product.id,
+      slug: product.slug,
+      name: product.name,
+      image: product.image,
+      size: variant.size,
+      color: variant.color,
+      price:
+        variant.discount > 0
+          ? variant.price - variant.price * (variant.discount / 100)
+          : variant.price,
+      stock: variant.quantity,
+      weight: variant.weight ?? 0,
+      quantity: 1, // Always start with 1 when first adding
+      shippingMethod: product.shippingFeeMethod,
+      extraShippingFee: 0,
+      shippingFee: 0,
+    }
+    addToCart(itemToAdd)
+    toast.success(
+      ` ${product.name} (${variant.size} / ${variant.color}) به کارت اضافه شد!`
+    )
+  }
+
+  const handleIncreaseQuantity = () => {
+    if (existItem && existItem.quantity < variant.quantity) {
+      updateProductQuantity(existItem, existItem.quantity + 1)
     }
   }
 
-  const handleAddToCart = async () => {
-    if (!isProductValid || remainingStock <= 0) return
-    addToCart(productToBeAddedToCart)
-  }
-
-  const handleRemoveFromCart = async () => {
+  const handleDecreaseQuantity = () => {
     if (existItem) {
-      updateProductQty(existItem, existItem.quantity - 1)
+      updateProductQuantity(existItem, existItem.quantity - 1)
     }
   }
-
-  if (stockQuantity <= 0) {
+  if (variant.quantity <= 0) {
     return (
       <div className="w-full p-4 bg-red-50 border border-red-200 rounded-sm text-center">
-        <p className="text-red-600 font-medium">این سایز موجود نیست</p>
+        <p className="text-red-600 font-medium">
+          این ترکیب رنگ و سایز موجود نیست!
+        </p>
       </div>
     )
   }
@@ -137,7 +94,7 @@ const AddToCardBtn: FC<AddToCardBtnProps> = ({
             variant="outline"
             // size={'icon'}
             className="rounded-md cursor-pointer w-7 h-7 sm:w-9 sm:h-9"
-            onClick={handleRemoveFromCart}
+            onClick={handleDecreaseQuantity}
           >
             <Minus className="w-2 h-2 sm:w-4 sm:h-4" />
           </Button>
@@ -151,20 +108,21 @@ const AddToCardBtn: FC<AddToCardBtnProps> = ({
             // size={'icon'}
             variant="outline"
             className="rounded-md cursor-pointer w-7 h-7 sm:w-9 sm:h-9"
-            onClick={handleAddQtyToCart}
-            disabled={existItem.quantity >= stockQuantity}
+            onClick={handleIncreaseQuantity}
+            disabled={existItem.quantity >= variant.quantity}
+            aria-label="Increase quantity"
           >
             <Plus className="w-2 h-2 sm:w-4 sm:h-4" />
           </Button>
         </article>
         <article className="flex  w-full h-full items-center justify-center">
-          {existItem.quantity >= stockQuantity ? (
+          {existItem.quantity >= variant.quantity ? (
             <span className="px-2 py-3 block text-center text-rose-300 text-xs">
               {'اتمام موجودی!'}
             </span>
           ) : (
             <span className="px-2 py-3 block text-center text-indigo-400 text-xs">
-              {stockQuantity - existItem.quantity} عدد در انبار
+              {variant.quantity - existItem.quantity} عدد در انبار
             </span>
           )}
         </article>
@@ -172,24 +130,29 @@ const AddToCardBtn: FC<AddToCardBtnProps> = ({
     )
   }
 
+  const finalPrice =
+    variant.discount > 0
+      ? variant.price - variant.price * (variant.discount / 100)
+      : variant.price
+
   return (
     <Button
-      disabled={!price || !isProductValid || remainingStock <= 0}
-      variant={price ? 'indigo' : 'secondary'}
+      disabled={variant.quantity <= 0}
+      variant={'indigo'}
       onClick={handleAddToCart}
       className={cn(
         'w-full rounded-sm py-6 font-bold flex justify-between items-center'
       )}
     >
       <p>خرید</p>
-      {price && (
+      {variant.discount && (
         <div className="flex items-center gap-1">
-          {!!discount && (
-            <p className="text-red-300">
-              {price - price * (discount / 100)} تومان
-            </p>
+          {variant.discount > 0 && (
+            <p className="text-red-300">{finalPrice} تومان</p>
           )}
-          <p className={cn('', discount && 'line-through')}>{price} تومان</p>
+          <p className={cn('', variant.discount && 'line-through')}>
+            {variant.price} تومان
+          </p>
         </div>
       )}
     </Button>

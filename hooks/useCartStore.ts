@@ -27,6 +27,14 @@ const INITIAL_STATE: State = {
   totalPrice: 0,
 }
 
+const calculateTotals = (cart: CartProductType[]) => {
+  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0)
+  const totalPrice = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  )
+  return { totalItems, totalPrice }
+}
 // Create the store with Zustand, combining the status interface and actions with persisted data
 export const useCartStore = create(
   persist<State & Actions>(
@@ -35,32 +43,28 @@ export const useCartStore = create(
       totalItems: INITIAL_STATE.totalItems,
       totalPrice: INITIAL_STATE.totalPrice,
       addToCart: (product: CartProductType) => {
-        if (!product) return
+        if (!product || !product.variantId) return
         const cart = get().cart
         // If product already exists in cart
         const cartItem = cart.find(
-          (item) =>
-            item.productId === product.productId &&
-            item.sizeId === product.sizeId
+          (item) => item.variantId === product.variantId
         )
         if (cartItem) {
           const updatedCart = cart.map((item) =>
-            item.productId === product.productId &&
-            item.sizeId === product.sizeId
-              ? { ...item, quantity: item.quantity + product.quantity }
+            item.variantId === product.variantId
+              ? {
+                  ...item,
+                  quantity: Math.min(
+                    item.quantity + product.quantity,
+                    item.stock
+                  ),
+                } // Prevent adding more than stock
               : item
           )
-          set((state) => ({
-            cart: updatedCart,
-            totalPrice: state.totalPrice + product.price * product.quantity,
-          }))
+          set({ cart: updatedCart, ...calculateTotals(updatedCart) })
         } else {
           const updatedCart = [...cart, { ...product }]
-          set((state) => ({
-            cart: updatedCart,
-            totalItems: state.totalItems + 1,
-            totalPrice: state.totalPrice + product.price * product.quantity,
-          }))
+          set({ cart: updatedCart, ...calculateTotals(updatedCart) })
         }
       },
       updateProductQuantity: (product: CartProductType, quantity: number) => {
@@ -73,170 +77,89 @@ export const useCartStore = create(
         }
 
         const updatedCart = cart.map((item) =>
-          item.productId === product.productId && item.sizeId === product.sizeId
-            ? { ...item, quantity }
+          item.variantId === product.variantId
+            ? { ...item, quantity: Math.min(quantity, item.stock) } // Prevent setting more than stock
             : item
         )
 
-        const totalItems = updatedCart.length
-        const totalPrice = updatedCart.reduce(
-          (sum, item) => sum + item.price * item.quantity,
-          0
-        )
-        set(() => ({
-          cart: updatedCart,
-          totalItems,
-          totalPrice,
-        }))
+        set({ cart: updatedCart, ...calculateTotals(updatedCart) })
       },
       removeFromCart: (product: CartProductType) => {
-        const cart = get().cart
-        const updatedCart = cart.filter(
-          (item) =>
-            !(
-              item.productId === product.productId &&
-              item.sizeId === product.sizeId
-            )
+        if (!product || !product.variantId) return
+        const updatedCart = get().cart.filter(
+          (item) => item.variantId !== product.variantId
         )
-        const totalItems = updatedCart.length
-        const totalPrice = updatedCart.reduce(
-          (sum, item) => sum + item.price * item.quantity,
-          0
-        )
-        set(() => ({
-          cart: updatedCart,
-          totalItems,
-          totalPrice,
-        }))
+        set({ cart: updatedCart, ...calculateTotals(updatedCart) })
 
         // Manually sync with localStorage after removal
         localStorage.setItem('cart', JSON.stringify(updatedCart))
       },
       removeMultipleFromCart: (products: CartProductType[]) => {
         const cart = get().cart
+        const variantIdsToRemove = new Set(products.map((p) => p.variantId))
         const updatedCart = cart.filter(
-          (item) =>
-            !products.some(
-              (product) =>
-                product.productId === item.productId &&
-                product.sizeId === item.sizeId
-            )
+          (item) => !variantIdsToRemove.has(item.variantId)
         )
-        const totalItems = updatedCart.length
-        const totalPrice = updatedCart.reduce(
-          (sum, item) => sum + item.price * item.quantity,
-          0
-        )
-
-        set(() => ({
-          cart: updatedCart,
-          totalItems,
-          totalPrice,
-        }))
-
-        localStorage.setItem('cart', JSON.stringify(updatedCart))
+        set({ cart: updatedCart, ...calculateTotals(updatedCart) })
       },
       emptyCart: () => {
-        set(() => ({
-          cart: [],
-          totalItems: 0,
-          totalPrice: 0,
-        }))
+        set(INITIAL_STATE)
 
-        // Explicitly clear the cart from localStorage as well
         localStorage.removeItem('cart')
       },
       setCart: (newCart: CartProductType[]) => {
-        const totalItems = newCart.length
-        const totalPrice = newCart.reduce(
-          (sum, item) => sum + item.price * item.quantity,
-          0
-        )
-        set(() => ({
-          cart: newCart,
-          totalItems,
-          totalPrice,
-        }))
+        set({ cart: newCart, ...calculateTotals(newCart) })
       },
       validateAndUpdatePrices: async () => {
         const cart = get().cart
         if (cart.length === 0) return
 
         try {
-          const sizeIds = cart.map((item) => item.sizeId)
-
-          const currentData = await fetchCurrentPricesAndStock(sizeIds)
+          const variantIds = cart.map((item) => item.variantId)
+          const currentData = await fetchCurrentPricesAndStock(variantIds)
 
           let hasChanges = false
-          const outOfStockItems: CartProductType[] = []
 
-          const updatedCart = cart.map((item) => {
-            const currentSize = currentData.find(
-              (data) => data.sizeId === item.sizeId
-            )
+          const updatedCart = cart
+            .map((item) => {
+              // ✅ CHANGE: Find current data by variantId
+              const currentVariant = currentData.find(
+                (data) => data.variantId === item.variantId
+              )
 
-            if (!currentSize) return item
+              // If variant was deleted from DB, it will be removed
+              if (!currentVariant) {
+                hasChanges = true
+                return null
+              }
 
-            const updatedItem = { ...item }
-            const currentFinalPrice =
-              currentSize.price -
-              currentSize.price * (currentSize.discount / 100)
-            // Check price changes
-            if (currentSize.price !== item.price) {
-              hasChanges = true
-              updatedItem.price = currentFinalPrice
-            }
+              const updatedItem = { ...item }
+              const currentFinalPrice =
+                currentVariant.price -
+                currentVariant.price * (currentVariant.discount / 100)
 
-            // Check stock availability
-            if (currentSize.stock !== item.stock) {
-              updatedItem.stock = currentSize.stock
-
-              // If item is out of stock
-              if (currentSize.stock === 0) {
-                outOfStockItems.push(updatedItem)
-              } else if (item.quantity > currentSize.stock) {
-                // Reduce quantity to available stock
-                updatedItem.quantity = currentSize.stock
+              if (Math.abs(currentFinalPrice - item.price) > 0.01) {
+                updatedItem.price = currentFinalPrice
                 hasChanges = true
               }
-            }
 
-            return updatedItem
-          })
+              if (currentVariant.stock !== item.stock) {
+                updatedItem.stock = currentVariant.stock
+                hasChanges = true
+              }
 
-          if (hasChanges) {
-            const finalCart = updatedCart.filter((item) => {
-              const isOutOfStock = outOfStockItems.some(
-                (outOfStockItem) =>
-                  outOfStockItem.productId === item.productId &&
-                  outOfStockItem.sizeId === item.sizeId
-              )
-              return !isOutOfStock
+              if (item.quantity > currentVariant.stock) {
+                updatedItem.quantity = currentVariant.stock
+                hasChanges = true
+              }
+              return updatedItem
             })
+            .filter(Boolean) as CartProductType[]
 
-            const totalPrice = updatedCart.reduce(
-              (sum, item) => sum + item.price * item.quantity,
-              0
-            )
+          const finalCart = updatedCart.filter((item) => item.quantity > 0)
 
-            set(() => ({
-              cart: finalCart,
-              totalItems: finalCart.length,
-              totalPrice,
-            }))
-
-            // Handle out of stock items notification
-            // if (outOfStockItems.length > 0) {
-            //   const outOfStockNames = outOfStockItems
-            //     .map((item) => `${item.name} (${item.size})`)
-            //     .join(', ')
-            //   // console.log(
-            //   //   `محصولات زیر از سبد خرید حذف شدند (تمام شده): ${outOfStockNames}`
-            //   // )
-
-            //   // Optional: You can also set an error message for the user
-            //   // set(() => ({ error: `محصولات زیر تمام شده و از سبد خرید حذف شدند: ${outOfStockNames}` }))
-            // }
+          if (hasChanges || finalCart.length !== cart.length) {
+            set({ cart: finalCart, ...calculateTotals(finalCart) })
           }
         } catch (error) {
           console.error('Failed to validate cart:', error)

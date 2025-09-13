@@ -68,10 +68,10 @@ export type HomepageProduct = {
   rating: number
   isFeatured: boolean
   isSale: boolean
-  brand: string
+  brand: string | null
   saleEndDate: string | null
   images: BasicProductImage[]
-  variants: { price: number; discount: number }[]
+  variants: { price: number; discount: number; quantity: number }[]
   category: CategoryInfo
   subCategory: SubCategoryInfo
 }
@@ -166,14 +166,14 @@ export interface FiltersData {
   }
   colors: string[]
   sizes: string[]
-  brands: string[]
+  brands: (string | null)[]
 }
 
 export interface SearchProduct {
   id: string
   name: string
   slug: string
-  brand: string
+  brand: string | null
   rating: number
   numReviews: number
   sales: number
@@ -371,7 +371,7 @@ export interface FiltersData {
   }
   colors: string[]
   sizes: string[]
-  brands: string[]
+  brands: (string | null)[]
 }
 export interface SortOption {
   name: string

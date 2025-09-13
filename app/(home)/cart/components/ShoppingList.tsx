@@ -57,6 +57,14 @@ const ShoppingList = ({ cartItems, mutable = false }: Props) => {
                       <p className="text-xs px-2 py-1">{item.size}</p>
                     </div>
                   )}
+                  {item.color && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">
+                        رنگ:
+                      </span>
+                      <p className="text-xs px-2 py-1">{item.color}</p>
+                    </div>
+                  )}
                 </Link>
                 {/* <p className="mt-1 text-sm ">{product.color}</p> */}
                 {/* {item.size ? (
@@ -117,19 +125,22 @@ const ShoppingList = ({ cartItems, mutable = false }: Props) => {
                   {!mutable && (
                     // <AddToCardBtn  item={product} />
                     <AddToCardBtn
-                      sizeId={item.sizeId}
-                      weight={item.weight}
-                      size={item.size}
-                      discount={item.price}
-                      price={item.price}
-                      stockQuantity={item.stock}
-                      productId={item.productId}
-                      slug={item.slug}
-                      name={item.name}
-                      qty={item.quantity}
-                      shippingFeeMethod={item.shippingMethod}
-                      // stock={stock}
-                      image={item.image}
+                      product={{
+                        id: item.productId,
+                        slug: item.slug,
+                        name: item.name,
+                        image: item.image,
+                        shippingFeeMethod: item.shippingMethod,
+                      }}
+                      variant={{
+                        id: item.variantId,
+                        size: item.size,
+                        color: item.color,
+                        price: item.price,
+                        discount: 0,
+                        quantity: item.stock,
+                        weight: item.weight,
+                      }}
                     />
                   )}
                 </div>

@@ -75,17 +75,19 @@ async function SearchPageContent({ searchParams }: SearchPageProps) {
               description: product.brand,
               image: product.images?.[0]?.url,
               url: `${process.env.NEXT_PUBLIC_SITE_URL}/products/${product.slug}`,
-              ...(product?.sizes?.[0]?.price && {
-                offers: {
-                  '@type': 'Offer',
-                  price: product?.sizes?.[0]?.price,
-                  priceCurrency: 'IRRI',
-                  availability:
-                    product.sizes?.[0].quantity > 0
-                      ? 'https://schema.org/InStock'
-                      : 'https://schema.org/OutOfStock',
-                },
-              }),
+              offers: {
+                '@type': 'Offer',
+                price: product.variants[0]
+                  ? product.variants[0].price -
+                    product.variants[0].price *
+                      (product.variants[0].discount / 100)
+                  : 0,
+                priceCurrency: 'IRR',
+                availability:
+                  product.variants[0] && product.variants[0].quantity > 0
+                    ? 'https://schema.org/InStock'
+                    : 'https://schema.org/OutOfStock',
+              },
             },
           })),
       },

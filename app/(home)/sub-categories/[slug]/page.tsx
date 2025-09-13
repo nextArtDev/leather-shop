@@ -147,13 +147,13 @@ const SubcategoryDetailsPage = async ({ params }: SubcategoryPageProps) => {
             // description: product.description,
             image: product.images?.[0]?.url,
             url: `${process.env.NEXT_PUBLIC_SITE_URL}/products/${product.slug}`,
-            ...(product?.sizes?.[0]?.price && {
+            ...(product?.variants?.map((vr) => vr.price) && {
               offers: {
                 '@type': 'Offer',
-                price: product?.sizes?.[0]?.price,
-                priceCurrency: 'IRRI',
+                price: product?.variants?.map((vr) => vr.price),
+                priceCurrency: 'IRI',
                 availability:
-                  product.sizes?.[0].quantity > 0
+                  product.variants?.[0].quantity > 0
                     ? 'https://schema.org/InStock'
                     : 'https://schema.org/OutOfStock',
               },

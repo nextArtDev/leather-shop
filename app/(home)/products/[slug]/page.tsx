@@ -51,27 +51,31 @@ export async function generateMetadata({
       reviewCount > 0
         ? `خریداران ${avgRating?.toFixed(1)}/5 بوسیله ${reviewCount} امتیاز`
         : ''
-    } در ${product.sizes?.length || 0} سایز. ارسال سریع به تمام نقاط کشور.`
+    } در ${product.variants?.length || 0} سایز. ارسال سریع به تمام نقاط کشور.`
 
   // Build keywords from product attributes
   const keywords = [
     product.name.toLowerCase(),
     brandName.toLowerCase(),
     categoryName.toLowerCase(),
-    ...(product.colors?.map((c) => c.name.toLowerCase()) || []),
-    ...(product.sizes?.map((s) => s.size.toLowerCase()) || []),
+    ...(product.variants
+      .map((vr) => vr.color)
+      ?.map((c) => c?.name.toLowerCase()) || []),
+    ...(product.variants
+      ?.map((vr) => vr?.size)
+      ?.map((s) => s?.name.toLowerCase()) || []),
     'خرید آنلاین',
     'فروشگاه',
     'بهترین کیفیت',
   ]
 
   // Check availability
-  const inStock = product.sizes?.some((size) => size.quantity > 0) || false
-  const lowestPrice = product.sizes?.reduce(
+  const inStock =
+    product.variants?.some((variant) => variant.quantity > 0) || false
+  const lowestPrice = product.variants?.reduce(
     (min, size) => (size.price < min ? size.price : min),
-    product.sizes?.[0]?.price || 0
+    product.variants?.[0]?.price || 0
   )
-
   return {
     title,
     description,
@@ -152,23 +156,36 @@ const ProductDetailsPage = async ({
 }: {
   params: Promise<{ slug: string }>
   searchParams: Promise<{
-    sizeId: string
-    page: string
+    size?: string
+    color?: string
+    page?: string
   }>
 }) => {
   const slug = (await params).slug
-  const searchParamsSizeId = (await searchParams).sizeId
+  const searchParamsSize = (await searchParams).size
+  const searchParamsColor = (await searchParams).color
 
   const product = await getProductDetails(slug)
-  if (!product) notFound()
+  if (!product || product.variants.length === 0) {
+    notFound()
+  }
   const relatedProducts = await getRelatedProducts(
     product.id,
     product.subCategoryId
   )
-  const sizeId =
-    product.sizes.find((s) => s.id === searchParamsSizeId)?.id ||
-    product.sizes?.[0].id ||
-    searchParamsSizeId
+
+  const defaultVariant = product.variants[0]
+  let selectedVariant = product.variants.find(
+    (v) => v.size?.id === searchParamsSize && v.color?.id === searchParamsColor
+  )
+  if (!selectedVariant && searchParamsSize) {
+    selectedVariant = product.variants.find(
+      (v) => v.size?.id === searchParamsSize
+    )
+  }
+  if (!selectedVariant) {
+    selectedVariant = defaultVariant
+  }
 
   const user = await currentUser()
 
@@ -205,13 +222,13 @@ const ProductDetailsPage = async ({
     },
     category: product.category?.name,
     offers:
-      product.sizes?.map((size) => ({
+      product.variants?.map((variant) => ({
         '@type': 'Offer',
-        url: `${process.env.NEXT_PUBLIC_SITE_URL}/products/${slug}?sizeId=${size.id}`,
+        url: `${process.env.NEXT_PUBLIC_SITE_URL}/products/${slug}?sizeId=${variant.size?.id}`,
         priceCurrency: 'USD',
-        price: size.price,
+        price: variant.price,
         availability:
-          size.quantity > 0
+          variant.quantity > 0
             ? 'https://schema.org/InStock'
             : 'https://schema.org/OutOfStock',
         itemCondition: 'https://schema.org/NewCondition',
@@ -252,33 +269,33 @@ const ProductDetailsPage = async ({
           datePublished: review.createdAt.toISOString(),
         })),
       }),
-    ...(product.sizes &&
-      product.sizes.length > 0 && {
-        hasVariant: product.sizes.map((size) => ({
+    ...(product.variants &&
+      product.variants.length > 0 && {
+        hasVariant: product.variants.map((variant) => ({
           '@type': 'ProductModel',
-          name: `${product.name} - ${size.size}`,
-          sku: `${product.sku || product.id}-${size.id}`,
+          name: `${product.name} - ${variant.size?.name}`,
+          sku: `${product.sku || product.id}-${variant.size?.id}`,
           offers: {
             '@type': 'Offer',
-            price: size.price,
+            price: variant.price,
             priceCurrency: 'USD',
             availability:
-              size.quantity > 0
+              variant.quantity > 0
                 ? 'https://schema.org/InStock'
                 : 'https://schema.org/OutOfStock',
           },
         })),
       }),
     additionalProperty: [
-      ...(product.colors?.map((color) => ({
+      ...(product.variants?.map((variant) => ({
         '@type': 'PropertyValue',
         name: 'رنگ',
-        value: color.name,
+        value: variant?.color?.name,
       })) || []),
-      ...(product.sizes?.map((size) => ({
+      ...(product.variants?.map((variant) => ({
         '@type': 'PropertyValue',
         name: 'سایز',
-        value: size.size,
+        value: variant.size?.name,
       })) || []),
     ],
   }
@@ -330,7 +347,10 @@ const ProductDetailsPage = async ({
       />
       <ProductPage
         data={product}
-        sizeId={sizeId}
+        selectedSizeId={
+          selectedVariant.size?.id ? selectedVariant.size?.id : ''
+        }
+        selectedColorId={selectedVariant.color ? selectedVariant.color?.id : ''}
         productAverageRating={
           !!productAverageRating._avg.rating && !!productAverageRating._count
             ? {

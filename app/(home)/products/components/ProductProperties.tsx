@@ -7,16 +7,16 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { ProductSize, ProductSpec } from '@/lib/types/home'
+import { ProductSpec, VariantsWithSizeAndColor } from '@/lib/types/home'
 import React from 'react'
 
 type Props = {
-  size: ProductSize
+  variant: VariantsWithSizeAndColor
   specs?: ProductSpec[]
   weight?: number
 }
 
-const ProductProperties = ({ size, specs, weight }: Props) => {
+const ProductProperties = ({ variant, specs, weight }: Props) => {
   return (
     <Table>
       <TableHeader>
@@ -29,7 +29,7 @@ const ProductProperties = ({ size, specs, weight }: Props) => {
         <TableRow key="dimensions">
           <TableCell className="font-medium">ابعاد (طول×عرض×ارتفاع)</TableCell>
           <TableCell className="text-right">
-            {`${size.length} × ${size.width} × ${size.height} سانتی‌متر`}
+            {`${variant.length} × ${variant.width} × ${variant.height} سانتی‌متر`}
           </TableCell>
         </TableRow>
         {weight && (

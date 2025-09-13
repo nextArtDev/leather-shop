@@ -90,28 +90,32 @@ export default function MainPageCarousel({ items }: MainPageCarousel) {
                   className="font-bold line-clamp-2 text-justify "
                   ></p> */}
                   <p className="font-bold">{item.name}</p>
-                  {!!item.sizes && (
+                  {!!item.variants && (
                     <>
-                      {item.sizes.map((size, i) => (
+                      {item.variants.map((variant, i) => (
                         <div key={i} className="flex items-center gap-1">
-                          {!!size.discount && (
+                          {!!variant.discount && (
                             <p className="text-red-500">
-                              {size.price - size.price * (size.discount / 100)}{' '}
+                              {variant.price -
+                                variant.price * (variant.discount / 100)}{' '}
                               تومان
                             </p>
                           )}
                           <p
-                            className={cn('', size.discount && 'line-through')}
+                            className={cn(
+                              '',
+                              variant.discount && 'line-through'
+                            )}
                           >
-                            {size.price} تومان
+                            {variant.price} تومان
                           </p>
                         </div>
                       ))}
                     </>
                   )}
                   {/* <p>
-                    {item.sizes.map((size) =>
-                      size.discount ? size.price * size.discount : size.price
+                    {item.variants.map((variant) =>
+                      variant.discount ? variant.price * variant.discount : variant.price
                     )}
                   </p> */}
                 </article>

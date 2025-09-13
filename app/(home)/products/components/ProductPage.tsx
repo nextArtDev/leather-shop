@@ -1,26 +1,20 @@
 import ProductDetailCarousel from '@/components/product/product-detail-carousel'
 import AddToCardBtn from '@/components/product/product-detail/AddToCardBtn'
 
-import ProductStatements from '@/components/product/product-detail/ProductStatemeents'
-import { Button, buttonVariants } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
-import {
-  ProductColor,
-  ProductDetails,
-  ProductReview,
-  ProductSize,
-  RelatedProduct,
-} from '@/lib/types/home'
-import { FC } from 'react'
-import ReviewList from './ReviewList'
-import { Review } from '@/lib/generated/prisma'
 import { SingleStarRating } from '@/components/home/testemonial/SingleStartRating'
+import ProductStatements from '@/components/product/product-detail/ProductStatemeents'
+import { buttonVariants } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
+import { Review } from '@/lib/generated/prisma'
+import { ProductDetails, ProductReview, RelatedProduct } from '@/lib/types/home'
+import { FC, useMemo } from 'react'
+import ReviewList from './ReviewList'
 // import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import Link from 'next/link'
-import { cn } from '@/lib/utils'
-import FAQItem from '../../faq/components/FAQItem'
-import { Badge } from '@/components/ui/badge'
 import RelatedProductCarousel from '@/components/product/related-products-carousel'
+import { Badge } from '@/components/ui/badge'
+import { cn } from '@/lib/utils'
+import Link from 'next/link'
+import FAQItem from '../../faq/components/FAQItem'
 import Countdown from './count-down'
 import ProductProperties from './ProductProperties'
 
@@ -30,33 +24,36 @@ type ProductPageProp = {
   reviews: ProductReview[]
   productAverageRating: { rating: number; count: number } | null
   userReview: Review | null
-  sizeId: string
+  selectedSizeId: string
+  selectedColorId: string
   relatedProducts: RelatedProduct[] | null
 }
 const ProductPage: FC<ProductPageProp> = ({
   data,
+  userId,
   reviews,
   productAverageRating,
-
-  userId,
   userReview,
-  sizeId,
   relatedProducts,
+
+  selectedColorId,
+  selectedSizeId,
 }) => {
-  // console.log({ reviews, numReviews })
   const {
     description,
     sku,
     images,
-    variantImages,
-    sizes,
-    colors,
+    // variantImages,
+    // sizes,
+    // colors,
+    variants,
+
     brand,
     // subCategory,
     id,
     name,
     slug,
-    weight,
+    // weight,
     shippingFeeMethod,
     questions,
     specs,
@@ -73,29 +70,39 @@ const ProductPage: FC<ProductPageProp> = ({
     // offerTag,
     // freeShipping,
   } = data
-  //   console.log(specs, name)
-  // const pathname = usePathname()
-  // const { replace, refresh } = useRouter()
-  // const searchParams = useSearchParams()
-  // const params = new URLSearchParams(searchParams)
 
-  // let updatedSizeId = sizeId
+  const currentVariant = variants.find(
+    (v) => v.size?.id === selectedSizeId && v.color?.id === selectedColorId
+  )
+  const uniqueSizes = useMemo(() => {
+    const seen = new Set()
+    return variants
+      .map((v) => v.size)
+      .filter((size) => {
+        if (!size || seen.has(size.id)) return false
+        seen.add(size.id)
+        return true
+      })
+  }, [variants])
 
-  // useEffect(() => {
-  //   params.set('sizeId', sizeId)
-  //   replace(`${pathname}?${params.toString()}`, {
-  //     scroll: false,
-  //   })
-  //   return () => refresh()
-  // }, [sizeId])
-  // updatedSizeId = searchParams.get('sizeId')
-  const currentSize = sizes.find((s) => sizeId === s.id)
+  const uniqueColors = useMemo(() => {
+    const seen = new Set()
+    return variants
+      .map((v) => v.color)
+      .filter((color) => {
+        if (!color || seen.has(color.id)) return false
+        seen.add(color.id)
+        return true
+      })
+  }, [variants])
 
   return (
     <section className="pb-24 w-full h-full">
       <div className="max-w-2xl px-4 mx-auto  flex flex-col gap-4">
         <article className=" ">
-          <ProductDetailCarousel images={[...images, ...variantImages]} />
+          <ProductDetailCarousel
+            images={[...variants?.flatMap((vr) => vr?.images ?? []), ...images]}
+          />
         </article>
 
         {/* <ProductDetails /> */}
@@ -107,7 +114,7 @@ const ProductPage: FC<ProductPageProp> = ({
                 {productAverageRating.rating}
                 <p>{' از'}</p>
                 {productAverageRating.count}
-                <p>{' نظر'}</p>
+                <p>{' نفر'}</p>
               </>
             )}
           </div>
@@ -119,52 +126,79 @@ const ProductPage: FC<ProductPageProp> = ({
 
           <Separator />
           <article className="flex items-center justify-evenly">
-            <div className="flex-1 flex flex-col gap-2 items-start">
-              <p className="text-sm font-semibold">رنگ</p>
-              <div className="flex gap-1">
-                {colors.map((clr: ProductColor) => (
-                  <Button
-                    size={'icon'}
-                    key={clr.id}
-                    style={{ background: clr.name }}
-                    className={`rounded-none size-8 cursor-pointer`}
-                  />
-                ))}
-              </div>
-            </div>
-            <Separator orientation="vertical" className="self-center mx-2" />
-            <div className="flex-1 flex flex-col gap-2 items-start">
-              <p className="text-sm font-semibold">سایز</p>
+            {/* === COLOR SELECTION === */}
+            <div className=" flex-1 flex flex-col gap-2 items-start">
+              <p className="text-base font-semibold">
+                سایز: {currentVariant?.size.name}
+              </p>
               <ul className="flex flex-wrap gap-1">
-                {sizes.map((size: ProductSize) => (
-                  <li key={size.id}>
+                {uniqueSizes.map((size) => {
+                  if (!size) return null
+                  const isAvailable = variants.some(
+                    (v) => v.size?.id === size.id && v.quantity > 0
+                  )
+                  return (
+                    <li key={size.id}>
+                      <Link
+                        href={{
+                          pathname: `/products/${slug}`,
+                          query: { size: size.id, color: selectedColorId },
+                        }}
+                        replace
+                        scroll={false}
+                        className={cn(
+                          buttonVariants({
+                            variant:
+                              selectedSizeId === size.id ? 'indigo' : 'link',
+                          }),
+                          !isAvailable &&
+                            'opacity-50 cursor-not-allowed pointer-events-none'
+                        )}
+                      >
+                        {size.name}
+                      </Link>
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
+            <Separator orientation="vertical" />
+            <div className="pr-2 flex-1 flex flex-col gap-2 items-start">
+              <p className="text-base font-semibold">
+                رنگ:{currentVariant?.color.name}
+              </p>
+              <div className="flex gap-1">
+                {uniqueColors.map((color) => {
+                  if (!color) return null
+                  const isAvailable = variants.some(
+                    (v) => v.color?.id === color.id && v.quantity > 0
+                  )
+                  return (
                     <Link
-                      // href={`/products/${slug}/?sizeId=${size.id}`}
+                      key={color.id}
                       href={{
                         pathname: `/products/${slug}`,
-                        query: { sizeId: `${size.id}` },
+                        query: { size: selectedSizeId, color: color.id },
                       }}
                       replace
                       scroll={false}
                       className={cn(
-                        'rounded-sm  cursor-pointer',
-                        buttonVariants({
-                          variant: size.id === sizeId ? 'default' : 'outline',
-                        }),
-                        size.quantity <= 0 &&
+                        'rounded-none p-1 m-2 transition-all',
+                        selectedColorId === color.id
+                          ? 'ring-2 ring-offset-2 ring-indigo-500'
+                          : 'ring-1 ring-gray-300 ',
+                        !isAvailable &&
                           'opacity-50 cursor-not-allowed pointer-events-none'
                       )}
                     >
-                      {size.size}
-                      {size.quantity <= 0 && (
-                        <span className="ml-1 text-xs text-red-500">
-                          ناموجود
-                        </span>
-                      )}
+                      <div
+                        className="size-8 rounded-none"
+                        style={{ backgroundColor: color.hex }}
+                      />
                     </Link>
-                  </li>
-                ))}
-              </ul>
+                  )
+                })}
+              </div>
             </div>
           </article>
         </article>
@@ -180,47 +214,52 @@ const ProductPage: FC<ProductPageProp> = ({
           <span
             className={cn(
               'w-2 h-2 animate-pulse rounded-full',
-              currentSize && currentSize.quantity > 0
+              currentVariant && currentVariant.quantity > 0
                 ? 'bg-green-600'
                 : 'bg-red-600'
             )}
           ></span>
-          {currentSize && currentSize.quantity > 0 ? 'موجود' : 'اتمام موجودی'}
-          {/* Show remaining quantity */}
-          {currentSize && currentSize.quantity > 0 && (
+          {currentVariant && currentVariant.quantity > 0
+            ? 'موجود'
+            : 'اتمام موجودی'}
+          {currentVariant && currentVariant.quantity > 0 && (
             <span className="text-xs text-gray-500">
-              ({currentSize.quantity} عدد باقی مانده)
+              ({currentVariant.quantity} عدد باقی مانده)
             </span>
           )}
         </span>
         <article className="sticky top-2">
-          {!!sizes.length && currentSize && currentSize.quantity > 0 && (
+          {currentVariant && currentVariant.size && currentVariant.color ? (
             <AddToCardBtn
-              sizeId={sizeId}
-              weight={weight}
-              size={currentSize.size}
-              discount={currentSize.discount}
-              price={currentSize.price}
-              stockQuantity={currentSize.quantity}
-              productId={id}
-              slug={slug}
-              name={name}
-              qty={1}
-              shippingFeeMethod={shippingFeeMethod}
-              // stock={stock}
-              image={images.map((image) => image.url)[0]}
+              variant={{
+                id: currentVariant?.id,
+                size: currentVariant.size.name,
+                color: currentVariant.color.name,
+                price: currentVariant.price,
+                discount: currentVariant.discount,
+                quantity: currentVariant.quantity,
+                weight: currentVariant?.weight,
+              }}
+              product={{
+                id: id,
+                slug: slug,
+                name: name,
+                image: (data.images[0] || data.variants[0]?.images)?.url,
+                shippingFeeMethod: shippingFeeMethod,
+              }}
             />
+          ) : (
+            <div className="bg-orange-100 border border-orange-200 rounded-md p-4 text-center">
+              <p className="text-orange-700 font-medium">
+                این ترکیب رنگ و سایز موجود نیست!
+              </p>
+              <p className="text-sm text-orange-600 mt-1">
+                لطفا ترکیب دیگری از سایز و رنگ را انتخاب کنید.
+              </p>
+            </div>
           )}
         </article>
 
-        {currentSize && currentSize.quantity <= 0 && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4 text-center">
-            <p className="text-red-600 font-medium">این سایز موجود نیست</p>
-            <p className="text-sm text-red-500 mt-1">
-              لطفاً سایز دیگری انتخاب کنید
-            </p>
-          </div>
-        )}
         <Link
           className={cn(
             buttonVariants({ variant: 'outline' }),
@@ -264,10 +303,12 @@ const ProductPage: FC<ProductPageProp> = ({
           <div className="w-full h-full flex  flex-col gap-4  ">
             <h1 className="font-semibold">ویژگی‌ها و ابعاد:</h1>
 
-            {currentSize && (
+            {currentVariant && currentVariant.size && (
               <ProductProperties
-                size={currentSize}
-                weight={weight ? weight : undefined}
+                variant={currentVariant}
+                weight={
+                  currentVariant?.weight ? currentVariant.weight : undefined
+                }
                 specs={
                   !!specs.filter((s) => s.name.trim().length > 0).length
                     ? specs

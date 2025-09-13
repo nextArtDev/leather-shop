@@ -365,8 +365,10 @@ export async function checkRateLimit(userId: string) {
     where: { userId, createdAt: { gte: oneHourAgo } },
   })
 
-  if (count >= 5) {
-    throw new Error('Too many payment attempts. Please wait before retrying.')
+  if (count >= 10) {
+    throw new Error(
+      'تعداد درخواست‌ها بیش از حد مجاز است، لطفا چند دقیقه بعد دوباره امتحان کنید.'
+    )
   }
 
   await prisma.paymentRateLimit.create({ data: { userId } })

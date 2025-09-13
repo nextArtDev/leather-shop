@@ -4,9 +4,10 @@ import { Check, Loader } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 import { useTransition } from 'react'
-import { useCartStore } from '@/hooks/useCartStore_'
+
 import { createOrder } from '@/lib/home/actions/order'
 import { toast } from 'sonner'
+import { useCartStore } from '@/hooks/useCartStore'
 
 const PlaceOrderForm = () => {
   const emptyCart = useCartStore((state) => state.emptyCart)

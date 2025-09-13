@@ -379,9 +379,9 @@ const ProductDetails: FC<ProductFormProps> = ({
                 <ImageInput
                   name="variantImages"
                   label="عکس وریانتها"
-                  initialDataImages={
-                    data?.variants?.map((v) => v.images)[0] ?? []
-                  }
+                  initialDataImages={data?.variants?.flatMap(
+                    (vr) => vr.images ?? []
+                  )}
                   createVariantFromColor={createVariantFromColor}
                 />
                 {/* <div className="space-y-4">

@@ -247,7 +247,7 @@ const OrderItemsCard = ({ orderItems }: { orderItems: OrderItem[] }) => (
           </TableHeader>
           <TableBody>
             {orderItems.map((item) => (
-              <TableRow key={`${item.productSlug}-${item.productId}`}>
+              <TableRow key={`${item.productSlug}-${item.variantId}`}>
                 <TableCell>
                   <Link
                     href={`/product/${item.productSlug}`}

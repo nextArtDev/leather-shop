@@ -36,6 +36,7 @@ export async function getHomepageProducts(limit: number = 12) {
         select: {
           price: true,
           discount: true,
+          quantity: true,
         },
         orderBy: {
           price: 'asc',
@@ -102,6 +103,7 @@ export async function getBestSellers(limit: number = 8) {
         select: {
           price: true,
           discount: true,
+          quantity: true,
         },
         orderBy: {
           price: 'asc',
