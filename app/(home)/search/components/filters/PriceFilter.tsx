@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
-import { Slider } from '@/components/ui/slider' // Your existing slider
+import { Slider } from '@/components/ui/slider'
 import { FiltersData } from '@/lib/types/home'
 
 interface PriceFilterProps {
@@ -76,7 +76,7 @@ export default function PriceFilter({
     localMax !== (selectedMaxPrice || filtersData.priceRange.max)
 
   return (
-    <Card dir="rtl" className=" rounded-none">
+    <Card dir="ltr" className=" rounded-none">
       <CardHeader className="pb-3">
         <CardTitle className="text-base font-medium">محدوده قیمت</CardTitle>
       </CardHeader>

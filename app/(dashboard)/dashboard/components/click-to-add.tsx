@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// components/click-to-add-rhf.tsx
 'use client'
 import React from 'react'
 import {
@@ -9,6 +8,7 @@ import {
   UseFormSetValue,
   UseFormGetValues,
   Path,
+  useWatch,
 } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -17,13 +17,14 @@ import { PlusCircle, XCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ColorPicker } from './color-picker'
 import colorNamer from 'color-namer'
-import { ProductVariantSchema } from '../lib/schemas'
 
 // --- Type Definitions ---
-type FormValues = any // Consider defining a more specific type for your form values
+type FormValues = any
 type FieldName = Path<FormValues>
 type ArrayItem<T> = T extends (infer U)[] ? U : never
-type DetailSchemaType = ArrayItem<FormValues['colors' | 'sizes' | 'specs']>
+type DetailSchemaType = ArrayItem<
+  FormValues['variants' | 'specs' | 'questions']
+>
 
 // --- Component Props Interface ---
 interface ClickToAddInputsRHFProps {
@@ -37,10 +38,8 @@ interface ClickToAddInputsRHFProps {
   onRemove: (index: number) => void
   initialDetailSchema: Partial<DetailSchemaType>
   header?: string
-  colorPicker?: boolean
   containerClassName?: string
   inputClassName?: string
-  // Add a labels prop to accept a map of field keys to custom label strings
   labels?: Record<string, string>
   isMandatory?: boolean
 }
@@ -49,19 +48,24 @@ interface ClickToAddInputsRHFProps {
 const ClickToAddInputsRHF: React.FC<ClickToAddInputsRHFProps> = ({
   fields,
   name,
-  // control,
+  control, // Make sure control is passed here
   register,
   setValue,
   onAppend,
   onRemove,
   initialDetailSchema,
   header,
-
   containerClassName,
   inputClassName,
-  labels, // Destructure the new labels prop
+  labels,
   isMandatory = false,
 }) => {
+  // 2. Watch the entire array of variants for changes
+  const watchedValues = useWatch({
+    control,
+    name,
+  })
+
   const handleAddDetail = () => {
     onAppend(initialDetailSchema)
   }
@@ -75,8 +79,8 @@ const ClickToAddInputsRHF: React.FC<ClickToAddInputsRHFProps> = ({
       {header && <Label className="text-md font-semibold">{header}</Label>}
 
       {fields.map((fieldItem, index) => {
-        const variantItem = fieldItem as unknown as ProductVariantSchema
-        const currentDetail = fieldItem as unknown as DetailSchemaType
+        // We no longer need this, as we'll get values from watchedValues
+        // const currentDetail = fieldItem as unknown as DetailSchemaType
 
         return (
           <div
@@ -93,7 +97,11 @@ const ClickToAddInputsRHF: React.FC<ClickToAddInputsRHFProps> = ({
                 typeof initialDetailSchema[
                   propertyKey as keyof DetailSchemaType
                 ] === 'number'
+
               if (propertyKey === 'colorHex') {
+                // 3. Get the latest colorHex value from the watched values
+                const currentColorHex = watchedValues?.[index]?.colorHex || ''
+
                 return (
                   <div key={propertyKey} className="flex flex-col gap-1">
                     <Label
@@ -105,7 +113,8 @@ const ClickToAddInputsRHF: React.FC<ClickToAddInputsRHFProps> = ({
                     </Label>
                     <div className="flex items-center gap-x-2">
                       <ColorPicker
-                        value={variantItem.colorHex}
+                        // 4. Use the reactive value here
+                        value={currentColorHex}
                         onChange={(newHex) => {
                           setValue(fieldPath, newHex, { shouldValidate: true })
                           // Also update the color name field automatically
@@ -121,12 +130,12 @@ const ClickToAddInputsRHF: React.FC<ClickToAddInputsRHFProps> = ({
                   </div>
                 )
               }
+              // ... keep the rest of your rendering logic for other fields
               return (
                 <div
                   key={propertyKey}
                   className="flex flex-col max-w-xs  gap-1 flex-grow"
                 >
-                  {/* Use the custom label if provided, otherwise fallback to the propertyKey */}
                   <Label
                     htmlFor={fieldPath}
                     className="text-xs text-muted-foreground"
@@ -134,72 +143,28 @@ const ClickToAddInputsRHF: React.FC<ClickToAddInputsRHFProps> = ({
                     {labels?.[propertyKey] || propertyKey}
                     {isMandatory && <span className="text-rose-500">*</span>}
                   </Label>
-                  {/* {propertyKey === 'color' && colorPicker ? (
-                    <div className="flex items-center gap-x-2">
-                      <ColorPicker
-                        value={(currentDetail as any)?.color || ''}
-                        onChange={(newColorValue) => {
-                          setValue(fieldPath, newColorValue as any, {
-                            shouldValidate: true,
-                            shouldDirty: true,
-                          })
-                        }}
-                      />
-                      <Input
-                        {...register(fieldPath as any)}
-                        id={fieldPath}
-                        className={cn(
-                          'w-28 placeholder:capitalize',
-                          inputClassName
-                        )}
-                        placeholder="Hex Color e.g. #FF0000"
-                        maxLength={7}
-                      />
-                    </div> */}
-                  {propertyKey === 'colorHex' ? (
-                    <div className="flex items-center gap-x-2">
-                      <ColorPicker
-                        value={(currentDetail as any)?.colorHex || ''}
-                        onChange={(newColorValue) => {
-                          setValue(fieldPath, newColorValue as any, {
-                            shouldValidate: true,
-                            shouldDirty: true,
-                          })
-                        }}
-                      />
-                      {/* You might not need this input if the picker is enough */}
-                      <Input
-                        {...register(fieldPath as any)}
-                        id={fieldPath}
-                        className={cn('w-28', inputClassName)}
-                        placeholder="e.g. #FF0000"
-                        maxLength={7}
-                      />
-                    </div>
-                  ) : (
-                    <Input
-                      {...register(fieldPath as any, {
-                        valueAsNumber: isNumeric,
-                      })}
-                      id={fieldPath}
-                      type={isNumeric ? 'number' : 'text'}
-                      className={cn('placeholder:capitalize', inputClassName)}
-                      placeholder={labels?.[propertyKey] || propertyKey}
-                      min={isNumeric ? 0 : undefined}
-                      step={
-                        isNumeric
-                          ? propertyKey === 'price' ||
-                            propertyKey === 'discount' ||
-                            propertyKey === 'length' ||
-                            propertyKey === 'width' ||
-                            propertyKey === 'height' ||
-                            propertyKey === 'weight'
-                            ? '0.01'
-                            : '1'
-                          : undefined
-                      }
-                    />
-                  )}
+                  <Input
+                    {...register(fieldPath as any, {
+                      valueAsNumber: isNumeric,
+                    })}
+                    id={fieldPath}
+                    type={isNumeric ? 'number' : 'text'}
+                    className={cn('placeholder:capitalize', inputClassName)}
+                    placeholder={labels?.[propertyKey] || propertyKey}
+                    min={isNumeric ? 0 : undefined}
+                    step={
+                      isNumeric
+                        ? propertyKey === 'price' ||
+                          propertyKey === 'discount' ||
+                          propertyKey === 'length' ||
+                          propertyKey === 'width' ||
+                          propertyKey === 'height' ||
+                          propertyKey === 'weight'
+                          ? '0.01'
+                          : '1'
+                        : undefined
+                    }
+                  />
                 </div>
               )
             })}
