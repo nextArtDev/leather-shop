@@ -1,3 +1,4 @@
+import { currentUser } from '@/lib/auth'
 import { Prisma, Review } from '@/lib/generated/prisma'
 import prisma from '@/lib/prisma'
 import {
@@ -858,6 +859,87 @@ export const getHomePageReviews = async (): Promise<
     take: 8,
   })
 }
+
+export async function userBookmarkedProducts({
+  page = 1,
+  limit = 50,
+}: {
+  page?: number
+  limit?: number
+}) {
+  const skip = (page - 1) * limit
+
+  const user = await currentUser()
+  if (!user) redirect('/sign-in')
+
+  try {
+    const [allWhishedProducts, total] = await prisma.$transaction([
+      prisma.wishlist.findMany({
+        where: {
+          userId: user.id,
+        },
+        include: {
+          product: {
+            include: {
+              images: { take: 1, orderBy: { created_at: 'asc' } },
+              variants: {
+                select: {
+                  price: true,
+                  discount: true,
+                  quantity: true,
+                  images: {
+                    take: 1,
+                    select: { url: true },
+                    orderBy: { created_at: 'asc' },
+                  },
+                  size: true,
+                  color: true,
+                },
+              },
+            },
+          },
+        },
+        skip: skip,
+        take: limit,
+        orderBy: {
+          updatedAt: 'desc',
+        },
+      }),
+      prisma.wishlist.count({
+        where: {
+          userId: user.id,
+        },
+      }),
+    ])
+    let products = allWhishedProducts.map((w) => w.product)
+
+    products = products.slice(skip, skip + limit)
+
+    return {
+      products,
+      pagination: {
+        total,
+        pages: Math.ceil(total / limit),
+        current: page,
+        hasNext: page < Math.ceil(total / limit),
+        hasPrev: page > 1,
+      },
+    }
+  } catch (error) {
+    console.error('Error searching products:', error)
+    return {
+      products: [],
+      pagination: {
+        total: 0,
+        pages: 1,
+        current: 1,
+        hasNext: false,
+        hasPrev: false,
+      },
+    }
+  }
+}
+
 // export async function getBestSellers(limit: number = 8) {
 //   const bestSellersByQuantity = await prisma.orderItem.groupBy({
 //     by: ['productId'],

@@ -9,6 +9,7 @@ import { currentUser } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { Metadata } from 'next'
 import { STORE_NAME, TWITTER_HANDLE } from '@/constants/store'
+import { getIsWhishedByUser } from '@/lib/home/queries/user'
 
 interface ProductDetailsPageProps {
   params: Promise<{ slug: string }>
@@ -188,7 +189,7 @@ const ProductDetailsPage = async ({
   }
 
   const user = await currentUser()
-
+  const isInWishList = await getIsWhishedByUser(product.id, user?.id)
   const userReview = await prisma.review.findFirst({
     where: {
       productId: product.id,
@@ -363,6 +364,7 @@ const ProductDetailsPage = async ({
         userId={!!user?.id ? user.id : null}
         userReview={userReview}
         relatedProducts={relatedProducts}
+        isInWishList={!!isInWishList}
       />
     </div>
   )

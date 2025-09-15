@@ -17,6 +17,8 @@ import Link from 'next/link'
 import FAQItem from '../../faq/components/FAQItem'
 import Countdown from './count-down'
 import ProductProperties from './ProductProperties'
+import ViewNumbers from './view-numbers'
+import BookmarkBtn from './BookmarkBtn'
 
 type ProductPageProp = {
   data: NonNullable<ProductDetails>
@@ -27,6 +29,7 @@ type ProductPageProp = {
   selectedSizeId: string
   selectedColorId: string
   relatedProducts: RelatedProduct[] | null
+  isInWishList: boolean
 }
 const ProductPage: FC<ProductPageProp> = ({
   data,
@@ -38,6 +41,7 @@ const ProductPage: FC<ProductPageProp> = ({
 
   selectedColorId,
   selectedSizeId,
+  isInWishList,
 }) => {
   const {
     description,
@@ -62,7 +66,7 @@ const ProductPage: FC<ProductPageProp> = ({
     saleEndDate,
     // rating,
     // sales,
-    // views,
+    views,
     // isFeatured,
     // createdAt,
     // updatedAt,
@@ -107,16 +111,19 @@ const ProductPage: FC<ProductPageProp> = ({
 
         {/* <ProductDetails /> */}
         <article className="grid grid-row-5 gap-4">
-          <div className="flex gap-2">
+          <div className="flex items-center justify-between gap-2">
             {productAverageRating && (
-              <>
+              <div className="flex gap-2">
                 <SingleStarRating rating={productAverageRating.rating} />
                 {productAverageRating.rating}
                 <p>{' از'}</p>
                 {productAverageRating.count}
                 <p>{' نفر'}</p>
-              </>
+              </div>
             )}
+
+            <ViewNumbers views={views} />
+            <BookmarkBtn isInWishList={isInWishList} productId={id} />
           </div>
           <p className="text-sm font-semibold">{brand}</p>
           <p className="text-base font-bold">

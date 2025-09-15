@@ -69,3 +69,10 @@ export async function getUserShippingAddressById(
   const shippingAddress = user.shippingAddresses?.[0] ?? null
   return shippingAddress
 }
+
+export async function getIsWhishedByUser(productId: string, userId?: string) {
+  if (!userId || !productId) return
+  return await prisma.wishlist.findFirst({
+    where: { userId: userId, productId },
+  })
+}

@@ -304,6 +304,83 @@ export async function updateProfile(user: { name: string; phone?: string }) {
   }
 }
 
+interface ActionState {
+  errors: {
+    _form?: string[]
+    [key: string]: string[] | undefined
+  }
+  message?: string
+  success?: boolean
+}
+
+export async function toggleWishlistItem(
+  path: string,
+  productId: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  formState: ActionState,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  formData: FormData
+): Promise<ActionState> {
+  try {
+    const user = await currentUser()
+
+    if (!user || !user.id) {
+      redirect('/sign-in')
+    }
+
+    const userId = user.id
+
+    // Check if the item already exists in the wishlist
+    const existingWishlistItem = await prisma.wishlist.findFirst({
+      where: {
+        userId,
+        productId,
+      },
+    })
+
+    if (existingWishlistItem) {
+      // If it exists, remove it from the wishlist
+      await prisma.wishlist.delete({
+        where: {
+          id: existingWishlistItem.id,
+        },
+      })
+
+      revalidatePath(path)
+      return {
+        errors: {},
+        message: 'محصول از لیست علاقه‌مندی‌ها حذف شد.',
+        success: true,
+      }
+    } else {
+      await prisma.wishlist.create({
+        data: {
+          userId,
+          productId,
+        },
+      })
+
+      revalidatePath(path)
+      return {
+        errors: {},
+        message: 'محصول به لیست علاقه‌مندی‌ها اضافه شد.',
+        success: true,
+      }
+    }
+  } catch (err: unknown) {
+    console.error('Error in toggleWishlistItem:', err)
+    const message =
+      err instanceof Error ? err.message : 'مشکلی در سرور پیش آمده.'
+
+    return {
+      errors: {
+        _form: [message],
+      },
+      success: false,
+    }
+  }
+}
+
 // interface SignOutFormState {
 //   errors: {
 //     _form?: string[]

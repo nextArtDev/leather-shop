@@ -639,8 +639,8 @@ model Wishlist {
   userId String
   user   User   @relation("WishlistToUser", fields: [userId], references: [id], onDelete: Cascade)
 
-  variantId String
-  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  variantId String?
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: Cascade)
 
   productId String
   product   Product @relation("WishlistToProduct", fields: [productId], references: [id], onDelete: Cascade)
