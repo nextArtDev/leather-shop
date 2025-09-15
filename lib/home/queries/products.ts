@@ -868,7 +868,6 @@ export async function userBookmarkedProducts({
   limit?: number
 }) {
   const skip = (page - 1) * limit
-
   const user = await currentUser()
   if (!user) redirect('/sign-in')
 
@@ -911,9 +910,9 @@ export async function userBookmarkedProducts({
         },
       }),
     ])
-    let products = allWhishedProducts.map((w) => w.product)
 
-    products = products.slice(skip, skip + limit)
+    // Remove the double slicing - it's already handled by Prisma's skip/take
+    const products = allWhishedProducts.map((w) => w.product)
 
     return {
       products,

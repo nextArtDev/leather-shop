@@ -13,6 +13,10 @@ const links = [
     title: 'سفارشها',
     href: '/user/orders',
   },
+  {
+    title: 'علاقه‌مندی‌ها',
+    href: '/user/bookmarks',
+  },
 ]
 
 const MainNav = ({
