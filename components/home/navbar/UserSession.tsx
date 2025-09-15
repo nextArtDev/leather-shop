@@ -52,6 +52,19 @@ export default function UserSession(session: {
                   پروفایل
                 </DropdownMenuItem>
               </TransitionLink>
+              <TransitionLink href={'/user/orders'} aria-label="user orders">
+                <DropdownMenuItem className="cursor-pointer">
+                  سفارشها
+                </DropdownMenuItem>
+              </TransitionLink>
+              <TransitionLink
+                href={'/user/bookmarks'}
+                aria-label="user bookmarks"
+              >
+                <DropdownMenuItem className="cursor-pointer">
+                  علاقه‌مندی‌ها
+                </DropdownMenuItem>
+              </TransitionLink>
             </DropdownMenuGroup>
 
             <DropdownMenuSeparator />

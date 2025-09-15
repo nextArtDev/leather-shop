@@ -175,18 +175,22 @@ const ProductDetailsPage = async ({
     product.subCategoryId
   )
 
-  const defaultVariant = product.variants[0]
-  let selectedVariant = product.variants.find(
+  const urlMatchVariant = product.variants.find(
     (v) => v.size?.id === searchParamsSize && v.color?.id === searchParamsColor
   )
-  if (!selectedVariant && searchParamsSize) {
-    selectedVariant = product.variants.find(
-      (v) => v.size?.id === searchParamsSize
-    )
-  }
-  if (!selectedVariant) {
-    selectedVariant = defaultVariant
-  }
+  const firstInStockVariant = product.variants.find((v) => v.quantity > 0)
+  const absoluteDefaultVariant = product.variants[0]
+  const selectedVariant =
+    urlMatchVariant || firstInStockVariant || absoluteDefaultVariant
+
+  // if (!selectedVariant && searchParamsSize) {
+  //   selectedVariant = product.variants.find(
+  //     (v) => v.size?.id === searchParamsSize
+  //   )
+  // }
+  // if (!selectedVariant) {
+  //   selectedVariant = defaultVariant
+  // }
 
   const user = await currentUser()
   const isInWishList = await getIsWhishedByUser(product.id, user?.id)

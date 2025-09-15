@@ -20,6 +20,7 @@ import ProductProperties from './ProductProperties'
 import ViewNumbers from './view-numbers'
 import BookmarkBtn from './BookmarkBtn'
 import ProductBreadcrumb from './ProductBreadcrumb'
+import { Check } from 'lucide-react'
 
 type ProductPageProp = {
   data: NonNullable<ProductDetails>
@@ -145,9 +146,12 @@ const ProductPage: FC<ProductPageProp> = ({
           <Separator />
           <article className="flex items-center justify-evenly">
             {/* === COLOR SELECTION === */}
-            <div className=" flex-1 flex flex-col gap-2 items-start">
-              <p className="text-base font-semibold">
-                سایز: {currentVariant?.size.name}
+            <div className=" flex-1 flex flex-col  gap-4 items-start">
+              <p className="text-base font-semibold flex items-center gap-x-1 ">
+                سایز انتخابی:
+                <Badge className="text-indigo-500 bg-indigo-500/35 inline text-base font-semibold py-0.5 px-1">
+                  {currentVariant?.size.name}
+                </Badge>
               </p>
               <ul className="flex flex-wrap gap-1">
                 {uniqueSizes.map((size) => {
@@ -181,9 +185,12 @@ const ProductPage: FC<ProductPageProp> = ({
               </ul>
             </div>
             <Separator orientation="vertical" />
-            <div className="pr-2 flex-1 flex flex-col gap-2 items-start">
-              <p className="text-base font-semibold">
-                رنگ:{currentVariant?.color.name}
+            <div className="pr-2 flex-1 flex flex-col gap-4 items-start">
+              <p className="text-base font-semibold flex  items-center gap-x-1">
+                رنگ انتخابی:{' '}
+                <Badge className="text-indigo-500 bg-indigo-500/35 inline text-base font-semibold py-0.5 px-1">
+                  {currentVariant?.color.name}
+                </Badge>
               </p>
               <div className="flex gap-1">
                 {uniqueColors.map((color) => {
@@ -201,18 +208,21 @@ const ProductPage: FC<ProductPageProp> = ({
                       replace
                       scroll={false}
                       className={cn(
-                        'rounded-none p-1 m-2 transition-all',
+                        'relative rounded-none  m-2 transition-all',
                         selectedColorId === color.id
-                          ? 'ring-2 ring-offset-2 ring-indigo-500'
-                          : 'ring-1 ring-gray-300 ',
+                          ? 'ring-4   ring-indigo-500'
+                          : '',
                         !isAvailable &&
-                          'opacity-50 cursor-not-allowed pointer-events-none'
+                          'opacity-50 cursor-not-allowed pointer-events-none grayscale-75'
                       )}
                     >
                       <div
                         className="size-8 rounded-none"
                         style={{ backgroundColor: color.hex }}
                       />
+                      {selectedColorId === color.id && (
+                        <Check className="absolute inset-0 -left-1/2 top-1/2 -translate-x-1/5 -translate-y-1/2 bg-transparent text-indigo-500" />
+                      )}
                     </Link>
                   )
                 })}
@@ -246,7 +256,7 @@ const ProductPage: FC<ProductPageProp> = ({
             </span>
           )}
         </span>
-        <article className="sticky top-2">
+        <article className="sticky top-2 bg-white z-20 rounded-md flex items-center justify-center w-full h-full">
           {currentVariant && currentVariant.size && currentVariant.color ? (
             <AddToCardBtn
               variant={{

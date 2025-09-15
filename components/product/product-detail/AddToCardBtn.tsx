@@ -87,7 +87,7 @@ const AddToCardBtn: FC<AddToCardBtnProps> = ({ product, variant }) => {
   // console.log(cartItems)
   if (existItem) {
     return (
-      <div className="flex flex-col w-full h-full items-center justify-center">
+      <div className="flex flex-col gap-2 w-full h-full items-center justify-center">
         <article className="flex  w-full h-full items-center justify-center">
           <Button
             type="button"
@@ -117,11 +117,11 @@ const AddToCardBtn: FC<AddToCardBtnProps> = ({ product, variant }) => {
         </article>
         <article className="flex  w-full h-full items-center justify-center">
           {existItem.quantity >= variant.quantity ? (
-            <span className="px-2 py-3 block text-center text-rose-300 text-xs">
+            <span className="px-3 py-2 block text-center text-rose-300 text-xs">
               {'اتمام موجودی!'}
             </span>
           ) : (
-            <span className="px-2 py-3 block text-center text-indigo-400 text-xs">
+            <span className="px-3 py-2 block text-center text-indigo-600 bg-indigo-500/30 text-xs rounded-md">
               {variant.quantity - existItem.quantity} عدد در انبار
             </span>
           )}

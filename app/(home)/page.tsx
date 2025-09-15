@@ -115,14 +115,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 export default async function Home() {
   // await seed()
-  // const [products, bestSellers, categories, subCategories, reviews] =
-  //   await Promise.all([
-  //     getHomepageProducts(),
-  //     getBestSellers(),
-  //     getCategoriesWithStats(),
-  //     getSubCategories(),
-  //     getHomePageReviews(),
-  //   ])
+
   const [products, bestSellers, subCategories, reviews] = await Promise.all([
     getHomepageProducts(),
     getBestSellers(),
