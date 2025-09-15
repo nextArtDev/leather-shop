@@ -146,7 +146,7 @@ const ProductDetails: FC<ProductFormProps> = ({
         colorHex: v?.color?.hex,
         quantity: v.quantity,
         price: v.price,
-        discount: v.discount || undefined,
+        discount: v.discount || 0,
         weight: v.weight || 0,
         length: v.length || 0,
         width: v.width || 0,

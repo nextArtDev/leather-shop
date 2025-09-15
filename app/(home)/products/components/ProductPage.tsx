@@ -19,6 +19,7 @@ import Countdown from './count-down'
 import ProductProperties from './ProductProperties'
 import ViewNumbers from './view-numbers'
 import BookmarkBtn from './BookmarkBtn'
+import ProductBreadcrumb from './ProductBreadcrumb'
 
 type ProductPageProp = {
   data: NonNullable<ProductDetails>
@@ -53,11 +54,10 @@ const ProductPage: FC<ProductPageProp> = ({
     variants,
 
     brand,
-    // subCategory,
+    subCategory,
     id,
     name,
     slug,
-    // weight,
     shippingFeeMethod,
     questions,
     specs,
@@ -102,6 +102,17 @@ const ProductPage: FC<ProductPageProp> = ({
 
   return (
     <section className="pb-24 w-full h-full">
+      <ProductBreadcrumb
+        links={[
+          { id: '1', label: 'خارک', href: '/' },
+          {
+            id: '2',
+            label: subCategory.name,
+            href: `/sub-categories/${subCategory.url}`,
+          },
+          { id: '3', label: name, href: slug },
+        ]}
+      />
       <div className="max-w-2xl px-4 mx-auto  flex flex-col gap-4">
         <article className=" ">
           <ProductDetailCarousel

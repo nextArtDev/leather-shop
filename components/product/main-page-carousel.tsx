@@ -95,7 +95,7 @@ export default function MainPageCarousel({ items }: MainPageCarousel) {
                       {item.variants.map((variant, i) => (
                         <div key={i} className="flex items-center gap-1">
                           {!!variant.discount && (
-                            <p className="text-red-500">
+                            <p className="">
                               {variant.price -
                                 variant.price * (variant.discount / 100)}{' '}
                               تومان
@@ -103,7 +103,7 @@ export default function MainPageCarousel({ items }: MainPageCarousel) {
                           )}
                           <p
                             className={cn(
-                              '',
+                              'text-red-500',
                               variant.discount && 'line-through'
                             )}
                           >

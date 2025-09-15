@@ -58,13 +58,11 @@ const BookmarkBtn: FC<BookmarkBtnProps> = ({ productId, isInWishList }) => {
             variant={'ghost'}
             disabled={pending || isPending}
             type="submit"
-
-            // className=" w-14 h-14"
           >
             <Bookmark
-              size={20}
+              size={32}
               className={cn(
-                'cursor-pointer ',
+                'cursor-pointer w-10 h-10 scale-150',
                 optimisticIsInWishList ? 'fill-indigo-600' : 'fill-none'
               )}
             />

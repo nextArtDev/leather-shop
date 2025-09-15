@@ -131,7 +131,7 @@ const AddToCardBtn: FC<AddToCardBtnProps> = ({ product, variant }) => {
   }
 
   const finalPrice =
-    variant.discount > 0
+    variant.discount > 0 && variant.discount
       ? variant.price - variant.price * (variant.discount / 100)
       : variant.price
 
@@ -145,15 +145,17 @@ const AddToCardBtn: FC<AddToCardBtnProps> = ({ product, variant }) => {
       )}
     >
       <p>خرید</p>
-      {variant.discount && (
-        <div className="flex items-center gap-1">
-          {variant.discount > 0 && (
-            <p className="text-red-300">{finalPrice} تومان</p>
-          )}
-          <p className={cn('', variant.discount && 'line-through')}>
+      {!!variant.discount ? (
+        <div className="flex items-center gap-1 text-lg">
+          {variant.discount > 0 && <p className="">{finalPrice} تومان</p>}
+          <p className={cn('text-red-300', variant.discount && 'line-through')}>
             {variant.price} تومان
           </p>
         </div>
+      ) : (
+        <p className={cn(' text-lg', variant.discount && 'line-through')}>
+          {variant.price} تومان
+        </p>
       )}
     </Button>
   )

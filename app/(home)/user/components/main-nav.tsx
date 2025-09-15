@@ -26,7 +26,7 @@ const MainNav = ({
   const pathname = usePathname()
   return (
     <nav
-      className={cn('flex items-center space-x-4 lg:space-x-6', className)}
+      className={cn('flex items-center space-x-8 lg:space-x-6', className)}
       {...props}
     >
       {links.map((item) => (
@@ -34,9 +34,9 @@ const MainNav = ({
           key={item.href}
           href={item.href}
           className={cn(
-            'text-base font-medium transition-colors hover:text-primary',
+            'text-base font-medium transition-colors hover:text-primary py-6',
             pathname.includes(item.href)
-              ? ' px-2 py-1 border'
+              ? ' px-2 py-1 underline underline-offset-6'
               : 'text-muted-foreground'
           )}
         >
