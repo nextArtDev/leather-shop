@@ -151,7 +151,7 @@ const ProductDetails: FC<ProductFormProps> = ({
         length: v.length || 0,
         width: v.width || 0,
         height: v.height || 0,
-        sku: v.sku || '',
+        // sku: v.sku || '',
       })) ?? [
         {
           size: '',
@@ -164,7 +164,7 @@ const ProductDetails: FC<ProductFormProps> = ({
           length: 0,
           width: 0,
           height: 0,
-          sku: '',
+          // sku: '',
         },
       ],
 
@@ -266,7 +266,8 @@ const ProductDetails: FC<ProductFormProps> = ({
     )
 
     if (isDuplicate) {
-      toast.info(`A variant with the color ${color.name} already exists.`)
+      // toast.info(`A variant with the color ${color.name} already exists.`)
+      toast.info(`موجود است! ${color.name} یک واریانت با رنگ`)
       return
     }
 
@@ -281,7 +282,7 @@ const ProductDetails: FC<ProductFormProps> = ({
       length: 0,
       width: 0,
       height: 0,
-      sku: '',
+      // sku: '',
     })
     toast.success(
       `ایجاد شد، لطفا جزئیات آنرا پر کنید. ${color.name} وریانت رنگ`
@@ -428,7 +429,7 @@ const ProductDetails: FC<ProductFormProps> = ({
                       length: 0,
                       width: 0,
                       height: 0,
-                      sku: '',
+                      // sku: '',
                     })
                   }
                   onRemove={removeVariant}
@@ -443,7 +444,7 @@ const ProductDetails: FC<ProductFormProps> = ({
                     length: 0,
                     width: 0,
                     height: 0,
-                    sku: '',
+                    // sku: '',
                   }}
                   labels={{
                     size: 'سایز',
@@ -452,11 +453,11 @@ const ProductDetails: FC<ProductFormProps> = ({
                     quantity: 'تعداد',
                     price: 'قیمت',
                     discount: 'تخفیف',
-                    weight: 'وزن (kg)',
+                    weight: 'وزن (g)',
                     length: 'طول (cm)',
                     width: 'عرض (cm)',
                     height: 'ارتفاع (cm)',
-                    sku: 'SKU',
+                    // sku: 'SKU',
                   }}
                   isMandatory
                 />

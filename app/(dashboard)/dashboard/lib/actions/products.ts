@@ -160,7 +160,7 @@ export async function createProduct(
             length: variantData.length,
             width: variantData.width,
             height: variantData.height,
-            sku: variantData.sku,
+            // sku: variantData.sku,
             // Connect variant images (these are shared across all variants for now)
             images: { connect: variantImageIds.map((id) => ({ id })) },
           },
@@ -458,7 +458,7 @@ export async function editProduct(
                 length: variantData.length,
                 width: variantData.width,
                 height: variantData.height,
-                sku: variantData.sku,
+                // sku: variantData.sku,
               },
             })
           } else {
@@ -475,7 +475,7 @@ export async function editProduct(
                 length: variantData.length,
                 width: variantData.width,
                 height: variantData.height,
-                sku: variantData.sku,
+                // sku: variantData.sku,
               },
             })
           }

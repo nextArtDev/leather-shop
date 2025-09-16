@@ -35,9 +35,7 @@ const ProductProperties = ({ variant, specs, weight }: Props) => {
         {weight && (
           <TableRow key="وزن">
             <TableCell className="font-medium"> وزن</TableCell>
-            <TableCell className="text-right">
-              {`${weight * 1000} گرم`}
-            </TableCell>
+            <TableCell className="text-right">{`${weight} گرم`}</TableCell>
           </TableRow>
         )}
 

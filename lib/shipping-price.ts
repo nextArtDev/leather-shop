@@ -116,14 +116,14 @@ export function calculateShippingCost(input: ShippingInput): {
     dimensions,
     packaging = 100000,
   } = input
-  //   console.log({
-  //     origin,
-  //     destination,
-  //     weightGrams,
-  //     valueRial,
-  //     dimensions,
-  //     packaging,
-  //   })
+  // console.log({
+  //   origin,
+  //   destination,
+  //   weightGrams,
+  //   valueRial,
+  //   dimensions,
+  //   packaging,
+  // })
   // تعیین نوع مسیر
   let region: 'intra' | 'neighbor' | 'nonNeighbor'
   if (origin.province === destination.province) {
@@ -174,6 +174,13 @@ export function calculateShippingCost(input: ShippingInput): {
 
   const toTomanRounded = (rial: number) => Math.round(rial / 10000) * 1000
 
+  // console.log({
+  //   base,
+  //   insurance,
+  //   packaging,
+  //   oversize,
+  //   totalRial,
+  // })
   return {
     base: toTomanRounded(base),
     insurance: toTomanRounded(insurance),

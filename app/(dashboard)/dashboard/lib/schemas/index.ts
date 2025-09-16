@@ -20,10 +20,11 @@ const fileSchema = z
   .instanceof(File) // Replaces zfd.file()
   .refine((file) => file.size > 0, 'File is required.') // Optional: check for empty file
   .refine((file) => file.size <= MAX_FILE_SIZE, {
-    message: `File can't be bigger than 5MB.`,
+    message: `فایل نمی‌تواند از 5 مگابات بزرگتر باشد.`,
   })
   .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), {
-    message: 'File format must be either jpg, jpeg, png or webp.',
+    // message: 'File format must be either jpg, jpeg, png or webp.',
+    message: 'فرمت فایل شما باید یکی از فرمتهای jpg, jpeg, png و یا webp باشد',
   })
 
 // Create the combined schema that accepts both new Files and existing image objects
@@ -35,77 +36,16 @@ const imageSchema = z
   ])
   .optional()
 
-// export const CategoryFormSchema = z.object({
-//   name: z
-//     .string()
-//     .min(2, { message: 'Category name must be at least 2 characters long.' })
-//     .max(50, { message: 'Category name cannot exceed 50 characters.' })
-//     .regex(/^[a-zA-Z0-9\s'&-‌\u0600-\u06FF]+$/, {
-//       message:
-//         'Only letters, numbers, and spaces are allowed in the category name.',
-//     }),
-//   name_fa: z
-//     .string()
-//     .min(2, { message: 'Category name must be at least 2 characters long.' })
-//     .max(50, { message: 'Category name cannot exceed 50 characters.' })
-//     .regex(/^[a-zA-Z0-9\s'&-‌\u0600-\u06FF]+$/, {
-//       message:
-//         'Only letters, numbers, and spaces are allowed in the category name.',
-//     })
-//     .optional(),
-//   images: imageSchema,
-//   url: z
-//     .string()
-//     .min(2, { message: 'Category url must be at least 2 characters long.' })
-//     .max(50, { message: 'Category url cannot exceed 50 characters.' })
-//     .regex(/^(?!.*(?:[-_ ]){2,})[a-zA-Z0-9\s'&-‌\u0600-\u06FF]+$/, {
-//       message:
-//         'Only letters, numbers, hyphen, and underscore are allowed in the category url, and consecutive occurrences of hyphens, underscores, or spaces are not permitted.',
-//     }),
-//   featured: z.union([z.boolean().default(false), z.string()]),
-// })
-
-// export const CategoryServerFormSchema = z.object({
-//   name: z
-//     .string()
-//     .min(2, { message: 'Category name must be at least 2 characters long.' })
-//     .max(50, { message: 'Category name cannot exceed 50 characters.' })
-//     .regex(/^[a-zA-Z0-9\s'&-‌\u0600-\u06FF]+$/, {
-//       message:
-//         'Only letters, numbers, and spaces are allowed in the category name.',
-//     }),
-//   name_fa: z
-//     .string()
-//     .min(2, { message: 'Category name must be at least 2 characters long.' })
-//     .max(50, { message: 'Category name cannot exceed 50 characters.' })
-//     .regex(/^[a-zA-Z0-9\s'&-‌\u0600-\u06FF]+$/, {
-//       message:
-//         'Only letters, numbers, and spaces are allowed in the category name.',
-//     })
-//     .optional(),
-
-//   images: imageSchema,
-
-//   url: z
-//     .string()
-//     .min(2, { message: 'Category url must be at least 2 characters long.' })
-//     .max(50, { message: 'Category url cannot exceed 50 characters.' })
-//     .regex(/^(?!.*(?:[-_ ]){2,})[a-zA-Z0-9\s'&-‌\u0600-\u06FF]+$/, {
-//       message:
-//         'Only letters, numbers, hyphen, and underscore are allowed in the category url, and consecutive occurrences of hyphens, underscores, or spaces are not permitted.',
-//     }),
-//   featured: z.string().optional(),
-// })
 export const SubCategoryFormSchema = z.object({
   name: z.string().min(2, {
-    message: 'Sub Category name must be at least 2 characters long.',
+    message: 'نام باید حداقل دو کاراکتر باشد.',
   }),
   images: imageSchema,
 
   url: z
     .string()
-    .min(2, { message: 'Sub Category url must be at least 2 characters long.' })
-    .max(50, { message: 'Sub Category url cannot exceed 50 characters.' })
+    .min(2, { message: 'url زیردسته باید حداقل 2 کاراکتر باشد.' })
+    .max(50, { message: 'url زیردسته باید حداکثر 50 کاراکتر باشد.' })
     .regex(/^(?!.*(?:[-_ ]){2,})[a-zA-Z0-9\s'&-‌\u0600-\u06FF]+$/, {
       message:
         'Only letters, numbers, hyphen, and underscore are allowed in the sub category url, and consecutive occurrences of hyphens, underscores, or spaces are not permitted.',
@@ -182,7 +122,7 @@ export const ProductFormSchema = z.object({
         length: z.number().min(0),
         width: z.number().min(0),
         height: z.number().min(0),
-        sku: z.string().optional(),
+        // sku: z.string().optional(),
       })
     )
     .min(1, 'حداقل یک نوع محصول (وریانت) باید اضافه کنید.'),
@@ -237,119 +177,6 @@ export const CategoryFormSchema = z.object({
         'تنها استفاده از حروف، اعداد، آندرلاین و خط تیره مجاز است.',
     }),
   featured: z.union([z.boolean().default(false)]).optional(),
-})
-
-export const CategoryServerFormSchema = z.object({
-  name: z
-    .string()
-    .min(2, { message: 'Category name must be at least 2 characters long.' })
-    .max(50, { message: 'Category name cannot exceed 50 characters.' })
-    .regex(/^[a-zA-Z0-9\s'&-‌\u0600-\u06FF]+$/, {
-      message:
-        'Only letters, numbers, and spaces are allowed in the category name.',
-    }),
-  name_fa: z
-    .string()
-    .min(2, { message: 'Category name must be at least 2 characters long.' })
-    .max(50, { message: 'Category name cannot exceed 50 characters.' })
-    .regex(/^[a-zA-Z0-9\s'&-‌\u0600-\u06FF]+$/, {
-      message:
-        'Only letters, numbers, and spaces are allowed in the category name.',
-    })
-    .optional(),
-
-  images: imageSchema,
-
-  url: z
-    .string()
-    .min(2, { message: 'Category url must be at least 2 characters long.' })
-    .max(50, { message: 'Category url cannot exceed 50 characters.' })
-    .regex(/^(?!.*(?:[-_ ]){2,})[a-zA-Z0-9\s'&-‌\u0600-\u06FF]+$/, {
-      message:
-        'Only letters, numbers, hyphen, and underscore are allowed in the category url, and consecutive occurrences of hyphens, underscores, or spaces are not permitted.',
-    }),
-  featured: z.string().optional(),
-})
-
-export const VariantFormSchema = z.object({
-  name: z
-    .string()
-    .min(2, {
-      message: 'Variant variant name should be at least 2 characters long.',
-    })
-    .max(100, {
-      message: 'Variant variant name cannot exceed 100 characters.',
-    }),
-
-  description: z.string().optional(),
-
-  sku: z
-    .string()
-    .min(6, {
-      message: 'Variant SKU should be at least 6 characters long.',
-    })
-    .max(50, {
-      message: 'Variant SKU cannot exceed 50 characters.',
-    })
-    .optional(),
-  weight: z.number().min(1, {
-    message: 'Please provide a valid variant weight.',
-  }),
-  // .optional(),
-
-  colors: z
-    .object({ color: z.string() })
-    .array()
-    .min(1, 'Please provide at least one color.')
-    .refine((colors) => colors.every((c) => c.color.length > 0), {
-      message: 'All color inputs must be filled.',
-    })
-    .optional(),
-  sizes: z
-    .object({
-      size: z.string(),
-      quantity: z
-        .number()
-        .min(1, { message: 'Quantity must be greater than 0.' }),
-      price: z.number().min(0.01, { message: 'Price must be greater than 0.' }),
-      discount: z.number().min(0).default(0).optional(),
-    })
-    .array()
-    .min(1, 'Please provide at least one size.')
-    .refine(
-      (sizes) =>
-        sizes.every((s) => s.size.length > 0 && s.price > 0 && s.quantity > 0),
-      {
-        message: 'All size inputs must be filled correctly.',
-      }
-    ),
-  specs: z
-    .object({
-      name: z.string(),
-      value: z.string(),
-      // name_fa: z.string(),
-    })
-    .array()
-    // .min(1, 'Please provide at least one variant spec.')
-    .refine(
-      (specs) => specs.every((s) => s.name.length > 0 && s.value.length > 0),
-      {
-        message: 'All variant specs inputs must be filled correctly.',
-      }
-    )
-    .optional(),
-
-  isSale: z.boolean().default(false).optional(),
-  // saleEndDate: z.string().optional(),
-  keywords: z
-    .array(z.string())
-    .nonempty('Please at least one item')
-    .max(10, {
-      message: 'You can provide up to 10 keywords.',
-    })
-    .optional(),
-
-  saleEndDate: z.union([z.date(), z.string()]).optional(),
 })
 
 export const CouponFormSchema = z.object({

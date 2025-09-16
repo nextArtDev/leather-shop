@@ -318,7 +318,8 @@ export async function updateCartWithShipping(
         city: shippingAddress.city.name,
       },
       weightGrams: cart.cartItems.reduce(
-        (acc, item) => acc + ((item.weight ?? 1000) * item.quantity || 2000),
+        (acc, item) =>
+          acc + ((Number(item.weight) ?? 1000) * item.quantity || 2000),
         0
       ),
       valueRial:
